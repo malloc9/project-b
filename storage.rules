@@ -1,0 +1,43 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to validate image file types
+    function isValidImageType() {
+      return resource.contentType.matches('image/.*');
+    }
+    
+    // Helper function to validate file size (max 10MB)
+    function isValidSize() {
+      return resource.size < 10 * 1024 * 1024;
+    }
+    
+    // Users can only upload/access photos in their own directory
+    match /users/{userId}/plants/{plantId}/photos/{photoId} {
+      // Allow read access to authenticated users who own the resource
+      allow read: if isOwner(userId);
+      
+      // Allow write access (create/update) with validation
+      allow write: if isOwner(userId) 
+                   && isValidImageType() 
+                   && isValidSize();
+      
+      // Allow delete access to owners
+      allow delete: if isOwner(userId);
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
