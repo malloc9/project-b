@@ -3,6 +3,10 @@
 import type { AppError, ValidationError, FormErrors } from './index';
 import { ErrorCode } from './index';
 
+// Re-export types for convenience
+export type { AppError, ValidationError, FormErrors };
+export { ErrorCode };
+
 /**
  * Creates a standardized AppError object
  */

@@ -328,6 +328,3 @@ export interface FileUploadProgress {
 
 // Re-export error utilities
 export * from './errors';
-
-// Re-export utility types and functions
-export * from './utils';

@@ -12,8 +12,9 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { offlineStorage, OfflineOperation } from '../utils/offlineStorage';
-import { conflictResolver, ConflictData } from '../utils/conflictResolution';
+import { offlineStorage } from '../utils/offlineStorage';
+// import type { OfflineOperation } from '../utils/offlineStorage';
+// import { conflictResolver, ConflictData } from '../utils/conflictResolution';
 import { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../types';
 
 export interface SyncResult {
@@ -179,6 +180,23 @@ class SyncService {
     localData: any,
     remoteData: any
   ): Promise<void> {
+    // Temporarily disabled conflict resolution
+    console.log('Conflict detected but resolution is disabled:', { collectionName });
+    
+    // For now, just use the remote data
+    const resolution = {
+      resolved: remoteData,
+      strategy: 'remote' as const
+    };
+
+    // Cache the resolved data
+    offlineStorage.cacheData(
+      collectionName as keyof any, 
+      resolution.resolved.id, 
+      resolution.resolved
+    );
+
+    /*
     const conflict: ConflictData<any> = {
       local: localData,
       remote: remoteData,
@@ -208,13 +226,6 @@ class SyncService {
         resolution = conflictResolver.resolveByTimestamp(conflict);
     }
 
-    // Cache the resolved data
-    offlineStorage.cacheData(
-      collectionName as keyof any, 
-      resolution.resolved.id, 
-      resolution.resolved
-    );
-
     // If we used local data, add an update operation to sync queue
     if (resolution.strategy === 'local' || resolution.strategy === 'merge') {
       offlineStorage.addToSyncQueue({
@@ -225,6 +236,7 @@ class SyncService {
         userId: resolution.resolved.userId
       });
     }
+    */
   }
 
   // Push local changes to remote
@@ -256,7 +268,7 @@ class SyncService {
   }
 
   // Execute a single offline operation
-  private async executeOperation(operation: OfflineOperation): Promise<void> {
+  private async executeOperation(operation: any): Promise<void> {
     const docRef = doc(db, 'users', operation.userId, operation.collection, operation.documentId);
 
     switch (operation.type) {

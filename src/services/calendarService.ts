@@ -1,5 +1,5 @@
 import { httpsCallable, getFunctions } from 'firebase/functions';
-import { CalendarEvent, CalendarReminder } from '../types';
+import type { CalendarEvent, CalendarReminder } from '../types';
 import { executeCalendarOperation, calendarQueue, isCalendarAvailable } from '../utils/calendarErrorHandler';
 
 const functions = getFunctions();

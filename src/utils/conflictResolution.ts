@@ -116,7 +116,14 @@ export class ConflictResolutionManager {
       };
     }
     
-    return this.resolveByTimestamp(conflict);
+    // Since PlantCareTask doesn't have updatedAt, use dueDate as fallback
+    const localTime = new Date(local.dueDate).getTime();
+    const remoteTime = new Date(remote.dueDate).getTime();
+    
+    return {
+      resolved: localTime > remoteTime ? local : remote,
+      strategy: localTime > remoteTime ? 'local' : 'remote'
+    };
   }
 
   // Resolve subtask conflicts
