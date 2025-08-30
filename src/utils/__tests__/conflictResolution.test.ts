@@ -1,5 +1,5 @@
 import { conflictResolver, ConflictData } from '../conflictResolution';
-import { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../../types';
+import type { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../../types';
 
 describe('ConflictResolutionManager', () => {
   describe('Timestamp Resolution', () => {

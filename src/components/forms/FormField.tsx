@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { ValidationError } from '../../types/errors';
+import type { ValidationError } from '../../types/errors';
 
 interface FormFieldProps {
   label: string;

@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import { FormErrors, ValidationError, validationErrorsToFormErrors, hasFormErrors } from '../types/errors';
+import type { FormErrors, ValidationError } from '../types/errors';
+import { validationErrorsToFormErrors, hasFormErrors } from '../types/errors';
 
 interface ValidationRule<T> {
   field: keyof T;

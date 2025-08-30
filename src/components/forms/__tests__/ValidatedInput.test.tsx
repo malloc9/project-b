@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
 import { ValidatedInput } from '../ValidatedInput';
-import { ValidationError } from '../../../types/errors';
+import type { ValidationError } from '../../../types/errors';
 
 describe('ValidatedInput', () => {
   const mockOnChange = vi.fn();

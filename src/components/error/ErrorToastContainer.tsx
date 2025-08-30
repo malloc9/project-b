@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { AppError } from '../../types/errors';
+import type { AppError } from '../../types/errors';
 import { ErrorToast } from './ErrorToast';
 
 interface ToastItem {

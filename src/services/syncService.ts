@@ -15,7 +15,7 @@ import { db } from '../config/firebase';
 import { offlineStorage } from '../utils/offlineStorage';
 // import type { OfflineOperation } from '../utils/offlineStorage';
 // import { conflictResolver, ConflictData } from '../utils/conflictResolution';
-import { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../types';
+import type { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../types';
 
 export interface SyncResult {
   success: boolean;

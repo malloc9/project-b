@@ -1,11 +1,61 @@
 // Error handling utility functions
 
-import type { AppError, ValidationError, FormErrors } from './index';
-import { ErrorCode } from './index';
+// Define error types locally to avoid circular dependencies
+export const ErrorCode = {
+  // Authentication errors
+  AUTH_INVALID_CREDENTIALS: 'auth/invalid-credentials',
+  AUTH_USER_NOT_FOUND: 'auth/user-not-found',
+  AUTH_WRONG_PASSWORD: 'auth/wrong-password',
+  AUTH_EMAIL_ALREADY_IN_USE: 'auth/email-already-in-use',
+  AUTH_WEAK_PASSWORD: 'auth/weak-password',
+  AUTH_NETWORK_ERROR: 'auth/network-request-failed',
+  AUTH_TOO_MANY_REQUESTS: 'auth/too-many-requests',
 
-// Re-export types for convenience
-export type { AppError, ValidationError, FormErrors };
-export { ErrorCode };
+  // Database errors
+  DB_PERMISSION_DENIED: 'db/permission-denied',
+  DB_NOT_FOUND: 'db/not-found',
+  DB_NETWORK_ERROR: 'db/network-error',
+  DB_QUOTA_EXCEEDED: 'db/quota-exceeded',
+  DB_VALIDATION_ERROR: 'db/validation-error',
+
+  // Storage errors
+  STORAGE_UNAUTHORIZED: 'storage/unauthorized',
+  STORAGE_QUOTA_EXCEEDED: 'storage/quota-exceeded',
+  STORAGE_INVALID_FORMAT: 'storage/invalid-format',
+  STORAGE_FILE_TOO_LARGE: 'storage/file-too-large',
+  STORAGE_NETWORK_ERROR: 'storage/network-error',
+
+  // Calendar errors
+  CALENDAR_AUTH_ERROR: 'calendar/auth-error',
+  CALENDAR_QUOTA_EXCEEDED: 'calendar/quota-exceeded',
+  CALENDAR_NETWORK_ERROR: 'calendar/network-error',
+  CALENDAR_INVALID_EVENT: 'calendar/invalid-event',
+
+  // General errors
+  UNKNOWN_ERROR: 'unknown-error',
+  VALIDATION_ERROR: 'validation-error',
+  NETWORK_ERROR: 'network-error'
+} as const;
+
+export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
+
+export interface AppError {
+  code: ErrorCode;
+  message: string;
+  details?: Record<string, any>;
+  timestamp: Date;
+  userId?: string;
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  value?: any;
+}
+
+export interface FormErrors {
+  [fieldName: string]: string[];
+}
 
 /**
  * Creates a standardized AppError object
@@ -58,6 +108,40 @@ export function handleFirebaseError(error: any): AppError {
     error.message || 'An unexpected error occurred',
     { originalError: errorCode }
   );
+}
+
+/**
+ * Gets user-friendly error message for display
+ */
+export function getErrorMessage(error: AppError): string {
+  const userFriendlyMessages: Record<ErrorCode, string> = {
+    [ErrorCode.AUTH_INVALID_CREDENTIALS]: 'Invalid email or password. Please try again.',
+    [ErrorCode.AUTH_USER_NOT_FOUND]: 'No account found with this email address.',
+    [ErrorCode.AUTH_WRONG_PASSWORD]: 'Incorrect password. Please try again.',
+    [ErrorCode.AUTH_EMAIL_ALREADY_IN_USE]: 'An account with this email already exists.',
+    [ErrorCode.AUTH_WEAK_PASSWORD]: 'Password is too weak. Please choose a stronger password.',
+    [ErrorCode.AUTH_NETWORK_ERROR]: 'Network error. Please check your connection and try again.',
+    [ErrorCode.AUTH_TOO_MANY_REQUESTS]: 'Too many failed attempts. Please try again later.',
+    [ErrorCode.DB_PERMISSION_DENIED]: 'You do not have permission to perform this action.',
+    [ErrorCode.DB_NOT_FOUND]: 'The requested item was not found.',
+    [ErrorCode.DB_NETWORK_ERROR]: 'Network error. Please check your connection and try again.',
+    [ErrorCode.DB_QUOTA_EXCEEDED]: 'Storage quota exceeded. Please contact support.',
+    [ErrorCode.DB_VALIDATION_ERROR]: 'Invalid data provided. Please check your input.',
+    [ErrorCode.STORAGE_UNAUTHORIZED]: 'You do not have permission to upload files.',
+    [ErrorCode.STORAGE_QUOTA_EXCEEDED]: 'Storage quota exceeded. Please contact support.',
+    [ErrorCode.STORAGE_INVALID_FORMAT]: 'Invalid file format. Please use JPEG, PNG, or WebP.',
+    [ErrorCode.STORAGE_FILE_TOO_LARGE]: 'File is too large. Please choose a smaller file.',
+    [ErrorCode.STORAGE_NETWORK_ERROR]: 'Network error during upload. Please try again.',
+    [ErrorCode.CALENDAR_AUTH_ERROR]: 'Calendar authentication failed. Please reconnect your calendar.',
+    [ErrorCode.CALENDAR_QUOTA_EXCEEDED]: 'Calendar API quota exceeded. Please try again later.',
+    [ErrorCode.CALENDAR_NETWORK_ERROR]: 'Network error connecting to calendar. Please try again.',
+    [ErrorCode.CALENDAR_INVALID_EVENT]: 'Invalid calendar event data.',
+    [ErrorCode.UNKNOWN_ERROR]: 'An unexpected error occurred. Please try again.',
+    [ErrorCode.VALIDATION_ERROR]: 'Please check your input and try again.',
+    [ErrorCode.NETWORK_ERROR]: 'Network error. Please check your connection and try again.'
+  };
+
+  return userFriendlyMessages[error.code] || error.message || 'An unexpected error occurred.';
 }
 
 /**
@@ -190,38 +274,4 @@ export function clearFieldErrors(errors: FormErrors, fieldName: string): FormErr
   const newErrors = { ...errors };
   delete newErrors[fieldName];
   return newErrors;
-}
-
-/**
- * Gets user-friendly error message for display
- */
-export function getErrorMessage(error: AppError): string {
-  const userFriendlyMessages: Record<ErrorCode, string> = {
-    [ErrorCode.AUTH_INVALID_CREDENTIALS]: 'Invalid email or password. Please try again.',
-    [ErrorCode.AUTH_USER_NOT_FOUND]: 'No account found with this email address.',
-    [ErrorCode.AUTH_WRONG_PASSWORD]: 'Incorrect password. Please try again.',
-    [ErrorCode.AUTH_EMAIL_ALREADY_IN_USE]: 'An account with this email already exists.',
-    [ErrorCode.AUTH_WEAK_PASSWORD]: 'Password is too weak. Please choose a stronger password.',
-    [ErrorCode.AUTH_NETWORK_ERROR]: 'Network error. Please check your connection and try again.',
-    [ErrorCode.AUTH_TOO_MANY_REQUESTS]: 'Too many failed attempts. Please try again later.',
-    [ErrorCode.DB_PERMISSION_DENIED]: 'You don\'t have permission to perform this action.',
-    [ErrorCode.DB_NOT_FOUND]: 'The requested item was not found.',
-    [ErrorCode.DB_NETWORK_ERROR]: 'Network error. Please check your connection and try again.',
-    [ErrorCode.DB_QUOTA_EXCEEDED]: 'Storage quota exceeded. Please contact support.',
-    [ErrorCode.DB_VALIDATION_ERROR]: 'Invalid data provided. Please check your input.',
-    [ErrorCode.STORAGE_UNAUTHORIZED]: 'You don\'t have permission to upload files.',
-    [ErrorCode.STORAGE_QUOTA_EXCEEDED]: 'Storage quota exceeded. Please contact support.',
-    [ErrorCode.STORAGE_INVALID_FORMAT]: 'Invalid file format. Please use JPEG, PNG, or WebP.',
-    [ErrorCode.STORAGE_FILE_TOO_LARGE]: 'File is too large. Please choose a smaller file.',
-    [ErrorCode.STORAGE_NETWORK_ERROR]: 'Network error during upload. Please try again.',
-    [ErrorCode.CALENDAR_AUTH_ERROR]: 'Calendar authentication failed. Please reconnect your calendar.',
-    [ErrorCode.CALENDAR_QUOTA_EXCEEDED]: 'Calendar API quota exceeded. Please try again later.',
-    [ErrorCode.CALENDAR_NETWORK_ERROR]: 'Network error connecting to calendar. Please try again.',
-    [ErrorCode.CALENDAR_INVALID_EVENT]: 'Invalid calendar event data.',
-    [ErrorCode.UNKNOWN_ERROR]: 'An unexpected error occurred. Please try again.',
-    [ErrorCode.VALIDATION_ERROR]: 'Please check your input and try again.',
-    [ErrorCode.NETWORK_ERROR]: 'Network error. Please check your connection and try again.'
-  };
-
-  return userFriendlyMessages[error.code] || error.message || 'An unexpected error occurred.';
 }

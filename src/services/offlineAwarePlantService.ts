@@ -1,4 +1,4 @@
-import { Plant, PlantPhoto, PlantCareTask, PlantFilters } from '../types';
+import type { Plant, PlantPhoto, PlantCareTask, PlantFilters } from '../types';
 import { PlantService } from './plantService';
 import { offlineStorage } from '../utils/offlineStorage';
 import { serviceWorkerManager } from '../utils/serviceWorkerManager';

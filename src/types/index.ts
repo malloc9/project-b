@@ -191,61 +191,8 @@ export interface StorageService {
 // ERROR HANDLING TYPES
 // ============================================================================
 
-export const ErrorCode = {
-  // Authentication errors
-  AUTH_INVALID_CREDENTIALS: 'auth/invalid-credentials',
-  AUTH_USER_NOT_FOUND: 'auth/user-not-found',
-  AUTH_WRONG_PASSWORD: 'auth/wrong-password',
-  AUTH_EMAIL_ALREADY_IN_USE: 'auth/email-already-in-use',
-  AUTH_WEAK_PASSWORD: 'auth/weak-password',
-  AUTH_NETWORK_ERROR: 'auth/network-request-failed',
-  AUTH_TOO_MANY_REQUESTS: 'auth/too-many-requests',
-
-  // Database errors
-  DB_PERMISSION_DENIED: 'db/permission-denied',
-  DB_NOT_FOUND: 'db/not-found',
-  DB_NETWORK_ERROR: 'db/network-error',
-  DB_QUOTA_EXCEEDED: 'db/quota-exceeded',
-  DB_VALIDATION_ERROR: 'db/validation-error',
-
-  // Storage errors
-  STORAGE_UNAUTHORIZED: 'storage/unauthorized',
-  STORAGE_QUOTA_EXCEEDED: 'storage/quota-exceeded',
-  STORAGE_INVALID_FORMAT: 'storage/invalid-format',
-  STORAGE_FILE_TOO_LARGE: 'storage/file-too-large',
-  STORAGE_NETWORK_ERROR: 'storage/network-error',
-
-  // Calendar errors
-  CALENDAR_AUTH_ERROR: 'calendar/auth-error',
-  CALENDAR_QUOTA_EXCEEDED: 'calendar/quota-exceeded',
-  CALENDAR_NETWORK_ERROR: 'calendar/network-error',
-  CALENDAR_INVALID_EVENT: 'calendar/invalid-event',
-
-  // General errors
-  UNKNOWN_ERROR: 'unknown-error',
-  VALIDATION_ERROR: 'validation-error',
-  NETWORK_ERROR: 'network-error'
-} as const;
-
-export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
-
-export interface AppError {
-  code: ErrorCode;
-  message: string;
-  details?: Record<string, any>;
-  timestamp: Date;
-  userId?: string;
-}
-
-export interface ValidationError {
-  field: string;
-  message: string;
-  value?: any;
-}
-
-export interface FormErrors {
-  [fieldName: string]: string[];
-}
+// Error types are defined in './errors' to avoid circular dependencies
+// Import them directly: import { ErrorCode, AppError, ValidationError, FormErrors } from '../types/errors'
 
 // ============================================================================
 // UTILITY TYPES
@@ -254,7 +201,7 @@ export interface FormErrors {
 // API Response wrapper
 export interface ApiResponse<T> {
   data?: T;
-  error?: AppError;
+  error?: any; // Use any to avoid circular dependency - cast to AppError when needed
   success: boolean;
 }
 
@@ -306,7 +253,7 @@ export interface AuthContextType {
 // Form state types
 export interface FormState<T> {
   data: T;
-  errors: FormErrors;
+  errors: Record<string, string[]>; // Use generic type to avoid circular dependency
   isSubmitting: boolean;
   isDirty: boolean;
 }
@@ -315,7 +262,7 @@ export interface FormState<T> {
 export type AsyncState<T> = {
   data: T | null;
   loading: boolean;
-  error: AppError | null;
+  error: any | null; // Use any to avoid circular dependency - cast to AppError when needed
 };
 
 // File upload types
@@ -326,5 +273,4 @@ export interface FileUploadProgress {
   error?: string;
 }
 
-// Re-export error utilities
-export * from './errors';
+// Note: Error utilities are available in './errors' - import directly to avoid circular dependencies

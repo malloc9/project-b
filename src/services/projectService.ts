@@ -13,7 +13,9 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Project, Subtask, TaskStatus, AppError, ErrorCode } from '../types';
+import { Project, Subtask, TaskStatus } from '../types';
+import type { AppError, ErrorCode } from '../types/errors';
+import { createAppError } from '../types/errors';
 import { createProjectCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './calendarService';
 
 // ============================================================================
@@ -50,11 +52,10 @@ export const createProject = async (
     return docRef.id;
   } catch (error) {
     console.error('Error creating project:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to create project',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to create project'
+    );
   }
 };
 
@@ -77,11 +78,10 @@ export const getProject = async (projectId: string): Promise<Project | null> => 
     } as Project;
   } catch (error) {
     console.error('Error getting project:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to get project',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to get project'
+    );
   }
 };
 
@@ -110,11 +110,10 @@ export const getUserProjects = async (userId: string): Promise<Project[]> => {
     return projects;
   } catch (error) {
     console.error('Error getting user projects:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to get projects',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to get projects'
+    );
   }
 };
 
@@ -164,11 +163,10 @@ export const updateProject = async (
     await updateDoc(docRef, updateData);
   } catch (error) {
     console.error('Error updating project:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to update project',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to update project'
+    );
   }
 };
 
@@ -220,11 +218,10 @@ export const deleteProject = async (projectId: string): Promise<void> => {
     await batch.commit();
   } catch (error) {
     console.error('Error deleting project:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to delete project',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to delete project'
+    );
   }
 };
 
@@ -246,11 +243,10 @@ export const createSubtask = async (
     return docRef.id;
   } catch (error) {
     console.error('Error creating subtask:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to create subtask',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to create subtask'
+    );
   }
 };
 
@@ -273,11 +269,10 @@ export const getSubtask = async (subtaskId: string): Promise<Subtask | null> => 
     } as Subtask;
   } catch (error) {
     console.error('Error getting subtask:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to get subtask',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to get subtask'
+    );
   }
 };
 
@@ -306,11 +301,10 @@ export const getProjectSubtasks = async (projectId: string): Promise<Subtask[]> 
     return subtasks;
   } catch (error) {
     console.error('Error getting project subtasks:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to get subtasks',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to get subtasks'
+    );
   }
 };
 
@@ -333,11 +327,10 @@ export const updateSubtask = async (
     await updateDoc(docRef, updateData);
   } catch (error) {
     console.error('Error updating subtask:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to update subtask',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to update subtask'
+    );
   }
 };
 
@@ -347,11 +340,10 @@ export const deleteSubtask = async (subtaskId: string): Promise<void> => {
     await deleteDoc(docRef);
   } catch (error) {
     console.error('Error deleting subtask:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to delete subtask',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to delete subtask'
+    );
   }
 };
 
@@ -398,11 +390,10 @@ export const getProjectsWithSubtasks = async (userId: string): Promise<Project[]
     return projectsWithSubtasks;
   } catch (error) {
     console.error('Error getting projects with subtasks:', error);
-    throw new AppError({
-      code: ErrorCode.DB_NETWORK_ERROR,
-      message: 'Failed to get projects with subtasks',
-      timestamp: new Date()
-    });
+    throw createAppError(
+      ErrorCode.DB_NETWORK_ERROR,
+      'Failed to get projects with subtasks'
+    );
   }
 };
 

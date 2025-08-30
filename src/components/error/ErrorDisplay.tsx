@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AppError, getErrorMessage } from '../../types/errors';
+import type { AppError } from '../../types/errors';
+import { getErrorMessage } from '../../types/errors';
 
 interface ErrorDisplayProps {
   error: AppError;

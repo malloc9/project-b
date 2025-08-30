@@ -1,6 +1,6 @@
 import React, { useState, useCallback, forwardRef } from 'react';
 import { sanitizeInput } from '../../utils/inputSanitizer';
-import { ValidationError } from '../../types/errors';
+import type { ValidationError } from '../../types/errors';
 
 interface ValidatedInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   value: string;

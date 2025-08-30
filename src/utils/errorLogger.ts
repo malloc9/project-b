@@ -1,4 +1,4 @@
-import type { AppError } from '../types';
+import type { AppError } from '../types/errors';
 
 /**
  * Centralized error logging and reporting utility

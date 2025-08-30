@@ -1,4 +1,4 @@
-import { ErrorCode } from '../types';
+import { ErrorCode } from '../types/errors';
 
 export interface CalendarError {
   code: string;

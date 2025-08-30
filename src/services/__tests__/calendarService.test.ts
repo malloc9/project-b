@@ -9,7 +9,7 @@ import {
   manualSyncCalendar,
   getCalendarSyncStatus
 } from '../calendarService';
-import { CalendarEvent } from '../../types';
+import type { CalendarEvent } from '../../types';
 
 // Mock Firebase Functions
 vi.mock('firebase/functions', () => ({

@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import { ErrorLogger } from '../errorLogger';
-import { AppError, ErrorCode, createAppError } from '../../types/errors';
+import type { AppError, ErrorCode } from '../../types/errors';
+import { createAppError } from '../../types/errors';
 
 // Mock localStorage
 const localStorageMock = {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Project, Subtask, TaskStatus } from '../../types';
+import type { Project, Subtask, TaskStatus } from '../../types';
 
 // Mock Firebase
 vi.mock('../../config/firebase', () => ({

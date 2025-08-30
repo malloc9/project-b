@@ -5,7 +5,7 @@ import {
   executeCalendarOperation,
   CalendarOperationQueue,
 } from '../calendarErrorHandler';
-import { ErrorCode } from '../../types';
+import { ErrorCode } from '../../types/errors';
 
 describe('CalendarErrorHandler', () => {
   beforeEach(() => {

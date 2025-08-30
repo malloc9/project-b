@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { syncService, SyncStatus, SyncResult } from '../services/syncService';
+import { syncService } from '../services/syncService';
+import type { SyncStatus, SyncResult } from '../services/syncService';
 import { offlineStorage } from '../utils/offlineStorage';
 
 export interface OfflineHookResult {
