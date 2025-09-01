@@ -76,11 +76,15 @@ export class FirestoreService {
   ): Promise<string> {
     try {
       const collectionRef = collection(db, collectionPath);
-      const docRef = await addDoc(collectionRef, {
+      
+      // Filter out undefined values as Firestore doesn't allow them
+      const cleanData = this.filterUndefinedValues({
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+      
+      const docRef = await addDoc(collectionRef, cleanData);
       return docRef.id;
     } catch (error) {
       console.error('Error creating document:', error);
@@ -98,14 +102,43 @@ export class FirestoreService {
   ): Promise<void> {
     try {
       const docRef = doc(db, collectionPath, docId);
-      await updateDoc(docRef, {
+      
+      // Filter out undefined values as Firestore doesn't allow them
+      const cleanData = this.filterUndefinedValues({
         ...data,
         updatedAt: new Date(),
       });
+      
+      await updateDoc(docRef, cleanData);
     } catch (error) {
       console.error('Error updating document:', error);
       throw error;
     }
+  }
+
+  /**
+   * Filter out undefined values from an object (Firestore doesn't allow undefined)
+   */
+  private static filterUndefinedValues(obj: any): any {
+    if (obj === null || obj === undefined) {
+      return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.filterUndefinedValues(item));
+    }
+    
+    if (typeof obj === 'object' && obj.constructor === Object) {
+      const filtered: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined) {
+          filtered[key] = this.filterUndefinedValues(value);
+        }
+      }
+      return filtered;
+    }
+    
+    return obj;
   }
 
   /**

@@ -83,6 +83,26 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
     }
   };
 
+  const handleSignup = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      await AuthService.signup(formData.email, formData.password);
+      await login(formData.email, formData.password);
+      onSuccess?.();
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Signup failed';
+      setErrors({ general: errorMessage });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -160,6 +180,20 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             )}
           </button>
         </div>
+
+        {/* Development signup button */}
+        {import.meta.env.DEV && (
+          <div>
+            <button
+              type="button"
+              onClick={handleSignup}
+              disabled={isSubmitting}
+              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? 'Creating Account...' : 'Create Test Account'}
+            </button>
+          </div>
+        )}
 
         <div className="text-center">
           <button

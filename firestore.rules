@@ -2,8 +2,34 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    // Users can only access their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // User's plants subcollection
+      match /plants/{plantId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's projects subcollection
+      match /projects/{projectId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's subtasks subcollection
+      match /subtasks/{subtaskId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's simple tasks subcollection
+      match /tasks/{taskId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // User's plant care tasks subcollection
+      match /plantCareTasks/{taskId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
     }
   }
 }

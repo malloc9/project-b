@@ -1,5 +1,6 @@
 import {
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
   onAuthStateChanged,
@@ -22,6 +23,19 @@ export class AuthService {
       return this.mapFirebaseUser(userCredential.user);
     } catch (error) {
       FirebaseErrorHandler.logError(error, 'login');
+      throw new Error(FirebaseErrorHandler.getErrorMessage(error));
+    }
+  }
+
+  /**
+   * Create a new user account with email and password
+   */
+  static async signup(email: string, password: string): Promise<User> {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      return this.mapFirebaseUser(userCredential.user);
+    } catch (error) {
+      FirebaseErrorHandler.logError(error, 'signup');
       throw new Error(FirebaseErrorHandler.getErrorMessage(error));
     }
   }
