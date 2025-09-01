@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import type { AppError, ErrorCode } from '../../types/errors';
+import type { AppError } from '../../types/errors';
+import { ErrorCode } from '../../types/errors';
 import { createAppError } from '../../types/errors';
 import { ErrorLogger } from '../../utils/errorLogger';
 import { ErrorDisplay } from './ErrorDisplay';

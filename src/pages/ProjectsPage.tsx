@@ -1,6 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { ContentArea, GridLayout, StatsCard } from '../components/layout';
 
 export function ProjectsPage() {
+  const navigate = useNavigate();
   const projectStats = [
     {
       title: 'Active Projects',
@@ -32,7 +34,10 @@ export function ProjectsPage() {
         title="Household Projects"
         subtitle="Organize complex household tasks into manageable projects with subtasks and deadlines"
         actions={
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <button 
+            onClick={() => navigate('/projects/new')}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
             New Project
           </button>
         }

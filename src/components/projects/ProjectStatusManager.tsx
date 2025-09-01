@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Project, Subtask, TaskStatus } from '../../types';
+import type { Project, Subtask, TaskStatus } from '../../types';
 import { 
   updateProject, 
   updateSubtaskWithProjectSync, 

@@ -20,6 +20,10 @@ const CalendarPage = lazy(() => import('./pages/CalendarPage').then(module => ({
 const TaskForm = lazy(() => import('./components/tasks/TaskForm'));
 const TaskDetail = lazy(() => import('./components/tasks/TaskDetail'));
 
+// Lazy load project components
+const ProjectForm = lazy(() => import('./components/projects/ProjectForm'));
+const ProjectDetail = lazy(() => import('./components/projects/ProjectDetail'));
+
 // Loading component for Suspense fallback
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -76,6 +80,39 @@ function App() {
                 <ProtectedRoute>
                   <AppLayout>
                     <ProjectsPage />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/projects/new" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ProjectForm />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/projects/:projectId" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ProjectDetail />
+                  </AppLayout>
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/projects/:projectId/edit" 
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ProjectForm />
                   </AppLayout>
                 </ProtectedRoute>
               } 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Project, TaskStatus } from '../../types';
+import type { Project, TaskStatus } from '../../types';
 import { getUserProjects, filterProjectsByStatus, searchProjects } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatDate } from '../../utils/dateUtils';

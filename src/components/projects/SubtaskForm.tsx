@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TaskStatus } from '../../types';
+import type { TaskStatus } from '../../types';
 import { createSubtask } from '../../services/projectService';
 
 interface SubtaskFormProps {

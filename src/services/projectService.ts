@@ -13,8 +13,9 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Project, Subtask, TaskStatus } from '../types';
-import type { AppError, ErrorCode } from '../types/errors';
+import type { Project, Subtask, TaskStatus } from '../types';
+import type { AppError } from '../types/errors';
+import { ErrorCode } from '../types/errors';
 import { createAppError } from '../types/errors';
 import { createProjectCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './calendarService';
 
@@ -43,12 +44,31 @@ export const createProject = async (
       }
     }
     
-    const docRef = await addDoc(collection(db, 'projects'), {
-      ...projectData,
-      calendarEventId,
+    // Use user subcollection structure to match security rules
+    const userProjectsCollection = collection(db, `users/${projectData.userId}/projects`);
+    
+    // Filter out undefined values for Firestore
+    const firestoreData: any = {
+      userId: projectData.userId,
+      title: projectData.title,
+      description: projectData.description,
+      status: projectData.status,
+      subtasks: projectData.subtasks || [],
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now)
-    });
+    };
+    
+    // Only add dueDate if it's defined
+    if (projectData.dueDate) {
+      firestoreData.dueDate = Timestamp.fromDate(projectData.dueDate);
+    }
+    
+    // Only add calendarEventId if it's defined
+    if (calendarEventId) {
+      firestoreData.calendarEventId = calendarEventId;
+    }
+    
+    const docRef = await addDoc(userProjectsCollection, firestoreData);
     return docRef.id;
   } catch (error) {
     console.error('Error creating project:', error);
@@ -59,9 +79,9 @@ export const createProject = async (
   }
 };
 
-export const getProject = async (projectId: string): Promise<Project | null> => {
+export const getProject = async (projectId: string, userId: string): Promise<Project | null> => {
   try {
-    const docRef = doc(db, 'projects', projectId);
+    const docRef = doc(db, `users/${userId}/projects`, projectId);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {

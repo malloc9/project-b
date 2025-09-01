@@ -65,6 +65,12 @@ export async function completeCalendarAuth(code: string): Promise<CalendarOperat
  * Create a calendar event
  */
 export async function createCalendarEvent(event: CalendarEvent): Promise<string> {
+  // Skip calendar integration in development mode to avoid CORS issues
+  if (import.meta.env.DEV) {
+    console.log('Skipping calendar integration in development mode');
+    return 'dev-mock-event-id';
+  }
+
   // Check if calendar is available before attempting
   if (!(await isCalendarAvailable())) {
     throw new Error('Calendar is not available');
@@ -165,6 +171,12 @@ export async function createProjectCalendarEvent(
   description: string,
   dueDate: Date
 ): Promise<string> {
+  // Skip calendar integration in development mode to avoid CORS issues
+  if (import.meta.env.DEV) {
+    console.log('Skipping calendar integration in development mode');
+    return 'dev-mock-event-id';
+  }
+
   const event: CalendarEvent = {
     title: `Project: ${title}`,
     description: description || 'Household project deadline',

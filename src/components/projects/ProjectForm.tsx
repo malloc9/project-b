@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { TaskStatus } from '../../types';
+import type { TaskStatus } from '../../types';
 import { createProject, getProject, updateProject } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -38,7 +38,7 @@ const ProjectForm: React.FC = () => {
 
     try {
       setInitialLoading(true);
-      const project = await getProject(projectId);
+      const project = await getProject(projectId, user.uid);
       
       if (!project) {
         navigate('/projects');
@@ -91,7 +91,11 @@ const ProjectForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('ProjectForm submit - user:', user);
+    console.log('ProjectForm submit - user.uid:', user?.uid);
+
     if (!validateForm() || !user) {
+      console.log('Validation failed or no user');
       return;
     }
 
@@ -106,6 +110,8 @@ const ProjectForm: React.FC = () => {
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
         subtasks: []
       };
+
+      console.log('Creating project with data:', projectData);
 
       if (isEditing && projectId) {
         await updateProject(projectId, projectData);

@@ -43,7 +43,7 @@ export class FirebaseInitService {
       connectAuthEmulator(auth, 'http://localhost:9099');
 
       // Connect to Firestore emulator
-      connectFirestoreEmulator(db, 'localhost', 8080);
+      connectFirestoreEmulator(db, 'localhost', 8081);
 
       // Connect to Storage emulator
       connectStorageEmulator(storage, 'localhost', 9199);

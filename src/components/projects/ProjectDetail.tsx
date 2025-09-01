@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Project, Subtask, TaskStatus } from '../../types';
+import type { Project, Subtask, TaskStatus } from '../../types';
 import { 
   getProject, 
   getProjectSubtasks, 
@@ -40,7 +40,7 @@ const ProjectDetail: React.FC = () => {
       setError(null);
       
       const [projectData, subtasksData] = await Promise.all([
-        getProject(projectId),
+        getProject(projectId, user.uid),
         getProjectSubtasks(projectId)
       ]);
 
@@ -100,7 +100,7 @@ const ProjectDetail: React.FC = () => {
       await updateProjectStatusFromSubtasks(projectId);
       
       // Reload project to get updated status
-      const updatedProject = await getProject(projectId);
+      const updatedProject = await getProject(projectId, user.uid);
       if (updatedProject) {
         setProject(updatedProject);
       }

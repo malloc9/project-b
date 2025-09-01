@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Subtask, TaskStatus } from '../../types';
+import type { Subtask, TaskStatus } from '../../types';
 import { updateSubtask, deleteSubtask } from '../../services/projectService';
 import { formatDate } from '../../utils/dateUtils';
 
