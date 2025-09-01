@@ -57,7 +57,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Mobile overlay */}
+      {/* Mobile overlay - only show on mobile when sidebar is open */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity lg:hidden z-20"
@@ -67,8 +67,10 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        w-64 bg-white transform transition-transform duration-300 ease-in-out
+        lg:translate-x-0 lg:static lg:shadow-none lg:border-r lg:border-gray-200
+        ${isOpen ? 'fixed inset-y-0 left-0 z-30 shadow-xl translate-x-0' : 'fixed inset-y-0 left-0 z-30 shadow-xl -translate-x-full'}
+        lg:block
       `}>
         <div className="flex flex-col h-full">
           {/* Sidebar header */}

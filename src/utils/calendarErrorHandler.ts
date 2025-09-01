@@ -279,7 +279,10 @@ export class CalendarOperationQueue {
   private processing = false;
   private processingInterval: NodeJS.Timeout | null = null;
 
-  constructor(private processIntervalMs: number = 5000) {
+  private processIntervalMs: number;
+  
+  constructor(processIntervalMs: number = 5000) {
+    this.processIntervalMs = processIntervalMs;
     this.startProcessing();
   }
 

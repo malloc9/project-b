@@ -7,14 +7,14 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
+  const closeMobileSidebar = () => {
+    setIsMobileSidebarOpen(false);
   };
 
   return (
@@ -25,28 +25,20 @@ export function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       <div className="flex h-screen lg:h-auto">
-        {/* Sidebar - hidden on mobile, visible on desktop */}
+        {/* Desktop Sidebar - always visible on large screens */}
         <div className="hidden lg:block">
           <Sidebar isOpen={true} onClose={() => {}} />
         </div>
 
-        {/* Mobile sidebar overlay */}
-        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+        {/* Mobile Sidebar - overlay on small screens */}
+        <div className="lg:hidden">
+          <Sidebar isOpen={isMobileSidebarOpen} onClose={closeMobileSidebar} />
+        </div>
 
         {/* Main content area */}
         <div className="flex-1 flex flex-col lg:ml-0">
-          {/* Desktop header with sidebar toggle */}
+          {/* Desktop header */}
           <div className="hidden lg:flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200 shadow-sm">
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
-            >
-              <span className="sr-only">Toggle sidebar</span>
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
                 Welcome to your household management dashboard
@@ -65,7 +57,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       {/* Mobile menu button - floating action button */}
       <button
-        onClick={toggleSidebar}
+        onClick={toggleMobileSidebar}
         className="lg:hidden fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
       >
         <span className="sr-only">Open navigation menu</span>
