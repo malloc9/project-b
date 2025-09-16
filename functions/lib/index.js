@@ -1,16 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.completeCalendarAuth = exports.initCalendarAuth = void 0;
+exports.deletePlantCareTaskCalendar = exports.updatePlantCareTaskCalendar = exports.syncSimpleTask = exports.syncProject = exports.syncPlantCareTask = exports.deleteCalendarEvent = exports.updateCalendarEvent = exports.createCalendarEvent = exports.completeCalendarAuth = exports.initCalendarAuth = void 0;
 const https_1 = require("firebase-functions/v2/https");
+const firestore_1 = require("firebase-functions/v2/firestore");
 const app_1 = require("firebase-admin/app");
-const firestore_1 = require("firebase-admin/firestore");
+const firestore_2 = require("firebase-admin/firestore");
 const params_1 = require("firebase-functions/params");
 const GOOGLE_CLIENT_ID = (0, params_1.defineString)("GOOGLE_CLIENT_ID");
 const GOOGLE_CLIENT_SECRET = (0, params_1.defineString)("GOOGLE_CLIENT_SECRET");
 const GOOGLE_REDIRECT_URI = (0, params_1.defineString)("GOOGLE_REDIRECT_URI");
 // Initialize Firebase Admin
 (0, app_1.initializeApp)();
-const db = (0, firestore_1.getFirestore)();
+const db = (0, firestore_2.getFirestore)();
 // Google Calendar API setup
 const SCOPES = ["https://www.googleapis.com/auth/calendar"];
 /**
@@ -88,290 +89,258 @@ exports.completeCalendarAuth = (0, https_1.onCall)(async (request) => {
 /**
  * Create a calendar event
  */
-/*
-export const createCalendarEvent = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  const {event}: {event: CalendarEvent} = request.data;
-  if (!event) {
-    throw new HttpsError("invalid-argument", "Event data is required");
-  }
-
-  try {
-    const calendar = await getCalendarClient(request.auth.uid);
-    
-    const calendarEvent = {
-      summary: event.title,
-      description: event.description,
-      start: {
-        dateTime: new Date(event.startDate).toISOString(),
-        timeZone: "UTC",
-      },
-      end: {
-        dateTime: new Date(event.endDate).toISOString(),
-        timeZone: "UTC",
-      },
-      reminders: {
-        useDefault: false,
-        overrides: [
-          {method: "popup", minutes: 15},
-          {method: "email", minutes: 60},
-        ],
-      },
-    };
-
-    const response = await calendar.events.insert({
-      calendarId: "primary",
-      resource: calendarEvent,
-    });
-
-    return {eventId: response.data.id};
-  } catch (error) {
-    console.error("Error creating calendar event:", error);
-    throw new HttpsError("internal", "Failed to create calendar event");
-  }
+exports.createCalendarEvent = (0, https_1.onCall)(async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "User must be authenticated");
+    }
+    const { event } = request.data;
+    if (!event) {
+        throw new https_1.HttpsError("invalid-argument", "Event data is required");
+    }
+    try {
+        const calendar = await getCalendarClient(request.auth.uid);
+        const calendarEvent = {
+            summary: event.title,
+            description: event.description,
+            start: {
+                dateTime: new Date(event.startDate).toISOString(),
+                timeZone: "UTC",
+            },
+            end: {
+                dateTime: new Date(event.endDate).toISOString(),
+                timeZone: "UTC",
+            },
+            reminders: {
+                useDefault: false,
+                overrides: [
+                    { method: "popup", minutes: 15 },
+                    { method: "email", minutes: 60 },
+                ],
+            },
+        };
+        const response = await calendar.events.insert({
+            calendarId: "primary",
+            resource: calendarEvent,
+        });
+        return { eventId: response.data.id };
+    }
+    catch (error) {
+        console.error("Error creating calendar event:", error);
+        throw new https_1.HttpsError("internal", "Failed to create calendar event");
+    }
 });
-*/
 /**
  * Update a calendar event
  */
-/*
-export const updateCalendarEvent = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  const {eventId, event}: {eventId: string; event: Partial<CalendarEvent>} = request.data;
-  if (!eventId || !event) {
-    throw new HttpsError("invalid-argument", "Event ID and event data are required");
-  }
-
-  try {
-    const calendar = await getCalendarClient(request.auth.uid);
-    
-    const calendarEvent: any = {};
-    if (event.title) calendarEvent.summary = event.title;
-    if (event.description) calendarEvent.description = event.description;
-    if (event.startDate) {
-      calendarEvent.start = {
-        dateTime: new Date(event.startDate).toISOString(),
-        timeZone: "UTC",
-      };
+exports.updateCalendarEvent = (0, https_1.onCall)(async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "User must be authenticated");
     }
-    if (event.endDate) {
-      calendarEvent.end = {
-        dateTime: new Date(event.endDate).toISOString(),
-        timeZone: "UTC",
-      };
+    const { eventId, event } = request.data;
+    if (!eventId || !event) {
+        throw new https_1.HttpsError("invalid-argument", "Event ID and event data are required");
     }
-    if (event.reminders) {
-      calendarEvent.reminders = {
-        useDefault: false,
-        overrides: event.reminders,
-      };
+    try {
+        const calendar = await getCalendarClient(request.auth.uid);
+        const calendarEvent = {};
+        if (event.title)
+            calendarEvent.summary = event.title;
+        if (event.description)
+            calendarEvent.description = event.description;
+        if (event.startDate) {
+            calendarEvent.start = {
+                dateTime: new Date(event.startDate).toISOString(),
+                timeZone: "UTC",
+            };
+        }
+        if (event.endDate) {
+            calendarEvent.end = {
+                dateTime: new Date(event.endDate).toISOString(),
+                timeZone: "UTC",
+            };
+        }
+        if (event.reminders) {
+            calendarEvent.reminders = {
+                useDefault: false,
+                overrides: event.reminders,
+            };
+        }
+        await calendar.events.update({
+            calendarId: "primary",
+            eventId: eventId,
+            resource: calendarEvent,
+        });
+        return { success: true };
     }
-
-    await calendar.events.update({
-      calendarId: "primary",
-      eventId: eventId,
-      resource: calendarEvent,
-    });
-
-    return {success: true};
-  } catch (error) {
-    console.error("Error updating calendar event:", error);
-    throw new HttpsError("internal", "Failed to update calendar event");
-  }
+    catch (error) {
+        console.error("Error updating calendar event:", error);
+        throw new https_1.HttpsError("internal", "Failed to update calendar event");
+    }
 });
-*/
 /**
  * Delete a calendar event
  */
-/*
-export const deleteCalendarEvent = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  const {eventId}: {eventId: string} = request.data;
-  if (!eventId) {
-    throw new HttpsError("invalid-argument", "Event ID is required");
-  }
-
-  try {
-    const calendar = await getCalendarClient(request.auth.uid);
-    
-    await calendar.events.delete({
-      calendarId: "primary",
-      eventId: eventId,
-    });
-
-    return {success: true};
-  } catch (error) {
-    console.error("Error deleting calendar event:", error);
-    throw new HttpsError("internal", "Failed to delete calendar event");
-  }
+exports.deleteCalendarEvent = (0, https_1.onCall)(async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "User must be authenticated");
+    }
+    const { eventId } = request.data;
+    if (!eventId) {
+        throw new https_1.HttpsError("invalid-argument", "Event ID is required");
+    }
+    try {
+        const calendar = await getCalendarClient(request.auth.uid);
+        await calendar.events.delete({
+            calendarId: "primary",
+            eventId: eventId,
+        });
+        return { success: true };
+    }
+    catch (error) {
+        console.error("Error deleting calendar event:", error);
+        throw new https_1.HttpsError("internal", "Failed to delete calendar event");
+    }
 });
-*/
 // Firestore triggers for automatic calendar sync
 /**
  * Auto-sync plant care tasks to calendar
  */
-/*
-export const syncPlantCareTask = onDocumentCreated("users/{userId}/plantCareTasks/{taskId}", async (event) => {
+exports.syncPlantCareTask = (0, firestore_1.onDocumentCreated)("users/{userId}/plantCareTasks/{taskId}", async (event) => {
     const snap = event.data;
     if (!snap) {
         return;
     }
     const taskData = snap.data();
     const userId = event.params.userId;
-    
-    if (!taskData || !taskData.dueDate) return;
-
+    if (!taskData || !taskData.dueDate)
+        return;
     try {
-      const calendar = await getCalendarClient(userId);
-      
-      const calendarEvent = {
-        summary: `Plant Care: ${taskData.title}`,
-        description: taskData.description || `Care task for plant: ${taskData.plantName}`,
-        start: {
-          dateTime: taskData.dueDate.toDate().toISOString(),
-          timeZone: "UTC",
-        },
-        end: {
-          dateTime: new Date(taskData.dueDate.toDate().getTime() + 30 * 60000).toISOString(), // 30 minutes
-          timeZone: "UTC",
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            {method: "popup", minutes: 15},
-            {method: "email", minutes: 60},
-          ],
-        },
-      };
-
-      const response = await calendar.events.insert({
-        calendarId: "primary",
-        resource: calendarEvent,
-      });
-
-      // Update the task with calendar event ID
-      await snap.ref.update({
-        calendarEventId: response.data.id,
-      });
-    } catch (error) {
-      console.error("Error syncing plant care task to calendar:", error);
+        const calendar = await getCalendarClient(userId);
+        const calendarEvent = {
+            summary: `Plant Care: ${taskData.title}`,
+            description: taskData.description || `Care task for plant: ${taskData.plantName}`,
+            start: {
+                dateTime: taskData.dueDate.toDate().toISOString(),
+                timeZone: "UTC",
+            },
+            end: {
+                dateTime: new Date(taskData.dueDate.toDate().getTime() + 30 * 60000).toISOString(), // 30 minutes
+                timeZone: "UTC",
+            },
+            reminders: {
+                useDefault: false,
+                overrides: [
+                    { method: "popup", minutes: 15 },
+                    { method: "email", minutes: 60 },
+                ],
+            },
+        };
+        const response = await calendar.events.insert({
+            calendarId: "primary",
+            resource: calendarEvent,
+        });
+        // Update the task with calendar event ID
+        await snap.ref.update({
+            calendarEventId: response.data.id,
+        });
     }
-  });
-*/
+    catch (error) {
+        console.error("Error syncing plant care task to calendar:", error);
+    }
+});
 /**
  * Auto-sync projects to calendar
  */
-/*
-export const syncProject = onDocumentCreated("users/{userId}/projects/{projectId}", async (event) => {
+exports.syncProject = (0, firestore_1.onDocumentCreated)("users/{userId}/projects/{projectId}", async (event) => {
     const snap = event.data;
     if (!snap) {
         return;
     }
     const projectData = snap.data();
     const userId = event.params.userId;
-    
-    if (!projectData || !projectData.dueDate) return;
-
+    if (!projectData || !projectData.dueDate)
+        return;
     try {
-      const calendar = await getCalendarClient(userId);
-      
-      const calendarEvent = {
-        summary: `Project: ${projectData.title}`,
-        description: projectData.description || "Household project deadline",
-        start: {
-          dateTime: projectData.dueDate.toDate().toISOString(),
-          timeZone: "UTC",
-        },
-        end: {
-          dateTime: new Date(projectData.dueDate.toDate().getTime() + 60 * 60000).toISOString(), // 1 hour
-          timeZone: "UTC",
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            {method: "popup", minutes: 30},
-            {method: "email", minutes: 24 * 60}, // 1 day
-          ],
-        },
-      };
-
-      const response = await calendar.events.insert({
-        calendarId: "primary",
-        resource: calendarEvent,
-      });
-
-      // Update the project with calendar event ID
-      await snap.ref.update({
-        calendarEventId: response.data.id,
-      });
-    } catch (error) {
-      console.error("Error syncing project to calendar:", error);
+        const calendar = await getCalendarClient(userId);
+        const calendarEvent = {
+            summary: `Project: ${projectData.title}`,
+            description: projectData.description || "Household project deadline",
+            start: {
+                dateTime: projectData.dueDate.toDate().toISOString(),
+                timeZone: "UTC",
+            },
+            end: {
+                dateTime: new Date(projectData.dueDate.toDate().getTime() + 60 * 60000).toISOString(), // 1 hour
+                timeZone: "UTC",
+            },
+            reminders: {
+                useDefault: false,
+                overrides: [
+                    { method: "popup", minutes: 30 },
+                    { method: "email", minutes: 24 * 60 }, // 1 day
+                ],
+            },
+        };
+        const response = await calendar.events.insert({
+            calendarId: "primary",
+            resource: calendarEvent,
+        });
+        // Update the project with calendar event ID
+        await snap.ref.update({
+            calendarEventId: response.data.id,
+        });
     }
-  });
-*/
+    catch (error) {
+        console.error("Error syncing project to calendar:", error);
+    }
+});
 /**
  * Auto-sync simple tasks to calendar
  */
-/*
-export const syncSimpleTask = onDocumentCreated("users/{userId}/simpleTasks/{taskId}", async (event) => {
+exports.syncSimpleTask = (0, firestore_1.onDocumentCreated)("users/{userId}/simpleTasks/{taskId}", async (event) => {
     const snap = event.data;
     if (!snap) {
         return;
     }
     const taskData = snap.data();
     const userId = event.params.userId;
-    
-    if (!taskData || !taskData.dueDate) return;
-
+    if (!taskData || !taskData.dueDate)
+        return;
     try {
-      const calendar = await getCalendarClient(userId);
-      
-      const calendarEvent = {
-        summary: `Task: ${taskData.title}`,
-        description: taskData.description || "Household task",
-        start: {
-          dateTime: taskData.dueDate.toDate().toISOString(),
-          timeZone: "UTC",
-        },
-        end: {
-          dateTime: new Date(taskData.dueDate.toDate().getTime() + 30 * 60000).toISOString(), // 30 minutes
-          timeZone: "UTC",
-        },
-        reminders: {
-          useDefault: false,
-          overrides: [
-            {method: "popup", minutes: 15},
-          ],
-        },
-      };
-
-      const response = await calendar.events.insert({
-        calendarId: "primary",
-        calendarId: "primary",
-        resource: calendarEvent,
-      });
-
-      // Update the task with calendar event ID
-      await snap.ref.update({
-        calendarEventId: response.data.id,
-      });
-    } catch (error) {
-      console.error("Error syncing simple task to calendar:", error);
+        const calendar = await getCalendarClient(userId);
+        const calendarEvent = {
+            summary: `Task: ${taskData.title}`,
+            description: taskData.description || "Household task",
+            start: {
+                dateTime: taskData.dueDate.toDate().toISOString(),
+                timeZone: "UTC",
+            },
+            end: {
+                dateTime: new Date(taskData.dueDate.toDate().getTime() + 30 * 60000).toISOString(), // 30 minutes
+                timeZone: "UTC",
+            },
+            reminders: {
+                useDefault: false,
+                overrides: [
+                    { method: "popup", minutes: 15 },
+                ],
+            },
+        };
+        const response = await calendar.events.insert({
+            calendarId: "primary",
+            resource: calendarEvent,
+        });
+        // Update the task with calendar event ID
+        await snap.ref.update({
+            calendarEventId: response.data.id,
+        });
     }
-  });
-*/
+    catch (error) {
+        console.error("Error syncing simple task to calendar:", error);
+    }
+});
 // Update triggers for calendar sync
-/*
-export const updatePlantCareTaskCalendar = onDocumentUpdated("users/{userId}/plantCareTasks/{taskId}", async (event) => {
+exports.updatePlantCareTaskCalendar = (0, firestore_1.onDocumentUpdated)("users/{userId}/plantCareTasks/{taskId}", async (event) => {
     const change = event.data;
     if (!change) {
         return;
@@ -379,73 +348,65 @@ export const updatePlantCareTaskCalendar = onDocumentUpdated("users/{userId}/pla
     const beforeData = change.before.data();
     const afterData = change.after.data();
     const userId = event.params.userId;
-    
-    if (!afterData) return;
-
-    try {
-      const calendar = await getCalendarClient(userId);
-      
-      // If task is completed, delete calendar event
-      if (afterData.completed && afterData.calendarEventId) {
-        await calendar.events.delete({
-          calendarId: "primary",
-          eventId: afterData.calendarEventId,
-        });
-        
-        await change.after.ref.update({
-          calendarEventId: null,
-        });
+    if (!afterData)
         return;
-      }
-
-      // If due date changed, update calendar event
-      if (afterData.calendarEventId && beforeData?.dueDate !== afterData.dueDate) {
-        const calendarEvent = {
-          summary: `Plant Care: ${afterData.title}`,
-          description: afterData.description || `Care task for plant: ${afterData.plantName}`,
-          start: {
-            dateTime: afterData.dueDate.toDate().toISOString(),
-            timeZone: "UTC",
-          },
-          end: {
-            dateTime: new Date(afterData.dueDate.toDate().getTime() + 30 * 60000).toISOString(),
-            timeZone: "UTC",
-          },
-        };
-
-        await calendar.events.update({
-          calendarId: "primary",
-          eventId: afterData.calendarEventId,
-          resource: calendarEvent,
-        });
-      }
-    } catch (error) {
-      console.error("Error updating plant care task calendar event:", error);
+    try {
+        const calendar = await getCalendarClient(userId);
+        // If task is completed, delete calendar event
+        if (afterData.completed && afterData.calendarEventId) {
+            await calendar.events.delete({
+                calendarId: "primary",
+                eventId: afterData.calendarEventId,
+            });
+            await change.after.ref.update({
+                calendarEventId: null,
+            });
+            return;
+        }
+        // If due date changed, update calendar event
+        if (afterData.calendarEventId && (beforeData === null || beforeData === void 0 ? void 0 : beforeData.dueDate) !== afterData.dueDate) {
+            const calendarEvent = {
+                summary: `Plant Care: ${afterData.title}`,
+                description: afterData.description || `Care task for plant: ${afterData.plantName}`,
+                start: {
+                    dateTime: afterData.dueDate.toDate().toISOString(),
+                    timeZone: "UTC",
+                },
+                end: {
+                    dateTime: new Date(afterData.dueDate.toDate().getTime() + 30 * 60000).toISOString(),
+                    timeZone: "UTC",
+                },
+            };
+            await calendar.events.update({
+                calendarId: "primary",
+                eventId: afterData.calendarEventId,
+                resource: calendarEvent,
+            });
+        }
     }
-  });
-*/
+    catch (error) {
+        console.error("Error updating plant care task calendar event:", error);
+    }
+});
 // Delete triggers for calendar cleanup
-/*
-export const deletePlantCareTaskCalendar = onDocumentDeleted("users/{userId}/plantCareTasks/{taskId}", async (event) => {
+exports.deletePlantCareTaskCalendar = (0, firestore_1.onDocumentDeleted)("users/{userId}/plantCareTasks/{taskId}", async (event) => {
     const snap = event.data;
     if (!snap) {
         return;
     }
     const taskData = snap.data();
     const userId = event.params.userId;
-    
-    if (!taskData?.calendarEventId) return;
-
+    if (!(taskData === null || taskData === void 0 ? void 0 : taskData.calendarEventId))
+        return;
     try {
-      const calendar = await getCalendarClient(userId);
-      
-      await calendar.events.delete({
-        calendarId: "primary",
-        eventId: taskData.calendarEventId,
-      });
-    } catch (error) {
-      console.error("Error deleting plant care task calendar event:", error);
+        const calendar = await getCalendarClient(userId);
+        await calendar.events.delete({
+            calendarId: "primary",
+            eventId: taskData.calendarEventId,
+        });
     }
-  });
-*/ 
+    catch (error) {
+        console.error("Error deleting plant care task calendar event:", error);
+    }
+});
 //# sourceMappingURL=index.js.map

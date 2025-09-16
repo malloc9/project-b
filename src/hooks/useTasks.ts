@@ -3,14 +3,14 @@ import type { SimpleTask } from '../types'; // Assuming a SimpleTask type exists
 import { getUserSimpleTasks } from '../services/simpleTaskService'; // Assuming SimpleTaskService exists
 import { useAuth } from '../contexts/AuthContext';
 
-export function useTasks(userId: string | undefined) {
+export function useTasks() {
   const [tasks, setTasks] = useState<SimpleTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!userId || authLoading) {
+    if (!user?.uid || authLoading) {
       setTasks([]);
       setLoading(false);
       return;
@@ -21,7 +21,7 @@ export function useTasks(userId: string | undefined) {
 
     const fetchTasks = async () => {
       try {
-        const fetchedTasks = await getUserSimpleTasks(userId);
+        const fetchedTasks = await getUserSimpleTasks(user.uid);
         setTasks(fetchedTasks);
       } catch (err) {
         console.error("Failed to fetch tasks:", err);
@@ -39,7 +39,7 @@ export function useTasks(userId: string | undefined) {
     // });
     // return () => unsubscribe();
 
-  }, [userId, authLoading]);
+  }, [user?.uid, authLoading]);
 
   return { tasks, loading, error };
 }

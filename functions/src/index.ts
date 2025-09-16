@@ -129,7 +129,6 @@ export const completeCalendarAuth = onCall(async (request) => {
 /**
  * Create a calendar event
  */
-/*
 export const createCalendarEvent = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
@@ -174,12 +173,10 @@ export const createCalendarEvent = onCall(async (request) => {
     throw new HttpsError("internal", "Failed to create calendar event");
   }
 });
-*/
 
 /**
  * Update a calendar event
  */
-/*
 export const updateCalendarEvent = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
@@ -227,12 +224,10 @@ export const updateCalendarEvent = onCall(async (request) => {
     throw new HttpsError("internal", "Failed to update calendar event");
   }
 });
-*/
 
 /**
  * Delete a calendar event
  */
-/*
 export const deleteCalendarEvent = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
@@ -257,14 +252,12 @@ export const deleteCalendarEvent = onCall(async (request) => {
     throw new HttpsError("internal", "Failed to delete calendar event");
   }
 });
-*/
 
 // Firestore triggers for automatic calendar sync
 
 /**
  * Auto-sync plant care tasks to calendar
  */
-/*
 export const syncPlantCareTask = onDocumentCreated("users/{userId}/plantCareTasks/{taskId}", async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -311,12 +304,10 @@ export const syncPlantCareTask = onDocumentCreated("users/{userId}/plantCareTask
       console.error("Error syncing plant care task to calendar:", error);
     }
   });
-*/
 
 /**
  * Auto-sync projects to calendar
  */
-/*
 export const syncProject = onDocumentCreated("users/{userId}/projects/{projectId}", async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -363,12 +354,10 @@ export const syncProject = onDocumentCreated("users/{userId}/projects/{projectId
       console.error("Error syncing project to calendar:", error);
     }
   });
-*/
 
 /**
  * Auto-sync simple tasks to calendar
  */
-/*
 export const syncSimpleTask = onDocumentCreated("users/{userId}/simpleTasks/{taskId}", async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -403,7 +392,6 @@ export const syncSimpleTask = onDocumentCreated("users/{userId}/simpleTasks/{tas
 
       const response = await calendar.events.insert({
         calendarId: "primary",
-        calendarId: "primary",
         resource: calendarEvent,
       });
 
@@ -415,11 +403,9 @@ export const syncSimpleTask = onDocumentCreated("users/{userId}/simpleTasks/{tas
       console.error("Error syncing simple task to calendar:", error);
     }
   });
-*/
 
 // Update triggers for calendar sync
 
-/*
 export const updatePlantCareTaskCalendar = onDocumentUpdated("users/{userId}/plantCareTasks/{taskId}", async (event) => {
     const change = event.data;
     if (!change) {
@@ -472,11 +458,9 @@ export const updatePlantCareTaskCalendar = onDocumentUpdated("users/{userId}/pla
       console.error("Error updating plant care task calendar event:", error);
     }
   });
-*/
 
 // Delete triggers for calendar cleanup
 
-/*
 export const deletePlantCareTaskCalendar = onDocumentDeleted("users/{userId}/plantCareTasks/{taskId}", async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -498,4 +482,3 @@ export const deletePlantCareTaskCalendar = onDocumentDeleted("users/{userId}/pla
       console.error("Error deleting plant care task calendar event:", error);
     }
   });
-*/

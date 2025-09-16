@@ -11,9 +11,9 @@ import { useTasks } from '../hooks/useTasks'; // Import useTasks hook
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { plants } = usePlants(user?.uid); // Call usePlants hook with userId
-  const { projects } = useProjects(user?.uid); // Call useProjects hook with userId
-  const { tasks } = useTasks(user?.uid); // Call useTasks hook with userId
+  const { plants } = usePlants(); // Call usePlants hook with userId
+  const { projects } = useProjects(); // Call useProjects hook with userId
+  const { tasks } = useTasks(); // Call useTasks hook with userId
 
   const quickActions = [
     {

@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import type { Project } from "../types"; // Assuming a Project type exists
 // Assuming a Project type exists
 import { getUserProjects } from '../services/projectService'; // Import getUserProjects directly
+import { useAuth } from '../contexts/AuthContext';
 
-export function useProjects(userId: string | undefined) {
+export function useProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!userId) {
+    if (!user?.uid || authLoading) {
       setProjects([]);
       setLoading(false);
       return;
@@ -20,7 +22,7 @@ export function useProjects(userId: string | undefined) {
 
     const fetchProjects = async () => {
       try {
-        const fetchedProjects = await getUserProjects(userId);
+        const fetchedProjects = await getUserProjects(user.uid);
         setProjects(fetchedProjects);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
@@ -37,7 +39,7 @@ export function useProjects(userId: string | undefined) {
     //   setProjects(updatedProjects);
     // });
     // return () => unsubscribe();
-  }, [userId]);
+  }, [user?.uid, authLoading]);
 
   return { projects, loading, error };
 }

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import type { Plant } from "../types";
 import { OfflineAwarePlantService } from "../services/offlineAwarePlantService";
+import { useAuth } from '../contexts/AuthContext';
 
-export function usePlants(userId: string | undefined) {
+export function usePlants() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!userId) {
+    if (!user?.uid || authLoading) {
       setPlants([]);
       setLoading(false);
       return;
@@ -20,7 +22,7 @@ export function usePlants(userId: string | undefined) {
     const fetchPlants = async () => {
       try {
         const fetchedPlants = await OfflineAwarePlantService.getUserPlants(
-          userId
+          user.uid
         );
         setPlants(fetchedPlants);
       } catch (err) {
@@ -38,7 +40,7 @@ export function usePlants(userId: string | undefined) {
     //   setPlants(updatedPlants);
     // });
     // return () => unsubscribe();
-  }, [userId]);
+  }, [user?.uid, authLoading]);
 
   return { plants, loading, error };
 }
