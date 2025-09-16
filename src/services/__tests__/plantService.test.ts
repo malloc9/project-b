@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { PlantService } from '../plantService';
-import { FirestoreService, StorageService } from '../firebase';
-import type { Plant, PlantPhoto } from '../../types';
+import { FirestoreService } from '../firebase';
+import type { Plant } from '../../types';
 
 // Mock Firebase services
 vi.mock('../firebase', () => ({
@@ -12,11 +12,6 @@ vi.mock('../firebase', () => ({
     getDocuments: vi.fn(),
     updateDocument: vi.fn(),
     deleteDocument: vi.fn(),
-  },
-  StorageService: {
-    uploadFile: vi.fn(),
-    deleteFile: vi.fn(),
-    getPlantPhotoPath: vi.fn(),
   },
   QueryHelpers: {
     orderByCreated: vi.fn(() => ({ type: 'orderBy', field: 'createdAt', direction: 'desc' })),
@@ -43,16 +38,6 @@ describe('PlantService', () => {
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
   };
-
-  const mockPlantPhoto: PlantPhoto = {
-    id: 'photo-1',
-    url: 'https://example.com/photo.jpg',
-    thumbnailUrl: 'https://example.com/thumb.jpg',
-    uploadedAt: new Date('2024-01-01'),
-    description: 'Test photo',
-  };
-
-
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -228,86 +213,19 @@ describe('PlantService', () => {
   });
 
   describe('deletePlant', () => {
-    it('should delete a plant and its photos successfully', async () => {
-      const plantWithPhotos = {
-        ...mockPlant,
-        photos: [mockPlantPhoto],
-      };
-
-      // Mock the getPlant method on PlantService
-      const getPlantSpy = vi.spyOn(PlantService, 'getPlant').mockResolvedValue(plantWithPhotos);
-      vi.mocked(StorageService.getPlantPhotoPath).mockReturnValue('users/test-user-id/plants/test-plant-id/photos/photo-1.jpg');
-      vi.mocked(StorageService.deleteFile).mockResolvedValue();
-      vi.mocked(FirestoreService.getUserCollectionPath).mockReturnValue('users/test-user-id/plants');
-      vi.mocked(FirestoreService.deleteDocument).mockResolvedValue();
-
-      await PlantService.deletePlant(mockUserId, mockPlantId);
-
-      expect(getPlantSpy).toHaveBeenCalledWith(mockUserId, mockPlantId);
-      expect(StorageService.deleteFile).toHaveBeenCalledWith('users/test-user-id/plants/test-plant-id/photos/photo-1.jpg');
-      expect(FirestoreService.deleteDocument).toHaveBeenCalledWith('users/test-user-id/plants', mockPlantId);
-
-      getPlantSpy.mockRestore();
-    });
-
-    it('should continue deletion even if photo deletion fails', async () => {
-      const plantWithPhotos = {
-        ...mockPlant,
-        photos: [mockPlantPhoto],
-      };
-
-      const getPlantSpy = vi.spyOn(PlantService, 'getPlant').mockResolvedValue(plantWithPhotos);
-      vi.mocked(StorageService.deleteFile).mockRejectedValue(new Error('Storage error'));
+    it('should delete a plant successfully', async () => {
       vi.mocked(FirestoreService.getUserCollectionPath).mockReturnValue('users/test-user-id/plants');
       vi.mocked(FirestoreService.deleteDocument).mockResolvedValue();
 
       await PlantService.deletePlant(mockUserId, mockPlantId);
 
       expect(FirestoreService.deleteDocument).toHaveBeenCalledWith('users/test-user-id/plants', mockPlantId);
-
-      getPlantSpy.mockRestore();
     });
 
     it('should handle delete errors', async () => {
       vi.mocked(FirestoreService.deleteDocument).mockRejectedValue(new Error('Firestore error'));
 
       await expect(PlantService.deletePlant(mockUserId, mockPlantId)).rejects.toThrow('Failed to delete plant: Firestore error');
-    });
-  });
-
-  describe('addPhotoToPlant', () => {
-    it('should add a photo to a plant successfully', async () => {
-      const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-      const mockPhotoUrl = 'https://example.com/uploaded-photo.jpg';
-
-      const getPlantSpy = vi.spyOn(PlantService, 'getPlant').mockResolvedValue(mockPlant);
-      const updatePlantSpy = vi.spyOn(PlantService, 'updatePlant').mockResolvedValue();
-      
-      vi.mocked(StorageService.getPlantPhotoPath).mockReturnValue('users/test-user-id/plants/test-plant-id/photos/photo_123.jpg');
-      vi.mocked(StorageService.uploadFile).mockResolvedValue(mockPhotoUrl);
-
-      const result = await PlantService.addPhotoToPlant(mockUserId, mockPlantId, mockFile, 'Test description');
-
-      expect(result).toMatchObject({
-        url: mockPhotoUrl,
-        thumbnailUrl: mockPhotoUrl,
-        description: 'Test description',
-      });
-      expect(result.id).toMatch(/^photo_\d+_[a-z0-9]+$/);
-      expect(updatePlantSpy).toHaveBeenCalledWith(mockUserId, mockPlantId, {
-        photos: expect.arrayContaining([expect.objectContaining({ url: mockPhotoUrl })])
-      });
-
-      getPlantSpy.mockRestore();
-      updatePlantSpy.mockRestore();
-    });
-
-    it('should handle photo upload errors', async () => {
-      const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-
-      vi.mocked(StorageService.uploadFile).mockRejectedValue(new Error('Upload error'));
-
-      await expect(PlantService.addPhotoToPlant(mockUserId, mockPlantId, mockFile)).rejects.toThrow('Failed to add photo: Upload error');
     });
   });
 

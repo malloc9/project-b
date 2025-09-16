@@ -14,14 +14,7 @@ import {
   QueryOrderByConstraint,
   type DocumentData,
 } from 'firebase/firestore';
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-  type UploadMetadata,
-} from 'firebase/storage';
-import { db, storage } from '../config/firebase';
+import { db } from '../config/firebase';
 
 /**
  * Generic Firestore service for CRUD operations
@@ -159,50 +152,6 @@ export class FirestoreService {
    */
   static getUserCollectionPath(userId: string, collection: string): string {
     return `users/${userId}/${collection}`;
-  }
-}
-
-/**
- * Firebase Storage service for file operations
- */
-export class StorageService {
-  /**
-   * Upload a file to Firebase Storage
-   */
-  static async uploadFile(
-    filePath: string,
-    file: File,
-    metadata?: UploadMetadata
-  ): Promise<string> {
-    try {
-      const storageRef = ref(storage, filePath);
-      const snapshot = await uploadBytes(storageRef, file, metadata);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL;
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete a file from Firebase Storage
-   */
-  static async deleteFile(filePath: string): Promise<void> {
-    try {
-      const storageRef = ref(storage, filePath);
-      await deleteObject(storageRef);
-    } catch (error) {
-      console.error('Error deleting file:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get user-specific file path for plant photos
-   */
-  static getPlantPhotoPath(userId: string, plantId: string, photoId: string, extension: string): string {
-    return `users/${userId}/plants/${plantId}/photos/${photoId}.${extension}`;
   }
 }
 

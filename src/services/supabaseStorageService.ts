@@ -4,35 +4,29 @@
  * Install: npm install @supabase/supabase-js
  */
 
-// Uncomment when you install Supabase
-// import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 export class SupabaseStorageService {
   private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  // private static readonly BUCKET_NAME = 'plant-photos';
+  private static readonly BUCKET_NAME = 'plant-photos';
 
-  // Uncomment when you install Supabase
-  // private static supabase = createClient(this.SUPABASE_URL, this.SUPABASE_ANON_KEY);
+  private static supabase = createClient(this.SUPABASE_URL, this.SUPABASE_ANON_KEY);
 
   /**
    * Upload file to Supabase Storage
    */
   static async uploadFile(
-    _filePath: string,
-    _file: File,
-    _metadata?: any
+    filePath: string,
+    file: File,
+    metadata?: any
   ): Promise<string> {
     try {
       if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
         throw new Error('Supabase configuration missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
       }
 
-      // Uncomment when you install Supabase
-      throw new Error('Supabase client not initialized. Please install @supabase/supabase-js and uncomment the client initialization.');
-
-      /*
-      const { data, error } = await this.supabase.storage
+      const { error } = await this.supabase.storage
         .from(this.BUCKET_NAME)
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -50,7 +44,6 @@ export class SupabaseStorageService {
         .getPublicUrl(filePath);
 
       return urlData.publicUrl;
-      */
     } catch (error) {
       console.error('Error uploading to Supabase:', error);
       throw error;
@@ -60,15 +53,13 @@ export class SupabaseStorageService {
   /**
    * Delete file from Supabase Storage
    */
-  static async deleteFile(_filePath: string): Promise<void> {
+  static async deleteFile(filePath: string): Promise<void> {
     try {
       if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
         console.warn('Supabase not configured, skipping deletion');
         return;
       }
 
-      // Uncomment when you install Supabase
-      /*
       const { error } = await this.supabase.storage
         .from(this.BUCKET_NAME)
         .remove([filePath]);
@@ -76,7 +67,6 @@ export class SupabaseStorageService {
       if (error) {
         console.error('Error deleting from Supabase:', error);
       }
-      */
     } catch (error) {
       console.error('Error deleting from Supabase:', error);
     }

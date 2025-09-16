@@ -1,4 +1,4 @@
-import { auth, db, storage } from '../config/firebase';
+import { auth, db } from '../config/firebase';
 import { FirebaseInitService, FirebaseErrorHandler } from '../services/firebaseInit';
 
 /**
@@ -14,7 +14,6 @@ export class FirebaseTestUtils {
       config: boolean;
       auth: boolean;
       firestore: boolean;
-      storage: boolean;
     };
     errors: string[];
   }> {
@@ -22,7 +21,6 @@ export class FirebaseTestUtils {
       config: false,
       auth: false,
       firestore: false,
-      storage: false,
     };
     const errors: string[] = [];
 
@@ -53,18 +51,7 @@ export class FirebaseTestUtils {
         errors.push(`Firestore service error: ${FirebaseErrorHandler.getErrorMessage(error)}`);
       }
 
-      // Test Storage service
-      try {
-        // Try to access Storage (this will fail if not configured properly)
-        if (storage.app) {
-          results.storage = true;
-        }
-      } catch (error) {
-        results.storage = false;
-        errors.push(`Storage service error: ${FirebaseErrorHandler.getErrorMessage(error)}`);
-      }
-
-      const success = results.config && results.auth && results.firestore && results.storage;
+      const success = results.config && results.auth && results.firestore;
 
       return {
         success,
@@ -96,7 +83,6 @@ export class FirebaseTestUtils {
     console.log(`Configuration: ${testResults.results.config ? '✅' : '❌'}`);
     console.log(`Authentication: ${testResults.results.auth ? '✅' : '❌'}`);
     console.log(`Firestore: ${testResults.results.firestore ? '✅' : '❌'}`);
-    console.log(`Storage: ${testResults.results.storage ? '✅' : '❌'}`);
     console.groupEnd();
 
     if (testResults.errors.length > 0) {

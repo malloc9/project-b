@@ -8,7 +8,7 @@ import { CloudinaryStorageService } from './cloudinaryStorageService';
 import { ImgBBStorageService } from './imgbbStorageService';
 import { SupabaseStorageService } from './supabaseStorageService';
 
-export type StorageProvider = 'base64' | 'cloudinary' | 'imgbb' | 'supabase' | 'firebase';
+export type StorageProvider = 'base64' | 'cloudinary' | 'imgbb' | 'supabase';
 
 interface StorageServiceInterface {
   uploadFile(filePath: string, file: File, metadata?: any): Promise<string>;
@@ -44,11 +44,6 @@ export class UnifiedStorageService {
           return SupabaseStorageService;
         }
         console.warn('Supabase not configured, falling back to base64 storage');
-        return Base64StorageService;
-
-      case 'firebase':
-        // Import Firebase storage dynamically to avoid errors when not using it
-        console.warn('Firebase Storage not available in free tier, falling back to base64 storage');
         return Base64StorageService;
 
       case 'base64':
@@ -118,7 +113,6 @@ export class UnifiedStorageService {
       
       case 'base64':
       case 'imgbb':
-      case 'firebase':
       default:
         return originalUrl;
     }
@@ -142,7 +136,6 @@ export class UnifiedStorageService {
         // For base64, we'll need to generate thumbnails client-side
         return originalUrl; // Return original for now
       
-      case 'firebase':
       default:
         return originalUrl;
     }
@@ -211,13 +204,12 @@ export class UnifiedStorageService {
           features: ['Image transformations', 'CDN delivery', 'Real-time updates']
         };
 
-      case 'firebase':
       default:
         return {
-          name: 'Firebase Storage',
-          description: 'Google Cloud Storage for Firebase',
-          freeLimit: '1GB storage, 10GB bandwidth/month (Blaze plan required)',
-          features: ['Google Cloud integration', 'Security rules', 'Offline support']
+          name: 'Base64 Storage',
+          description: 'Images stored as base64 strings in Firestore documents',
+          freeLimit: '~500KB per image (Firestore document limit)',
+          features: ['Completely free', 'No external dependencies', 'Works offline']
         };
     }
   }

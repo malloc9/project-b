@@ -74,7 +74,6 @@ async function main() {
   log('\n📁 Required Files:', 'yellow');
   allChecks &= checkFile('firebase.json', 'Firebase configuration');
   allChecks &= checkFile('firestore.rules', 'Firestore security rules');
-  allChecks &= checkFile('storage.rules', 'Storage security rules');
   allChecks &= checkFile('firestore.indexes.json', 'Firestore indexes');
   allChecks &= checkFile('functions/package.json', 'Functions package.json');
   allChecks &= checkFile('functions/src/index.ts', 'Functions source code');
@@ -96,7 +95,6 @@ async function main() {
   allChecks &= checkEnvVar('VITE_FIREBASE_API_KEY', 'Firebase API Key');
   allChecks &= checkEnvVar('VITE_FIREBASE_AUTH_DOMAIN', 'Firebase Auth Domain');
   allChecks &= checkEnvVar('VITE_FIREBASE_PROJECT_ID', 'Firebase Project ID');
-  allChecks &= checkEnvVar('VITE_FIREBASE_STORAGE_BUCKET', 'Firebase Storage Bucket');
   allChecks &= checkEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', 'Firebase Messaging Sender ID');
   allChecks &= checkEnvVar('VITE_FIREBASE_APP_ID', 'Firebase App ID');
   

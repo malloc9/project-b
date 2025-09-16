@@ -1,8 +1,7 @@
 import { connectAuthEmulator } from 'firebase/auth';
 import { connectFirestoreEmulator } from 'firebase/firestore';
-import { connectStorageEmulator } from 'firebase/storage';
 import { connectFunctionsEmulator } from 'firebase/functions';
-import { auth, db, storage, functions } from '../config/firebase';
+import { auth, db, functions } from '../config/firebase';
 
 /**
  * Firebase initialization service
@@ -45,9 +44,6 @@ export class FirebaseInitService {
       // Connect to Firestore emulator
       connectFirestoreEmulator(db, 'localhost', 8081);
 
-      // Connect to Storage emulator
-      connectStorageEmulator(storage, 'localhost', 9199);
-
       // Connect to Functions emulator
       connectFunctionsEmulator(functions, 'localhost', 5001);
 
@@ -65,7 +61,6 @@ export class FirebaseInitService {
       'VITE_FIREBASE_API_KEY',
       'VITE_FIREBASE_AUTH_DOMAIN',
       'VITE_FIREBASE_PROJECT_ID',
-      'VITE_FIREBASE_STORAGE_BUCKET',
       'VITE_FIREBASE_MESSAGING_SENDER_ID',
       'VITE_FIREBASE_APP_ID',
     ];
@@ -137,18 +132,6 @@ export class FirebaseErrorHandler {
         return 'Service is temporarily unavailable. Please try again later.';
       case 'unauthenticated':
         return 'Please log in to continue.';
-
-      // Storage errors
-      case 'storage/unauthorized':
-        return 'You do not have permission to upload files.';
-      case 'storage/canceled':
-        return 'File upload was canceled.';
-      case 'storage/unknown':
-        return 'An error occurred during file upload.';
-      case 'storage/object-not-found':
-        return 'File not found.';
-      case 'storage/quota-exceeded':
-        return 'Storage quota exceeded.';
 
       default:
         return 'An error occurred. Please try again.';

@@ -21,8 +21,10 @@
     "setup:firebase": "node scripts/setup-firebase.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
     "date-fns": "^4.1.0",
     "firebase": "^12.1.0",
+    "firebase-functions": "^6.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.8.2"
