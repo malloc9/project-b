@@ -5,9 +5,11 @@ import {
   StatsCard, 
   QuickActionCard 
 } from '../components/layout';
+import { usePlants } from '../hooks/usePlants'; // Import usePlants hook
 
 export function DashboardPage() {
   const { user } = useAuth();
+  const { plants } = usePlants(user?.uid); // Call usePlants hook with userId
 
   const quickActions = [
     {
@@ -43,7 +45,7 @@ export function DashboardPage() {
   const stats = [
     {
       title: 'Plants Tracked',
-      value: '0',
+      value: plants.length,
       icon: '🌱',
       description: 'Active plants in your codex',
       color: 'green' as const,
