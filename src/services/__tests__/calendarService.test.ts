@@ -14,7 +14,7 @@ import type { CalendarEvent } from '../../types';
 // Mock Firebase Functions
 vi.mock('firebase/functions', () => ({
   getFunctions: vi.fn(() => ({})),
-  httpsCallable: vi.fn((functions, name) => {
+  httpsCallable: vi.fn((_functions, name) => {
     return vi.fn().mockImplementation(async (data) => {
       // Mock different responses based on function name
       switch (name) {
@@ -50,7 +50,7 @@ vi.mock('../../utils/calendarErrorHandler', () => ({
       return await operation();
     } catch (error) {
       // Simulate retry logic - return null for network errors, throw for others
-      if (error.message.includes('Mock')) {
+      if ((error as Error).message.includes('Mock')) {
         if (operationName.includes('create') || operationName.includes('update') || operationName.includes('delete')) {
           return null; // Simulate graceful failure
         }

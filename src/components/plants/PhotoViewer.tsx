@@ -153,7 +153,7 @@ export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: Ph
       {photos.length > 1 && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 rounded-lg p-2">
           <div className="flex space-x-2 max-w-md overflow-x-auto">
-            {photos.map((p, index) => (
+            {photos.map((p, _index) => (
               <button
                 key={p.id}
                 onClick={() => onNavigate(p)}

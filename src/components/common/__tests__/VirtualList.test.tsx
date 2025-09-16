@@ -1,14 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { VirtualList } from '../VirtualList';
-import { it } from 'date-fns/locale';
-import { it } from 'date-fns/locale';
-import { it } from 'date-fns/locale';
-import { it } from 'date-fns/locale';
-import { it } from 'date-fns/locale';
-import { it } from 'date-fns/locale';
-import { it } from 'date-fns/locale';
-import { describe } from 'node:test';
+
 
 interface TestItem {
   id: string;

@@ -193,7 +193,7 @@ describe('ServiceWorkerManager', () => {
     it('should handle missing sync support', async () => {
       // Register without sync support
       const registrationWithoutSync = { ...mockRegistration };
-      delete registrationWithoutSync.sync;
+      (registrationWithoutSync as any).sync = undefined;
       
       mockServiceWorker.register.mockResolvedValue(registrationWithoutSync);
       await serviceWorkerManager.register();
@@ -208,10 +208,29 @@ describe('ServiceWorkerManager', () => {
       const urls = ['/page1', '/page2'];
       
       // Mock MessageChannel
-      const mockPort = { onmessage: null };
+      const mockPort1 = {
+        onmessage: null as ((event: MessageEvent) => void) | null,
+        postMessage: vi.fn(),
+        start: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        onmessageerror: null,
+      };
+      const mockPort2 = {
+        onmessage: null as ((event: MessageEvent) => void) | null,
+        postMessage: vi.fn(),
+        start: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        onmessageerror: null,
+      };
       const mockMessageChannel = {
-        port1: mockPort,
-        port2: {}
+        port1: mockPort1,
+        port2: mockPort2,
       };
       
       global.MessageChannel = vi.fn(() => mockMessageChannel);
@@ -220,8 +239,8 @@ describe('ServiceWorkerManager', () => {
 
       // Simulate successful response
       setTimeout(() => {
-        if (mockPort.onmessage) {
-          mockPort.onmessage({ data: { success: true } });
+        if (mockPort1.onmessage) {
+          mockPort1.onmessage({ data: { success: true } } as MessageEvent);
         }
       }, 0);
 
@@ -231,10 +250,29 @@ describe('ServiceWorkerManager', () => {
     it('should handle cache failure', async () => {
       const urls = ['/page1', '/page2'];
       
-      const mockPort = { onmessage: null };
+      const mockPort1 = {
+        onmessage: null as ((event: MessageEvent) => void) | null,
+        postMessage: vi.fn(),
+        start: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        onmessageerror: null,
+      };
+      const mockPort2 = {
+        onmessage: null as ((event: MessageEvent) => void) | null,
+        postMessage: vi.fn(),
+        start: vi.fn(),
+        close: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        onmessageerror: null,
+      };
       const mockMessageChannel = {
-        port1: mockPort,
-        port2: {}
+        port1: mockPort1,
+        port2: mockPort2,
       };
       
       global.MessageChannel = vi.fn(() => mockMessageChannel);
@@ -243,8 +281,8 @@ describe('ServiceWorkerManager', () => {
 
       // Simulate failure response
       setTimeout(() => {
-        if (mockPort.onmessage) {
-          mockPort.onmessage({ data: { success: false } });
+        if (mockPort1.onmessage) {
+          mockPort1.onmessage({ data: { success: false } } as MessageEvent);
         }
       }, 0);
 
@@ -253,7 +291,7 @@ describe('ServiceWorkerManager', () => {
 
     it('should return false when no active service worker', async () => {
       // Remove controller
-      delete mockServiceWorker.controller;
+      (mockServiceWorker as any).controller = undefined;
 
       const result = await serviceWorkerManager.cacheUrls(['/page1']);
       expect(result).toBe(false);

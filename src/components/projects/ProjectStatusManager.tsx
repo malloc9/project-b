@@ -26,7 +26,7 @@ const ProjectStatusManager: React.FC<ProjectStatusManagerProps> = ({
     try {
       setLoading(true);
       setError(null);
-      await updateProject(project.id, { status: newStatus });
+      await updateProject(project.id, project.userId, { status: newStatus });
       onUpdate();
     } catch (err) {
       console.error('Error updating project status:', err);

@@ -1,14 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { LazyImage } from '../LazyImage';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { it } from 'node:test';
-import { beforeEach } from 'node:test';
-import { describe } from 'node:test';
+
 
 // Mock IntersectionObserver
 const mockIntersectionObserver = vi.fn();
@@ -147,6 +140,6 @@ describe('LazyImage', () => {
     );
 
     const img = screen.getByAltText('Test image');
-    expect(img.src).toContain('data:image/svg+xml');
+    expect((img as HTMLImageElement).src).toContain('data:image/svg+xml');
   });
 });

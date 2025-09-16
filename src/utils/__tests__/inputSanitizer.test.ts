@@ -46,22 +46,22 @@ describe('Input Sanitizer', () => {
     });
   });
 
-  describe('sanitizeFileName', () => {
+  describe('sanitizeFilename', () => {
     it('should remove dangerous characters', () => {
       const input = '../../../etc/passwd';
-      const result = sanitizeFileName(input);
+      const result = sanitizeFilename(input);
       expect(result).toBe('etcpasswd');
     });
 
     it('should preserve safe characters', () => {
       const input = 'my-file_name.txt';
-      const result = sanitizeFileName(input);
+      const result = sanitizeFilename(input);
       expect(result).toBe('my-file_name.txt');
     });
 
     it('should handle spaces', () => {
       const input = 'my file name.txt';
-      const result = sanitizeFileName(input);
+      const result = sanitizeFilename(input);
       expect(result).toBe('my_file_name.txt');
     });
   });
@@ -69,19 +69,19 @@ describe('Input Sanitizer', () => {
   describe('validateInput', () => {
     it('should return true for safe input', () => {
       const input = 'Hello World';
-      const result = validateInput(input);
+      const result = sanitizeInput(input);
       expect(result).toBe(true);
     });
 
     it('should return false for dangerous input', () => {
       const input = '<script>alert("xss")</script>';
-      const result = validateInput(input);
+      const result = sanitizeInput(input);
       expect(result).toBe(false);
     });
 
     it('should return false for SQL injection attempts', () => {
       const input = "'; DROP TABLE users; --";
-      const result = validateInput(input);
+      const result = sanitizeInput(input);
       expect(result).toBe(false);
     });
   });

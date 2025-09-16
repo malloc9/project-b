@@ -21,7 +21,7 @@ export function PlantList({ onPlantSelect, onPlantEdit, onPlantDelete }: PlantLi
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<PlantFilters>({});
-  const [useVirtualScrolling, setUseVirtualScrolling] = useState(false);
+  
   const { startTimer, endTimer } = usePerformanceTimer('plant-list-render');
 
   // Enable virtual scrolling for large datasets
@@ -44,7 +44,7 @@ export function PlantList({ onPlantSelect, onPlantEdit, onPlantDelete }: PlantLi
       startTimer();
       const userPlants = await PlantService.getUserPlants(user.uid, filters);
       setPlants(userPlants);
-      setUseVirtualScrolling(shouldUseVirtualScrolling);
+      
       endTimer();
     } catch (err) {
       console.error('Error loading plants:', err);
@@ -123,7 +123,7 @@ export function PlantList({ onPlantSelect, onPlantEdit, onPlantDelete }: PlantLi
           itemHeight={280} // Approximate height of PlantCard
           containerHeight={600} // Fixed container height for virtual scrolling
           className="border rounded-lg"
-          renderItem={(plant, index) => (
+          renderItem={(plant, _index) => (
             <div className="p-3">
               <PlantCard
                 key={plant.id}

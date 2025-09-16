@@ -3,16 +3,16 @@
  * This is free and works within Firestore document size limits (1MB per document)
  */
 
-import { compressImage, resizeImage } from '../utils/imageUtils';
+import { compressImage } from '../utils/imageUtils';
 
 export class Base64StorageService {
   /**
    * Convert file to base64 and compress for storage
    */
   static async uploadFile(
-    filePath: string, // Not used but kept for interface compatibility
+    _filePath: string, // Not used but kept for interface compatibility
     file: File,
-    metadata?: any
+    _metadata?: any
   ): Promise<string> {
     try {
       // Compress and resize image to keep under Firestore limits
@@ -37,7 +37,7 @@ export class Base64StorageService {
   /**
    * Delete file (no-op for base64 storage)
    */
-  static async deleteFile(filePath: string): Promise<void> {
+  static async deleteFile(_filePath: string): Promise<void> {
     // No action needed for base64 storage
     // Images are deleted when the document is updated
     return Promise.resolve();

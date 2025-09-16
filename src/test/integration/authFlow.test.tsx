@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../../contexts/AuthContext';
 import { LoginForm } from '../../components/auth/LoginForm';
@@ -39,7 +39,7 @@ describe('Authentication Flow Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock successful auth state change
-    mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+    mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
       // Initially no user
       callback(null);
       return () => {}; // unsubscribe function
@@ -79,7 +79,7 @@ describe('Authentication Flow Integration', () => {
     });
 
     it('displays error for invalid credentials', async () => {
-      const authError = new Error('Invalid credentials');
+      const authError: any = new Error('Invalid credentials');
       authError.code = 'auth/invalid-credential';
       
       mockSignInWithEmailAndPassword.mockRejectedValue(authError);
@@ -160,7 +160,7 @@ describe('Authentication Flow Integration', () => {
     });
 
     it('handles password reset errors', async () => {
-      const resetError = new Error('User not found');
+      const resetError: any = new Error('User not found');
       resetError.code = 'auth/user-not-found';
       
       mockSendPasswordResetEmail.mockRejectedValue(resetError);
@@ -201,7 +201,7 @@ describe('Authentication Flow Integration', () => {
       };
 
       // Mock authenticated state
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         callback(mockUser);
         return () => {};
       });
@@ -276,7 +276,7 @@ describe('Authentication Flow Integration', () => {
       };
 
       // Simulate auth state restoration
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
         // Simulate delay in auth state restoration
         setTimeout(() => callback(mockUser), 100);
         return () => {};

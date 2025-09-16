@@ -95,7 +95,7 @@ export const ValidatedTextarea = forwardRef<HTMLTextAreaElement, ValidatedTextar
   const hasError = validationError !== null;
   const characterCount = value.length;
   const isNearLimit = maxLength && characterCount > maxLength * 0.8;
-  const isOverLimit = maxLength && characterCount > maxLength;
+  const isOverLimit = Boolean(maxLength && characterCount > maxLength);
 
   return (
     <div className="relative">

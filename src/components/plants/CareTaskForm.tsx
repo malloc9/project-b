@@ -20,7 +20,9 @@ interface FormData {
 
 interface FormErrors {
   title?: string;
+  description?: string;
   dueDate?: string;
+  completed?: string;
   recurrence?: string;
 }
 
@@ -113,6 +115,8 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
       dueDate: new Date(formData.dueDate),
       completed: formData.completed,
       recurrence: hasRecurrence ? recurrenceData : undefined,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     try {

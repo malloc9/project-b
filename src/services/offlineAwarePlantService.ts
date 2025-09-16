@@ -214,7 +214,7 @@ export class OfflineAwarePlantService {
 
     if (serviceWorkerManager.isOnline()) {
       try {
-        const uploadedPhoto = await PlantService.uploadPlantPhoto(userId, plantId, file, description);
+        const uploadedPhoto = await PlantService.addPhotoToPlant(userId, plantId, file, description);
         
         // Update the plant with the real photo
         const plant = offlineStorage.getCachedData('plants', plantId) as Plant;
@@ -262,7 +262,7 @@ export class OfflineAwarePlantService {
     userId: string,
     plantId: string,
     taskData: Omit<PlantCareTask, 'id'>
-  ): Promise<string> {
+  ): Promise<PlantCareTask> {
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     const careTask: PlantCareTask = {
@@ -272,7 +272,7 @@ export class OfflineAwarePlantService {
 
     if (serviceWorkerManager.isOnline()) {
       try {
-        const actualTaskId = await PlantService.addCareTask(userId, plantId, taskData);
+        const actualTaskId = await PlantService.addCareTaskToPlant(userId, plantId, taskData);
         
         // Update cache with real task ID
         const plant = offlineStorage.getCachedData('plants', plantId) as Plant;
@@ -282,7 +282,7 @@ export class OfflineAwarePlantService {
           offlineStorage.cacheData('plants', plantId, updatedPlant);
         }
         
-        return actualTaskId;
+        return careTask;
       } catch (error) {
         console.warn('Online care task creation failed, storing offline:', error);
       }
@@ -306,7 +306,7 @@ export class OfflineAwarePlantService {
 
     serviceWorkerManager.requestBackgroundSync('household-sync').catch(console.error);
     
-    return taskId;
+    return careTask;
   }
 
   /**
@@ -324,17 +324,7 @@ export class OfflineAwarePlantService {
       );
     }
 
-    if (filters.hasPhotos !== undefined) {
-      filtered = filtered.filter(plant => 
-        filters.hasPhotos ? plant.photos.length > 0 : plant.photos.length === 0
-      );
-    }
-
-    if (filters.hasTasks !== undefined) {
-      filtered = filtered.filter(plant => 
-        filters.hasTasks ? plant.careTasks.length > 0 : plant.careTasks.length === 0
-      );
-    }
+    
 
     return filtered;
   }

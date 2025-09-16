@@ -65,10 +65,10 @@ const ProjectDetail: React.FC = () => {
   };
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
-    if (!project) return;
+    if (!project || !user) return;
 
     try {
-      await updateProject(project.id, { status: newStatus });
+      await updateProject(project.id, user.uid, { status: newStatus });
       setProject({ ...project, status: newStatus });
     } catch (err) {
       console.error('Error updating project status:', err);
@@ -77,10 +77,10 @@ const ProjectDetail: React.FC = () => {
   };
 
   const handleDeleteProject = async () => {
-    if (!project) return;
+    if (!project || !user) return;
 
     try {
-      await deleteProject(project.id);
+      await deleteProject(project.id, user.uid);
       navigate('/projects');
     } catch (err) {
       console.error('Error deleting project:', err);
@@ -90,14 +90,14 @@ const ProjectDetail: React.FC = () => {
 
   const handleSubtaskUpdate = async () => {
     // Reload subtasks and update project status
-    if (!projectId) return;
+    if (!projectId || !user) return;
     
     try {
       const updatedSubtasks = await getProjectSubtasks(projectId);
       setSubtasks(updatedSubtasks);
       
       // Update project status based on subtasks
-      await updateProjectStatusFromSubtasks(projectId);
+      await updateProjectStatusFromSubtasks(projectId, user.uid);
       
       // Reload project to get updated status
       const updatedProject = await getProject(projectId, user.uid);

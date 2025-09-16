@@ -1,12 +1,11 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { PlantService } from '../../services/plantService';
-import { ProjectService } from '../../services/projectService';
-import { SimpleTaskService } from '../../services/simpleTaskService';
+import * as ProjectService from '../../services/projectService';
+import * as SimpleTaskService from '../../services/simpleTaskService';
 import { PlantList } from '../../components/plants/PlantList';
-import { ProjectList } from '../../components/projects/ProjectList';
-import { TaskList } from '../../components/tasks/TaskList';
-import { AuthProvider } from '../../contexts/AuthContext';
+import ProjectList from '../../components/projects/ProjectList';
+import TaskList from '../../components/tasks/TaskList';
 import type { Plant, Project, SimpleTask } from '../../types';
 
 // Mock services
@@ -104,6 +103,7 @@ describe('CRUD Operations Integration', () => {
 
     it('handles plant creation', async () => {
       const newPlant = {
+        userId: 'test-user-id',
         name: 'New Plant',
         species: 'Test species',
         description: 'Test description',
@@ -114,9 +114,9 @@ describe('CRUD Operations Integration', () => {
       vi.mocked(PlantService.createPlant).mockResolvedValue('new-plant-id');
 
       // This would typically be tested with a form component
-      await PlantService.createPlant('test-user-id', newPlant);
+      await PlantService.createPlant(newPlant);
 
-      expect(PlantService.createPlant).toHaveBeenCalledWith('test-user-id', newPlant);
+      expect(PlantService.createPlant).toHaveBeenCalledWith(newPlant);
     });
 
     it('handles plant updates', async () => {
@@ -159,7 +159,7 @@ describe('CRUD Operations Integration', () => {
     });
 
     it('applies filters correctly', async () => {
-      const filters = { hasPhotos: true };
+      const filters = { hasCareTasks: true }; // Corrected here
       
       render(<PlantList />);
 
@@ -203,9 +203,10 @@ describe('CRUD Operations Integration', () => {
         subtasks: [],
       };
 
-      await ProjectService.createProject('test-user-id', newProject);
+      const projectToCreate = { ...newProject, userId: 'test-user-id' };
+      await ProjectService.createProject(projectToCreate);
 
-      expect(ProjectService.createProject).toHaveBeenCalledWith('test-user-id', newProject);
+      expect(ProjectService.createProject).toHaveBeenCalledWith(projectToCreate);
     });
 
     it('handles project status updates', async () => {
@@ -229,10 +230,10 @@ describe('CRUD Operations Integration', () => {
 
   describe('Simple Task CRUD Operations', () => {
     beforeEach(() => {
-      vi.mocked(SimpleTaskService.getUserTasks).mockResolvedValue(mockTasks);
-      vi.mocked(SimpleTaskService.createTask).mockResolvedValue('new-task-id');
-      vi.mocked(SimpleTaskService.updateTask).mockResolvedValue(undefined);
-      vi.mocked(SimpleTaskService.deleteTask).mockResolvedValue(undefined);
+      vi.mocked(SimpleTaskService.getUserSimpleTasks).mockResolvedValue(mockTasks);
+      vi.mocked(SimpleTaskService.createSimpleTask).mockResolvedValue('new-task-id');
+      vi.mocked(SimpleTaskService.updateSimpleTask).mockResolvedValue(undefined);
+      vi.mocked(SimpleTaskService.deleteSimpleTask).mockResolvedValue(undefined);
     });
 
     it('loads and displays tasks', async () => {
@@ -242,7 +243,7 @@ describe('CRUD Operations Integration', () => {
         expect(screen.getByText('Buy groceries')).toBeInTheDocument();
       });
 
-      expect(SimpleTaskService.getUserTasks).toHaveBeenCalledWith('test-user-id');
+      expect(SimpleTaskService.getUserSimpleTasks).toHaveBeenCalledWith('test-user-id');
     });
 
     it('handles task creation', async () => {
@@ -253,32 +254,32 @@ describe('CRUD Operations Integration', () => {
         completed: false,
       };
 
-      await SimpleTaskService.createTask('test-user-id', newTask);
+      const taskToCreate = { ...newTask, userId: 'test-user-id' };
+      await SimpleTaskService.createSimpleTask(taskToCreate);
 
-      expect(SimpleTaskService.createTask).toHaveBeenCalledWith('test-user-id', newTask);
+      expect(SimpleTaskService.createSimpleTask).toHaveBeenCalledWith(taskToCreate);
     });
 
     it('handles task completion', async () => {
       const completionUpdate = { completed: true };
 
-      await SimpleTaskService.updateTask('test-user-id', 'task-1', completionUpdate);
+      await SimpleTaskService.updateSimpleTask('task-1', completionUpdate);
 
-      expect(SimpleTaskService.updateTask).toHaveBeenCalledWith(
-        'test-user-id',
+      expect(SimpleTaskService.updateSimpleTask).toHaveBeenCalledWith(
         'task-1',
         completionUpdate
       );
     });
 
     it('handles task deletion', async () => {
-      await SimpleTaskService.deleteTask('test-user-id', 'task-1');
+      await SimpleTaskService.deleteSimpleTask('task-1');
 
-      expect(SimpleTaskService.deleteTask).toHaveBeenCalledWith('test-user-id', 'task-1');
+      expect(SimpleTaskService.deleteSimpleTask).toHaveBeenCalledWith('task-1');
     });
 
     it('filters completed tasks', async () => {
       const incompleteTasks = mockTasks.filter(task => !task.completed);
-      vi.mocked(SimpleTaskService.getUserTasks).mockResolvedValue(incompleteTasks);
+      vi.mocked(SimpleTaskService.getUserSimpleTasks).mockResolvedValue(incompleteTasks);
 
       render(<TaskList />);
 
@@ -286,7 +287,7 @@ describe('CRUD Operations Integration', () => {
         expect(screen.getByText('Buy groceries')).toBeInTheDocument();
       });
 
-      expect(SimpleTaskService.getUserTasks).toHaveBeenCalledWith('test-user-id');
+      expect(SimpleTaskService.getUserSimpleTasks).toHaveBeenCalledWith('test-user-id');
     });
   });
 
@@ -307,7 +308,8 @@ describe('CRUD Operations Integration', () => {
       vi.mocked(ProjectService.createProject).mockRejectedValue(validationError);
 
       try {
-        await ProjectService.createProject('test-user-id', {
+        await ProjectService.createProject({
+          userId: 'test-user-id',
           title: '',
           description: 'Test',
           status: 'todo',
@@ -320,10 +322,10 @@ describe('CRUD Operations Integration', () => {
 
     it('handles permission errors in task operations', async () => {
       const permissionError = new Error('Permission denied');
-      vi.mocked(SimpleTaskService.deleteTask).mockRejectedValue(permissionError);
+      vi.mocked(SimpleTaskService.deleteSimpleTask).mockRejectedValue(permissionError);
 
       try {
-        await SimpleTaskService.deleteTask('test-user-id', 'task-1');
+        await SimpleTaskService.deleteSimpleTask('task-1');
       } catch (error) {
         expect(error).toEqual(permissionError);
       }
@@ -344,11 +346,11 @@ describe('CRUD Operations Integration', () => {
 
     it('reverts optimistic updates on error', async () => {
       const updateError = new Error('Update failed');
-      vi.mocked(SimpleTaskService.updateTask).mockRejectedValue(updateError);
+      vi.mocked(SimpleTaskService.updateSimpleTask).mockRejectedValue(updateError);
 
       // This would typically be tested with a component that implements optimistic updates
       try {
-        await SimpleTaskService.updateTask('test-user-id', 'task-1', { completed: true });
+        await SimpleTaskService.updateSimpleTask('task-1', { completed: true });
       } catch (error) {
         expect(error).toEqual(updateError);
         // Component should revert the optimistic update

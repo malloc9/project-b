@@ -13,7 +13,7 @@ export class ImgBBStorageService {
   static async uploadFile(
     filePath: string,
     file: File,
-    metadata?: any
+    _metadata?: any
   ): Promise<string> {
     try {
       if (!this.API_KEY) {
@@ -61,7 +61,7 @@ export class ImgBBStorageService {
   /**
    * Delete file from ImgBB (not supported by free API)
    */
-  static async deleteFile(filePath: string): Promise<void> {
+  static async deleteFile(_filePath: string): Promise<void> {
     // ImgBB free tier doesn't support deletion via API
     // Images are automatically deleted after inactivity period
     console.warn('ImgBB free tier does not support image deletion via API');

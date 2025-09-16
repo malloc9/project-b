@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getCalendarSyncStatus, manualSyncCalendar } from '../../services/calendarService';
 import { useCalendar } from '../../contexts/CalendarContext';
 

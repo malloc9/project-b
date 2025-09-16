@@ -5,6 +5,7 @@ import {
   sendPasswordResetEmail,
   onAuthStateChanged,
 } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 import { AuthService } from '../authService';
 
 // Mock Firebase Auth functions
@@ -194,8 +195,8 @@ describe('AuthService', () => {
         },
       };
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(mockUser as any);
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        (callback as (user: any) => void)(mockUser as any);
         return mockUnsubscribe;
       });
 
@@ -215,8 +216,8 @@ describe('AuthService', () => {
       const mockCallback = vi.fn();
       const mockUnsubscribe = vi.fn();
 
-      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
-        callback(null);
+      mockOnAuthStateChanged.mockImplementation((_auth, callback) => {
+        (callback as (user: any) => void)(null);
         return mockUnsubscribe;
       });
 

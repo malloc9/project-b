@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Project, Subtask, TaskStatus } from '../../types';
+import type { Project, Subtask } from '../../types';
 import { 
   getProjectStatistics, 
   getSubtaskStatistics, 
@@ -28,18 +28,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
   const overdueSubtasks = selectedProject ? getOverdueSubtasks(subtasks) : [];
   const subtasksDueSoon = selectedProject ? getSubtasksDueSoon(subtasks) : [];
 
-  const getStatusColor = (status: TaskStatus): string => {
-    switch (status) {
-      case 'todo':
-        return 'text-gray-600';
-      case 'in_progress':
-        return 'text-blue-600';
-      case 'finished':
-        return 'text-green-600';
-      default:
-        return 'text-gray-600';
-    }
-  };
+  
 
   const StatCard: React.FC<{
     title: string;

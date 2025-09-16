@@ -75,6 +75,7 @@ describe('Project Service', () => {
   const mockSubtask: Subtask = {
     id: mockSubtaskId,
     projectId: mockProjectId,
+    userId: mockUserId,
     title: 'Test Subtask',
     description: 'Test subtask description',
     status: 'todo',
@@ -150,7 +151,7 @@ describe('Project Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getProject(mockProjectId);
+        const result = await getProject(mockProjectId, mockUserId);
 
         expect(result).toEqual(mockProject);
         expect(getDoc).toHaveBeenCalled();
@@ -162,7 +163,7 @@ describe('Project Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getProject(mockProjectId);
+        const result = await getProject(mockProjectId, mockUserId);
 
         expect(result).toBeNull();
       });
@@ -170,7 +171,7 @@ describe('Project Service', () => {
       it('should throw error when get fails', async () => {
         (getDoc as any).mockRejectedValue(new Error('Firestore error'));
 
-        await expect(getProject(mockProjectId)).rejects.toThrow();
+        await expect(getProject(mockProjectId, mockUserId)).rejects.toThrow();
       });
     });
 
@@ -209,7 +210,7 @@ describe('Project Service', () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
         const updates = { title: 'Updated Project' };
-        await updateProject(mockProjectId, updates);
+        await updateProject(mockProjectId, mockUserId, updates);
 
         expect(updateDoc).toHaveBeenCalledWith(
           expect.anything(),
@@ -224,7 +225,7 @@ describe('Project Service', () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
         const updates = { dueDate: new Date('2024-12-31') };
-        await updateProject(mockProjectId, updates);
+        await updateProject(mockProjectId, mockUserId, updates);
 
         expect(updateDoc).toHaveBeenCalledWith(
           expect.anything(),
@@ -238,7 +239,7 @@ describe('Project Service', () => {
       it('should throw error when update fails', async () => {
         (updateDoc as any).mockRejectedValue(new Error('Firestore error'));
 
-        await expect(updateProject(mockProjectId, {})).rejects.toThrow();
+        await expect(updateProject(mockProjectId, mockUserId, {})).rejects.toThrow();
       });
     });
 
@@ -257,7 +258,7 @@ describe('Project Service', () => {
         };
         (getDocs as any).mockResolvedValue(mockQuerySnapshot);
 
-        await deleteProject(mockProjectId);
+        await deleteProject(mockProjectId, mockUserId);
 
         expect(mockBatch.delete).toHaveBeenCalledTimes(2); // Project + 1 subtask
         expect(mockBatch.commit).toHaveBeenCalled();
@@ -271,7 +272,7 @@ describe('Project Service', () => {
         (writeBatch as any).mockReturnValue(mockBatch);
         (getDocs as any).mockResolvedValue({ forEach: vi.fn() });
 
-        await expect(deleteProject(mockProjectId)).rejects.toThrow();
+        await expect(deleteProject(mockProjectId, mockUserId)).rejects.toThrow();
       });
     });
   });
@@ -284,6 +285,7 @@ describe('Project Service', () => {
 
         const subtaskData = {
           projectId: mockProjectId,
+          userId: mockUserId,
           title: 'New Subtask',
           description: 'New subtask description',
           status: 'todo' as TaskStatus,
@@ -301,6 +303,7 @@ describe('Project Service', () => {
 
         const subtaskData = {
           projectId: mockProjectId,
+          userId: mockUserId,
           title: 'New Subtask',
           status: 'todo' as TaskStatus
         };

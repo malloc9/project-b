@@ -2,9 +2,7 @@ import {
   collection, 
   doc, 
   getDocs, 
-  getDoc, 
   setDoc, 
-  updateDoc, 
   deleteDoc, 
   query, 
   where, 
@@ -12,10 +10,10 @@ import {
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { offlineStorage } from '../utils/offlineStorage';
+import { offlineStorage, type OfflineData } from '../utils/offlineStorage';
 // import type { OfflineOperation } from '../utils/offlineStorage';
 // import { conflictResolver, ConflictData } from '../utils/conflictResolution';
-import type { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../types';
+
 
 export interface SyncResult {
   success: boolean;
@@ -157,7 +155,7 @@ class SyncService {
       for (const docSnapshot of snapshot.docs) {
         const remoteData = { id: docSnapshot.id, ...docSnapshot.data() };
         const localData = offlineStorage.getCachedData(
-          collectionName as keyof any, 
+          collectionName as keyof OfflineData, 
           docSnapshot.id
         );
 
@@ -166,7 +164,7 @@ class SyncService {
           await this.resolveConflict(collectionName, localData, remoteData);
         } else {
           // No local version, just cache the remote data
-          offlineStorage.cacheData(collectionName as keyof any, docSnapshot.id, remoteData);
+          offlineStorage.cacheData(collectionName as keyof OfflineData, docSnapshot.id, remoteData);
         }
       }
     } catch (error) {
@@ -177,7 +175,7 @@ class SyncService {
   // Resolve conflicts between local and remote data
   private async resolveConflict(
     collectionName: string,
-    localData: any,
+    _localData: any,
     remoteData: any
   ): Promise<void> {
     // Temporarily disabled conflict resolution
@@ -191,7 +189,7 @@ class SyncService {
 
     // Cache the resolved data
     offlineStorage.cacheData(
-      collectionName as keyof any, 
+      collectionName as keyof OfflineData, 
       resolution.resolved.id, 
       resolution.resolved
     );
@@ -240,7 +238,7 @@ class SyncService {
   }
 
   // Push local changes to remote
-  private async pushLocalChanges(userId: string): Promise<SyncResult> {
+  private async pushLocalChanges(_userId: string): Promise<SyncResult> {
     const pendingOperations = offlineStorage.getPendingOperations();
     let syncedOperations = 0;
     let conflicts = 0;

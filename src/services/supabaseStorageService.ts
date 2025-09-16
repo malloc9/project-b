@@ -10,7 +10,7 @@
 export class SupabaseStorageService {
   private static readonly SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  private static readonly BUCKET_NAME = 'plant-photos';
+  // private static readonly BUCKET_NAME = 'plant-photos';
 
   // Uncomment when you install Supabase
   // private static supabase = createClient(this.SUPABASE_URL, this.SUPABASE_ANON_KEY);
@@ -19,9 +19,9 @@ export class SupabaseStorageService {
    * Upload file to Supabase Storage
    */
   static async uploadFile(
-    filePath: string,
-    file: File,
-    metadata?: any
+    _filePath: string,
+    _file: File,
+    _metadata?: any
   ): Promise<string> {
     try {
       if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
@@ -60,7 +60,7 @@ export class SupabaseStorageService {
   /**
    * Delete file from Supabase Storage
    */
-  static async deleteFile(filePath: string): Promise<void> {
+  static async deleteFile(_filePath: string): Promise<void> {
     try {
       if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
         console.warn('Supabase not configured, skipping deletion');

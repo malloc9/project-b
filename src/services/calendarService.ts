@@ -1,5 +1,5 @@
 import { httpsCallable, getFunctions } from 'firebase/functions';
-import type { CalendarEvent, CalendarReminder } from '../types';
+import type { CalendarEvent } from '../types';
 import { executeCalendarOperation, calendarQueue, isCalendarAvailable } from '../utils/calendarErrorHandler';
 
 const functions = getFunctions();
@@ -150,6 +150,7 @@ export async function createPlantCareCalendarEvent(
   plantName?: string
 ): Promise<string> {
   const event: CalendarEvent = {
+    id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Generate unique ID
     title: `Plant Care: ${title}`,
     description: description || `Care task for plant: ${plantName}`,
     startDate: dueDate,
@@ -178,6 +179,7 @@ export async function createProjectCalendarEvent(
   }
 
   const event: CalendarEvent = {
+    id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Generate unique ID
     title: `Project: ${title}`,
     description: description || 'Household project deadline',
     startDate: dueDate,
@@ -200,6 +202,7 @@ export async function createSimpleTaskCalendarEvent(
   dueDate: Date
 ): Promise<string> {
   const event: CalendarEvent = {
+    id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Generate unique ID
     title: `Task: ${title}`,
     description: description || 'Household task',
     startDate: dueDate,

@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import type { AppError } from '../../types/errors';
 import { ErrorCode } from '../../types/errors';
 import { createAppError } from '../../types/errors';
@@ -51,7 +51,7 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(_error: Error, errorInfo: ErrorInfo) {
     const { error: appError, errorId } = this.state;
     
     if (appError && errorId) {

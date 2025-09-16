@@ -1,9 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { ValidatedInput } from '../ValidatedInput';
-import type { ValidationError } from '../../../types/errors';
 
 describe('ValidatedInput', () => {
   const mockOnChange = vi.fn();
@@ -135,7 +134,7 @@ describe('ValidatedInput', () => {
   it('displays validation error with correct styling', () => {
     mockOnValidate.mockReturnValue({ field: 'test', message: 'Error message' });
     
-    const { rerender } = render(
+    const {} = render(
       <ValidatedInput
         value="invalid"
         onChange={mockOnChange}

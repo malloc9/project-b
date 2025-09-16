@@ -14,7 +14,7 @@ export class CloudinaryStorageService {
   static async uploadFile(
     filePath: string,
     file: File,
-    metadata?: any
+    _metadata?: any
   ): Promise<string> {
     try {
       if (!this.CLOUD_NAME || !this.UPLOAD_PRESET) {
@@ -102,7 +102,7 @@ export class CloudinaryStorageService {
   /**
    * Get plant photo path
    */
-  static getPlantPhotoPath(userId: string, plantId: string, photoId: string, extension: string): string {
+  static getPlantPhotoPath(userId: string, plantId: string, photoId: string, _extension: string): string {
     return `users/${userId}/plants/${plantId}/photos/${photoId}`;
   }
 

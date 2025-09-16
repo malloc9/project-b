@@ -14,7 +14,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import type { Project, Subtask, TaskStatus } from '../types';
-import type { AppError } from '../types/errors';
+
 import { ErrorCode } from '../types/errors';
 import { createAppError } from '../types/errors';
 import { createProjectCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './calendarService';
@@ -139,11 +139,12 @@ export const getUserProjects = async (userId: string): Promise<Project[]> => {
 
 export const updateProject = async (
   projectId: string,
+  userId: string,
   updates: Partial<Project>
 ): Promise<void> => {
   try {
     // Get current project for calendar sync
-    const currentProject = await getProject(projectId);
+    const currentProject = await getProject(projectId, userId);
     
     // Handle calendar sync for completed projects
     if (updates.status === 'finished' && currentProject?.calendarEventId) {
@@ -190,11 +191,11 @@ export const updateProject = async (
   }
 };
 
-export const deleteProject = async (projectId: string): Promise<void> => {
+export const deleteProject = async (projectId: string, userId: string): Promise<void> => {
   try {
     // Get project and subtasks for calendar cleanup
     const [project, subtasks] = await Promise.all([
-      getProject(projectId),
+      getProject(projectId, userId),
       getProjectSubtasks(projectId)
     ]);
     
@@ -420,16 +421,16 @@ export const getProjectsWithSubtasks = async (userId: string): Promise<Project[]
 /**
  * Update project status based on subtask completion
  */
-export const updateProjectStatusFromSubtasks = async (projectId: string): Promise<void> => {
+export const updateProjectStatusFromSubtasks = async (projectId: string, userId: string): Promise<void> => {
   try {
     const subtasks = await getProjectSubtasks(projectId);
     
     if (shouldAutoCompleteProject(subtasks)) {
-      await updateProject(projectId, { status: 'finished' });
+      await updateProject(projectId, userId, { status: 'finished' });
     } else if (subtasks.some(subtask => subtask.status === 'in_progress')) {
-      await updateProject(projectId, { status: 'in_progress' });
+      await updateProject(projectId, userId, { status: 'in_progress' });
     } else if (subtasks.some(subtask => subtask.status === 'todo')) {
-      await updateProject(projectId, { status: 'todo' });
+      await updateProject(projectId, userId, { status: 'todo' });
     }
   } catch (error) {
     console.error('Error updating project status:', error);
@@ -646,7 +647,7 @@ export const updateSubtaskWithProjectSync = async (
     }
 
     // Update project status based on all subtasks
-    await updateProjectStatusFromSubtasks(subtask.projectId);
+    await updateProjectStatusFromSubtasks(subtask.projectId, subtask.userId);
   } catch (error) {
     console.error('Error updating subtask with project sync:', error);
     throw error;
@@ -660,23 +661,23 @@ export const bulkUpdateSubtasks = async (
   updates: Array<{ id: string; updates: Partial<Subtask> }>
 ): Promise<void> => {
   try {
-    const projectIds = new Set<string>();
+    const projectUserIds = new Map<string, string>();
     
-    // Update all subtasks and collect project IDs
+    // Update all subtasks and collect project IDs and user IDs
     await Promise.all(
       updates.map(async ({ id, updates: subtaskUpdates }) => {
         await updateSubtask(id, subtaskUpdates);
         const subtask = await getSubtask(id);
         if (subtask) {
-          projectIds.add(subtask.projectId);
+          projectUserIds.set(subtask.projectId, subtask.userId);
         }
       })
     );
 
     // Update all affected project statuses
     await Promise.all(
-      Array.from(projectIds).map(projectId => 
-        updateProjectStatusFromSubtasks(projectId)
+      Array.from(projectUserIds.entries()).map(([projectId, userId]) => 
+        updateProjectStatusFromSubtasks(projectId, userId)
       )
     );
   } catch (error) {
@@ -688,7 +689,7 @@ export const bulkUpdateSubtasks = async (
 /**
  * Get project progress details including subtask breakdown
  */
-export const getProjectProgressDetails = async (projectId: string): Promise<{
+export const getProjectProgressDetails = async (projectId: string, userId: string): Promise<{
   project: Project;
   subtasks: Subtask[];
   progress: number;
@@ -698,7 +699,7 @@ export const getProjectProgressDetails = async (projectId: string): Promise<{
 }> => {
   try {
     const [project, subtasks] = await Promise.all([
-      getProject(projectId),
+      getProject(projectId, userId),
       getProjectSubtasks(projectId)
     ]);
 

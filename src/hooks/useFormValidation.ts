@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { FormErrors, ValidationError } from '../types/errors';
-import { validationErrorsToFormErrors, hasFormErrors } from '../types/errors';
+import { hasFormErrors } from '../types/errors';
 
 interface ValidationRule<T> {
   field: keyof T;
@@ -37,11 +37,12 @@ export function useFormValidation<T extends Record<string, any>>({
   initialData,
   validationRules,
   validateOnChange = false,
-  validateOnBlur = true
+  validateOnBlur
 }: UseFormValidationOptions<T>): UseFormValidationReturn<T> {
+  console.log(validateOnBlur);
   const [data, setData] = useState<T>(initialData);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [touchedFields, setTouchedFields] = useState<Set<keyof T>>(new Set());
+  const [_touchedFields, setTouchedFields] = useState<Set<keyof T>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Create a map of validation rules for quick lookup

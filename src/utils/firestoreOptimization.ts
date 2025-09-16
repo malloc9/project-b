@@ -5,8 +5,8 @@ import {
   orderBy, 
   where, 
   startAfter, 
-  DocumentSnapshot,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot,
+  query
 } from 'firebase/firestore';
 
 /**
@@ -25,19 +25,13 @@ export function createPaginatedQuery(
   options: PaginationOptions,
   constraints: QueryConstraint[] = []
 ): Query {
-  let query = baseQuery;
+  let finalQuery = query(baseQuery, ...constraints);
 
-  // Apply additional constraints
-  constraints.forEach(constraint => {
-    query = query.withConverter(query.converter);
-  });
-
-  // Add pagination
   if (options.lastDoc) {
-    query = query.startAfter(options.lastDoc);
+    finalQuery = query(finalQuery, startAfter(options.lastDoc));
   }
 
-  return query.limit(options.pageSize);
+  return query(finalQuery, limit(options.pageSize));
 }
 
 /**

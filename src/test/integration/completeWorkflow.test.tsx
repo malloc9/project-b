@@ -1,53 +1,53 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import App from '../../App';
-import * as AuthService from '../../services/authService';
-import * as PlantService from '../../services/plantService';
-import * as ProjectService from '../../services/projectService';
-import * as SimpleTaskService from '../../services/simpleTaskService';
-import * as CalendarService from '../../services/calendarService';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { BrowserRouter } from "react-router-dom";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import App from "../../App";
+import { AuthService } from "../../services/authService";
+import { PlantService } from "../../services/plantService";
+import * as ProjectService from "../../services/projectService";
+import * as SimpleTaskService from "../../services/simpleTaskService";
+import * as CalendarService from "../../services/calendarService";
 
 // Mock types and enums
-vi.mock('../../types', () => ({
+vi.mock("../../types", () => ({
   ErrorCode: {
-    UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-    AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
-    AUTH_USER_NOT_FOUND: 'AUTH_USER_NOT_FOUND',
-    AUTH_WRONG_PASSWORD: 'AUTH_WRONG_PASSWORD',
-    AUTH_EMAIL_ALREADY_IN_USE: 'AUTH_EMAIL_ALREADY_IN_USE',
-    AUTH_WEAK_PASSWORD: 'AUTH_WEAK_PASSWORD',
-    AUTH_NETWORK_ERROR: 'AUTH_NETWORK_ERROR',
-    AUTH_TOO_MANY_REQUESTS: 'AUTH_TOO_MANY_REQUESTS',
-    DB_PERMISSION_DENIED: 'DB_PERMISSION_DENIED',
-    DB_NOT_FOUND: 'DB_NOT_FOUND',
-    DB_NETWORK_ERROR: 'DB_NETWORK_ERROR',
-    DB_QUOTA_EXCEEDED: 'DB_QUOTA_EXCEEDED',
-    DB_VALIDATION_ERROR: 'DB_VALIDATION_ERROR',
-    STORAGE_UNAUTHORIZED: 'STORAGE_UNAUTHORIZED',
-    STORAGE_QUOTA_EXCEEDED: 'STORAGE_QUOTA_EXCEEDED',
-    STORAGE_INVALID_FORMAT: 'STORAGE_INVALID_FORMAT',
-    STORAGE_FILE_TOO_LARGE: 'STORAGE_FILE_TOO_LARGE',
-    STORAGE_NETWORK_ERROR: 'STORAGE_NETWORK_ERROR',
-    CALENDAR_AUTH_ERROR: 'CALENDAR_AUTH_ERROR',
-    CALENDAR_QUOTA_EXCEEDED: 'CALENDAR_QUOTA_EXCEEDED',
-    CALENDAR_NETWORK_ERROR: 'CALENDAR_NETWORK_ERROR',
-    CALENDAR_INVALID_EVENT: 'CALENDAR_INVALID_EVENT',
-    VALIDATION_ERROR: 'VALIDATION_ERROR',
-    NETWORK_ERROR: 'NETWORK_ERROR',
+    UNKNOWN_ERROR: "UNKNOWN_ERROR",
+    AUTH_INVALID_CREDENTIALS: "AUTH_INVALID_CREDENTIALS",
+    AUTH_USER_NOT_FOUND: "AUTH_USER_NOT_FOUND",
+    AUTH_WRONG_PASSWORD: "AUTH_WRONG_PASSWORD",
+    AUTH_EMAIL_ALREADY_IN_USE: "AUTH_EMAIL_ALREADY_IN_USE",
+    AUTH_WEAK_PASSWORD: "AUTH_WEAK_PASSWORD",
+    AUTH_NETWORK_ERROR: "AUTH_NETWORK_ERROR",
+    AUTH_TOO_MANY_REQUESTS: "AUTH_TOO_MANY_REQUESTS",
+    DB_PERMISSION_DENIED: "DB_PERMISSION_DENIED",
+    DB_NOT_FOUND: "DB_NOT_FOUND",
+    DB_NETWORK_ERROR: "DB_NETWORK_ERROR",
+    DB_QUOTA_EXCEEDED: "DB_QUOTA_EXCEEDED",
+    DB_VALIDATION_ERROR: "DB_VALIDATION_ERROR",
+    STORAGE_UNAUTHORIZED: "STORAGE_UNAUTHORIZED",
+    STORAGE_QUOTA_EXCEEDED: "STORAGE_QUOTA_EXCEEDED",
+    STORAGE_INVALID_FORMAT: "STORAGE_INVALID_FORMAT",
+    STORAGE_FILE_TOO_LARGE: "STORAGE_FILE_TOO_LARGE",
+    STORAGE_NETWORK_ERROR: "STORAGE_NETWORK_ERROR",
+    CALENDAR_AUTH_ERROR: "CALENDAR_AUTH_ERROR",
+    CALENDAR_QUOTA_EXCEEDED: "CALENDAR_QUOTA_EXCEEDED",
+    CALENDAR_NETWORK_ERROR: "CALENDAR_NETWORK_ERROR",
+    CALENDAR_INVALID_EVENT: "CALENDAR_INVALID_EVENT",
+    VALIDATION_ERROR: "VALIDATION_ERROR",
+    NETWORK_ERROR: "NETWORK_ERROR",
   },
 }));
 
 // Mock application services
-vi.mock('../../services/authService', () => ({
+vi.mock("../../services/authService", () => ({
   getCurrentUser: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
   resetPassword: vi.fn(),
 }));
 
-vi.mock('../../services/plantService', () => ({
+vi.mock("../../services/plantService", () => ({
   getUserPlants: vi.fn(),
   createPlant: vi.fn(),
   updatePlant: vi.fn(),
@@ -55,7 +55,7 @@ vi.mock('../../services/plantService', () => ({
   uploadPlantPhoto: vi.fn(),
 }));
 
-vi.mock('../../services/projectService', () => ({
+vi.mock("../../services/projectService", () => ({
   getUserProjects: vi.fn(),
   createProject: vi.fn(),
   updateProject: vi.fn(),
@@ -65,45 +65,45 @@ vi.mock('../../services/projectService', () => ({
   deleteSubtask: vi.fn(),
 }));
 
-vi.mock('../../services/simpleTaskService', () => ({
+vi.mock("../../services/simpleTaskService", () => ({
   getUserTasks: vi.fn(),
-  createTask: vi.fn(),
+  createSimpleTask: vi.fn(),
   updateTask: vi.fn(),
   deleteTask: vi.fn(),
 }));
 
-vi.mock('../../services/calendarService', () => ({
-  createEvent: vi.fn(),
-  updateEvent: vi.fn(),
-  deleteEvent: vi.fn(),
+vi.mock("../../services/calendarService", () => ({
+  createCalendarEvent: vi.fn(),
+  updateCalendarEvent: vi.fn(),
+  deleteCalendarEvent: vi.fn(),
   createProjectCalendarEvent: vi.fn(),
   createTaskCalendarEvent: vi.fn(),
 }));
 
 // Mock React Router for navigation testing
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
   };
 });
 
-describe('Complete Application Workflow Integration Tests', () => {
+describe("Complete Application Workflow Integration Tests", () => {
   const mockUser = {
-    uid: 'test-user-123',
-    email: 'test@example.com',
-    displayName: 'Test User',
+    uid: "test-user-123",
+    email: "test@example.com",
+    displayName: "Test User",
     createdAt: new Date(),
   };
 
   const mockPlant = {
-    id: 'plant-1',
-    userId: 'test-user-123',
-    name: 'Test Plant',
-    species: 'Test Species',
-    description: 'A test plant for integration testing',
+    id: "plant-1",
+    userId: "test-user-123",
+    name: "Test Plant",
+    species: "Test Species",
+    description: "A test plant for integration testing",
     photos: [],
     careTasks: [],
     createdAt: new Date(),
@@ -111,11 +111,11 @@ describe('Complete Application Workflow Integration Tests', () => {
   };
 
   const mockProject = {
-    id: 'project-1',
-    userId: 'test-user-123',
-    title: 'Test Project',
-    description: 'A test project for integration testing',
-    status: 'todo' as const,
+    id: "project-1",
+    userId: "test-user-123",
+    title: "Test Project",
+    description: "A test project for integration testing",
+    status: "todo" as const,
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
     subtasks: [],
     createdAt: new Date(),
@@ -123,10 +123,10 @@ describe('Complete Application Workflow Integration Tests', () => {
   };
 
   const mockTask = {
-    id: 'task-1',
-    userId: 'test-user-123',
-    title: 'Test Task',
-    description: 'A test task for integration testing',
+    id: "task-1",
+    userId: "test-user-123",
+    title: "Test Task",
+    description: "A test task for integration testing",
     dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
     completed: false,
     createdAt: new Date(),
@@ -136,43 +136,45 @@ describe('Complete Application Workflow Integration Tests', () => {
   beforeEach(() => {
     // Reset all mocks
     vi.clearAllMocks();
-    
+
     // Mock successful authentication
     vi.mocked(AuthService.getCurrentUser).mockResolvedValue(mockUser);
     vi.mocked(AuthService.login).mockResolvedValue(mockUser);
     vi.mocked(AuthService.logout).mockResolvedValue();
-    
+
     // Mock plant service
     vi.mocked(PlantService.getUserPlants).mockResolvedValue([mockPlant]);
-    vi.mocked(PlantService.createPlant).mockResolvedValue(mockPlant);
-    vi.mocked(PlantService.updatePlant).mockResolvedValue(mockPlant);
+    vi.mocked(PlantService.createPlant).mockResolvedValue('plant-1');
+    vi.mocked(PlantService.updatePlant).mockResolvedValue(undefined);
     vi.mocked(PlantService.deletePlant).mockResolvedValue();
-    
+
     // Mock project service
     vi.mocked(ProjectService.getUserProjects).mockResolvedValue([mockProject]);
-    vi.mocked(ProjectService.createProject).mockResolvedValue(mockProject);
-    vi.mocked(ProjectService.updateProject).mockResolvedValue(mockProject);
+    vi.mocked(ProjectService.createProject).mockResolvedValue('project-1');
+    vi.mocked(ProjectService.updateProject).mockResolvedValue(undefined);
     vi.mocked(ProjectService.deleteProject).mockResolvedValue();
-    
+
     // Mock task service
-    vi.mocked(SimpleTaskService.getUserTasks).mockResolvedValue([mockTask]);
-    vi.mocked(SimpleTaskService.createTask).mockResolvedValue(mockTask);
-    vi.mocked(SimpleTaskService.updateTask).mockResolvedValue(mockTask);
-    vi.mocked(SimpleTaskService.deleteTask).mockResolvedValue();
-    
+    vi.mocked(SimpleTaskService.getUserSimpleTasks).mockResolvedValue([mockTask]);
+    vi.mocked(SimpleTaskService.createSimpleTask).mockResolvedValue('task-1');
+    vi.mocked(SimpleTaskService.updateSimpleTask).mockResolvedValue(undefined);
+    vi.mocked(SimpleTaskService.deleteSimpleTask).mockResolvedValue();
+
     // Mock calendar service
-    vi.mocked(CalendarService.createEvent).mockResolvedValue('calendar-event-123');
-    vi.mocked(CalendarService.updateEvent).mockResolvedValue();
-    vi.mocked(CalendarService.deleteEvent).mockResolvedValue();
+    vi.mocked(CalendarService.createCalendarEvent).mockResolvedValue(
+      "calendar-event-123"
+    );
+    vi.mocked(CalendarService.updateCalendarEvent).mockResolvedValue();
+    vi.mocked(CalendarService.deleteCalendarEvent).mockResolvedValue();
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('should complete full user workflow from login to task management', async () => {
+  it("should complete full user workflow from login to task management", async () => {
     const user = userEvent.setup();
-    
+
     // Render the app
     render(
       <BrowserRouter>
@@ -191,7 +193,7 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Navigate to plants page
-    const plantsLink = screen.getByRole('link', { name: /plant codex/i });
+    const plantsLink = screen.getByRole("link", { name: /plant codex/i });
     await user.click(plantsLink);
 
     await waitFor(() => {
@@ -199,7 +201,7 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Navigate to projects page
-    const projectsLink = screen.getByRole('link', { name: /projects/i });
+    const projectsLink = screen.getByRole("link", { name: /projects/i });
     await user.click(projectsLink);
 
     await waitFor(() => {
@@ -207,7 +209,7 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Navigate to tasks page
-    const tasksLink = screen.getByRole('link', { name: /tasks/i });
+    const tasksLink = screen.getByRole("link", { name: /tasks/i });
     await user.click(tasksLink);
 
     await waitFor(() => {
@@ -215,7 +217,7 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Navigate to calendar page
-    const calendarLink = screen.getByRole('link', { name: /calendar/i });
+    const calendarLink = screen.getByRole("link", { name: /calendar/i });
     await user.click(calendarLink);
 
     await waitFor(() => {
@@ -223,9 +225,9 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
   });
 
-  it('should handle plant creation workflow with photo upload', async () => {
+  it("should handle plant creation workflow with photo upload", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BrowserRouter>
         <App />
@@ -238,42 +240,45 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Navigate to plants page
-    const plantsLink = screen.getByRole('link', { name: /plant codex/i });
+    const plantsLink = screen.getByRole("link", { name: /plant codex/i });
     await user.click(plantsLink);
 
     // Click add plant button
-    const addPlantButton = screen.getByRole('button', { name: /add plant/i });
+    const addPlantButton = screen.getByRole("button", { name: /add plant/i });
     await user.click(addPlantButton);
 
     // Fill out plant form
     const nameInput = screen.getByLabelText(/plant name/i);
-    await user.type(nameInput, 'New Test Plant');
+    await user.type(nameInput, "New Test Plant");
 
     const speciesInput = screen.getByLabelText(/species/i);
-    await user.type(speciesInput, 'Testicus planticus');
+    await user.type(speciesInput, "Testicus planticus");
 
     const descriptionInput = screen.getByLabelText(/description/i);
-    await user.type(descriptionInput, 'A beautiful test plant for our collection');
+    await user.type(
+      descriptionInput,
+      "A beautiful test plant for our collection"
+    );
 
     // Submit form
-    const saveButton = screen.getByRole('button', { name: /save plant/i });
+    const saveButton = screen.getByRole("button", { name: /save plant/i });
     await user.click(saveButton);
 
     // Verify plant service was called
     await waitFor(() => {
       expect(PlantService.createPlant).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: 'New Test Plant',
-          species: 'Testicus planticus',
-          description: 'A beautiful test plant for our collection',
+          name: "New Test Plant",
+          species: "Testicus planticus",
+          description: "A beautiful test plant for our collection",
         })
       );
     });
   });
 
-  it('should handle project creation with subtasks and calendar integration', async () => {
+  it("should handle project creation with subtasks and calendar integration", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BrowserRouter>
         <App />
@@ -285,47 +290,49 @@ describe('Complete Application Workflow Integration Tests', () => {
       expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
     });
 
-    const projectsLink = screen.getByRole('link', { name: /projects/i });
+    const projectsLink = screen.getByRole("link", { name: /projects/i });
     await user.click(projectsLink);
 
     // Click add project button
-    const addProjectButton = screen.getByRole('button', { name: /add project/i });
+    const addProjectButton = screen.getByRole("button", {
+      name: /add project/i,
+    });
     await user.click(addProjectButton);
 
     // Fill out project form
     const titleInput = screen.getByLabelText(/project title/i);
-    await user.type(titleInput, 'Kitchen Renovation');
+    await user.type(titleInput, "Kitchen Renovation");
 
     const descriptionInput = screen.getByLabelText(/description/i);
-    await user.type(descriptionInput, 'Complete kitchen renovation project');
+    await user.type(descriptionInput, "Complete kitchen renovation project");
 
     // Set due date
     const dueDateInput = screen.getByLabelText(/due date/i);
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 30);
-    await user.type(dueDateInput, futureDate.toISOString().split('T')[0]);
+    await user.type(dueDateInput, futureDate.toISOString().split("T")[0]);
 
     // Submit form
-    const saveButton = screen.getByRole('button', { name: /save project/i });
+    const saveButton = screen.getByRole("button", { name: /save project/i });
     await user.click(saveButton);
 
     // Verify project service was called
     await waitFor(() => {
       expect(ProjectService.createProject).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: 'Kitchen Renovation',
-          description: 'Complete kitchen renovation project',
+          title: "Kitchen Renovation",
+          description: "Complete kitchen renovation project",
         })
       );
     });
 
     // Verify calendar integration
-    expect(CalendarService.createEvent).toHaveBeenCalled();
+    expect(CalendarService.createCalendarEvent).toHaveBeenCalled();
   });
 
-  it('should handle task creation and calendar synchronization', async () => {
+  it("should handle task creation and calendar synchronization", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BrowserRouter>
         <App />
@@ -337,52 +344,52 @@ describe('Complete Application Workflow Integration Tests', () => {
       expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
     });
 
-    const tasksLink = screen.getByRole('link', { name: /tasks/i });
+    const tasksLink = screen.getByRole("link", { name: /tasks/i });
     await user.click(tasksLink);
 
     // Click add task button
-    const addTaskButton = screen.getByRole('button', { name: /add task/i });
+    const addTaskButton = screen.getByRole("button", { name: /add task/i });
     await user.click(addTaskButton);
 
     // Fill out task form
     const titleInput = screen.getByLabelText(/task title/i);
-    await user.type(titleInput, 'Buy groceries');
+    await user.type(titleInput, "Buy groceries");
 
     const descriptionInput = screen.getByLabelText(/description/i);
-    await user.type(descriptionInput, 'Weekly grocery shopping');
+    await user.type(descriptionInput, "Weekly grocery shopping");
 
     // Set due date
     const dueDateInput = screen.getByLabelText(/due date/i);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    await user.type(dueDateInput, tomorrow.toISOString().split('T')[0]);
+    await user.type(dueDateInput, tomorrow.toISOString().split("T")[0]);
 
     // Submit form
-    const saveButton = screen.getByRole('button', { name: /save task/i });
+    const saveButton = screen.getByRole("button", { name: /save task/i });
     await user.click(saveButton);
 
     // Verify task service was called
     await waitFor(() => {
-      expect(SimpleTaskService.createTask).toHaveBeenCalledWith(
+      expect(SimpleTaskService.createSimpleTask).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: 'Buy groceries',
-          description: 'Weekly grocery shopping',
+          title: "Buy groceries",
+          description: "Weekly grocery shopping",
         })
       );
     });
 
     // Verify calendar integration
-    expect(CalendarService.createEvent).toHaveBeenCalled();
+    expect(CalendarService.createCalendarEvent).toHaveBeenCalled();
   });
 
-  it('should handle responsive design across different screen sizes', async () => {
+  it("should handle responsive design across different screen sizes", async () => {
     // Test mobile viewport
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(window, "innerWidth", {
       writable: true,
       configurable: true,
       value: 375,
     });
-    Object.defineProperty(window, 'innerHeight', {
+    Object.defineProperty(window, "innerHeight", {
       writable: true,
       configurable: true,
       value: 667,
@@ -399,40 +406,42 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Check for mobile navigation (hamburger menu should be visible)
-    const mobileMenuButton = screen.getByRole('button', { name: /menu/i });
+    const mobileMenuButton = screen.getByRole("button", { name: /menu/i });
     expect(mobileMenuButton).toBeInTheDocument();
 
     // Test tablet viewport
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(window, "innerWidth", {
       writable: true,
       configurable: true,
       value: 768,
     });
 
     // Trigger resize event
-    fireEvent(window, new Event('resize'));
+    fireEvent(window, new Event("resize"));
 
     // Test desktop viewport
-    Object.defineProperty(window, 'innerWidth', {
+    Object.defineProperty(window, "innerWidth", {
       writable: true,
       configurable: true,
       value: 1024,
     });
 
     // Trigger resize event
-    fireEvent(window, new Event('resize'));
+    fireEvent(window, new Event("resize"));
 
     // Desktop navigation should be visible
-    const desktopNav = screen.getByRole('navigation');
+    const desktopNav = screen.getByRole("navigation");
     expect(desktopNav).toBeInTheDocument();
   });
 
-  it('should handle error states and recovery', async () => {
+  it("should handle error states and recovery", async () => {
     // Mock service errors
-    vi.mocked(PlantService.getUserPlants).mockRejectedValue(new Error('Network error'));
-    
+    vi.mocked(PlantService.getUserPlants).mockRejectedValue(
+      new Error("Network error")
+    );
+
     const user = userEvent.setup();
-    
+
     render(
       <BrowserRouter>
         <App />
@@ -444,7 +453,7 @@ describe('Complete Application Workflow Integration Tests', () => {
       expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
     });
 
-    const plantsLink = screen.getByRole('link', { name: /plant codex/i });
+    const plantsLink = screen.getByRole("link", { name: /plant codex/i });
     await user.click(plantsLink);
 
     // Should show error message
@@ -453,11 +462,11 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Test retry functionality
-    const retryButton = screen.getByRole('button', { name: /retry/i });
-    
+    const retryButton = screen.getByRole("button", { name: /retry/i });
+
     // Mock successful retry
     vi.mocked(PlantService.getUserPlants).mockResolvedValue([mockPlant]);
-    
+
     await user.click(retryButton);
 
     // Should recover and show plants
@@ -466,9 +475,9 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
   });
 
-  it('should handle offline functionality', async () => {
+  it("should handle offline functionality", async () => {
     // Mock offline state
-    Object.defineProperty(navigator, 'onLine', {
+    Object.defineProperty(navigator, "onLine", {
       writable: true,
       value: false,
     });
@@ -485,7 +494,7 @@ describe('Complete Application Workflow Integration Tests', () => {
     });
 
     // Test offline data access
-    const plantsLink = screen.getByRole('link', { name: /plant codex/i });
+    const plantsLink = screen.getByRole("link", { name: /plant codex/i });
     await userEvent.click(plantsLink);
 
     // Should still show cached data or appropriate offline message

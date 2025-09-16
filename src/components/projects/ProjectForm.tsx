@@ -114,7 +114,7 @@ const ProjectForm: React.FC = () => {
       console.log('Creating project with data:', projectData);
 
       if (isEditing && projectId) {
-        await updateProject(projectId, projectData);
+        await updateProject(projectId, user.uid, projectData);
         navigate(`/projects/${projectId}`);
       } else {
         const newProjectId = await createProject(projectData);

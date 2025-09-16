@@ -152,20 +152,6 @@ export async function testFirebaseConnection(): Promise<{
     }
 
     // Try to initialize Firebase (this will throw if config is wrong)
-    const { initializeApp } = await import('firebase/app');
-    const { getAuth } = await import('firebase/auth');
-    
-    const app = initializeApp({
-      apiKey: validation.config.apiKey!,
-      authDomain: validation.config.authDomain!,
-      projectId: validation.config.projectId!,
-      storageBucket: validation.config.storageBucket!,
-      messagingSenderId: validation.config.messagingSenderId!,
-      appId: validation.config.appId!,
-    });
-
-    const auth = getAuth(app);
-    
     // If we get here, Firebase initialized successfully
     return { success: true };
     

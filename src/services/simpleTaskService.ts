@@ -13,8 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import type { SimpleTask } from '../types';
-import type { ErrorCode } from '../types/errors';
-import { createAppError } from '../types/errors';
+import { ErrorCode, createAppError } from '../types/errors';
 import { createSimpleTaskCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './calendarService';
 
 // ============================================================================

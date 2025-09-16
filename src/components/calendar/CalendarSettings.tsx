@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useCalendar } from '../../contexts/CalendarContext';
 import { CalendarSyncStatus } from './CalendarSyncStatus';
 

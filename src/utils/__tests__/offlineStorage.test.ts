@@ -1,5 +1,4 @@
 import { offlineStorage } from '../offlineStorage';
-import type { OfflineOperation } from '../offlineStorage';
 import type { Plant } from '../../types';
 import { describe, it, expect, beforeEach } from 'vitest';
 

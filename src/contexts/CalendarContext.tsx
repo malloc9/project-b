@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { 
   initializeCalendarAuth, 
-  completeCalendarAuth, 
-  getCalendarConnectionStatus 
+  completeCalendarAuth 
 } from '../services/calendarService';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';

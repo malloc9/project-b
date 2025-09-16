@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import type { ValidationError } from '../../types/errors';
+import React, { type ReactNode } from 'react';
+
 
 interface FormFieldProps {
   label: string;
@@ -39,12 +39,12 @@ export const FormField: React.FC<FormFieldProps> = ({
       </label>
       
       <div className="relative">
-        {React.cloneElement(children as React.ReactElement, {
+        {React.cloneElement(children as React.ReactElement<any>, {
           id: fieldId,
           name,
           'aria-invalid': hasErrors,
           'aria-describedby': hasErrors ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined,
-          className: `${(children as React.ReactElement).props.className || ''} ${
+          className: `${((children as React.ReactElement).props as any).className || ''} ${
             hasErrors 
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
               : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'

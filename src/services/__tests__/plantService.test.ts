@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { PlantService } from '../plantService';
 import { FirestoreService, StorageService } from '../firebase';
-import type { Plant, PlantPhoto, PlantCareTask } from '../../types';
+import type { Plant, PlantPhoto } from '../../types';
 
 // Mock Firebase services
 vi.mock('../firebase', () => ({
@@ -318,6 +318,8 @@ describe('PlantService', () => {
         description: 'Water thoroughly',
         dueDate: new Date('2024-01-15'),
         completed: false,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       };
 
       const getPlantSpy = vi.spyOn(PlantService, 'getPlant').mockResolvedValue(mockPlant);
@@ -343,6 +345,8 @@ describe('PlantService', () => {
         title: 'Water plant',
         dueDate: new Date('2024-01-15'),
         completed: false,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       };
 
       const getPlantSpy = vi.spyOn(PlantService, 'getPlant').mockRejectedValue(new Error('Plant not found'));

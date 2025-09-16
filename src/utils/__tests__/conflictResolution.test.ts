@@ -1,4 +1,6 @@
-import { conflictResolver, ConflictData } from '../conflictResolution';
+import { describe, it, expect } from 'vitest';
+import { conflictResolver } from '../conflictResolution';
+import type { ConflictData } from '../conflictResolution';
 import type { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../../types';
 
 describe('ConflictResolutionManager', () => {
@@ -146,6 +148,7 @@ describe('ConflictResolutionManager', () => {
       const localSubtask: Subtask = {
         id: 'subtask1',
         projectId: 'project1',
+        userId: 'test-user-id',
         title: 'Local Subtask',
         status: 'in_progress',
         createdAt: baseTime,
@@ -155,6 +158,7 @@ describe('ConflictResolutionManager', () => {
       const remoteSubtask: Subtask = {
         id: 'subtask2',
         projectId: 'project1',
+        userId: 'test-user-id',
         title: 'Remote Subtask',
         status: 'todo',
         createdAt: baseTime,
@@ -266,6 +270,7 @@ describe('ConflictResolutionManager', () => {
         local: {
           id: 'subtask1',
           projectId: 'project1',
+          userId: 'test-user-id',
           title: 'Subtask',
           status: 'finished',
           createdAt: baseTime,
@@ -274,6 +279,7 @@ describe('ConflictResolutionManager', () => {
         remote: {
           id: 'subtask1',
           projectId: 'project1',
+          userId: 'test-user-id',
           title: 'Subtask',
           status: 'in_progress',
           createdAt: baseTime,
@@ -296,6 +302,7 @@ describe('ConflictResolutionManager', () => {
         local: {
           id: 'subtask1',
           projectId: 'project1',
+          userId: 'test-user-id',
           title: 'Local title',
           status: 'todo',
           createdAt: older,
@@ -304,6 +311,7 @@ describe('ConflictResolutionManager', () => {
         remote: {
           id: 'subtask1',
           projectId: 'project1',
+          userId: 'test-user-id',
           title: 'Remote title',
           status: 'todo',
           createdAt: older,

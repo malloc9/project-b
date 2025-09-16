@@ -156,7 +156,7 @@ class ServiceWorkerManagerImpl implements ServiceWorkerManager {
         resolve(event.data.success);
       };
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller!.postMessage(
         {
           type: 'CACHE_URLS',
           action: { urls }
@@ -180,7 +180,7 @@ class ServiceWorkerManagerImpl implements ServiceWorkerManager {
         resolve(event.data.success);
       };
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller!.postMessage(
         {
           type: 'CLEAR_CACHE'
         },

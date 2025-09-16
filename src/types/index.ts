@@ -44,6 +44,8 @@ export interface PlantCareTask {
   recurrence?: RecurrencePattern;
   completed: boolean;
   calendarEventId?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Plant {
@@ -65,6 +67,7 @@ export interface Plant {
 export interface Subtask {
   id: string;
   projectId: string;
+  userId: string; // Added userId
   title: string;
   description?: string;
   status: TaskStatus;

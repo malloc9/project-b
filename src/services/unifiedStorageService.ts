@@ -94,7 +94,7 @@ export class UnifiedStorageService {
       width?: number;
       height?: number;
       quality?: number;
-      format?: string;
+      format?: 'auto' | 'webp' | 'jpg' | 'png';
     } = {}
   ): string {
     switch (this.STORAGE_PROVIDER) {
@@ -102,7 +102,19 @@ export class UnifiedStorageService {
         return CloudinaryStorageService.getOptimizedImageUrl(originalUrl, options);
       
       case 'supabase':
-        return SupabaseStorageService.getOptimizedImageUrl(originalUrl, options);
+        const supabaseOptions = { ...options };
+        if (supabaseOptions.format === 'auto') {
+          delete supabaseOptions.format; // Supabase doesn't support 'auto'
+        }
+        return SupabaseStorageService.getOptimizedImageUrl(
+          originalUrl, 
+          supabaseOptions as {
+            width?: number;
+            height?: number;
+            quality?: number;
+            format?: 'webp' | 'jpg' | 'png';
+          }
+        );
       
       case 'base64':
       case 'imgbb':

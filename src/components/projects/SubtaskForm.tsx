@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { TaskStatus } from '../../types';
 import { createSubtask } from '../../services/projectService';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface SubtaskFormProps {
   projectId: string;
@@ -16,6 +17,7 @@ interface SubtaskFormData {
 }
 
 const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState<SubtaskFormData>({
     title: '',
     description: '',
@@ -46,7 +48,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    if (!validateForm() || !user) {
       return;
     }
 
@@ -55,6 +57,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
       
       const subtaskData = {
         projectId,
+        userId: user.uid,
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
         status: formData.status,
