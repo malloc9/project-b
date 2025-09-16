@@ -27,7 +27,7 @@ interface CalendarEvent {
 interface UserCalendarConfig {
   accessToken: string;
   refreshToken: string;
-  expiryDate?: number;
+  expiryDate?: number | null;
 }
 
 /**
