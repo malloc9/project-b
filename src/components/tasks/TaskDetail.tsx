@@ -48,7 +48,7 @@ const TaskDetail: React.FC = () => {
   };
 
   const handleToggleCompletion = async () => {
-    if (!task || !taskId) return;
+    if (!task || !taskId || !user) return; // Add user null check
 
     try {
       setActionLoading(true);
@@ -63,7 +63,7 @@ const TaskDetail: React.FC = () => {
   };
 
   const handleDeleteTask = async () => {
-    if (!task || !taskId) return;
+    if (!task || !taskId || !user) return; // Add user null check
 
     if (!window.confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
       return;

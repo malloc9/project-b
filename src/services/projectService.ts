@@ -403,7 +403,7 @@ export const getProjectsWithSubtasks = async (userId: string): Promise<Project[]
     // Fetch subtasks for each project
     const projectsWithSubtasks = await Promise.all(
       projects.map(async (project) => {
-        const subtasks = await getProjectSubtasks(project.id);
+        const subtasks = await getProjectSubtasks(project.id, userId);
         return {
           ...project,
           subtasks
@@ -426,7 +426,7 @@ export const getProjectsWithSubtasks = async (userId: string): Promise<Project[]
  */
 export const updateProjectStatusFromSubtasks = async (projectId: string, userId: string): Promise<void> => {
   try {
-    const subtasks = await getProjectSubtasks(projectId);
+    const subtasks = await getProjectSubtasks(projectId, userId);
     
     if (shouldAutoCompleteProject(subtasks)) {
       await updateProject(projectId, userId, { status: 'finished' });

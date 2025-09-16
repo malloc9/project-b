@@ -72,6 +72,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
   };
 
   const handleToggleCompletion = async (taskId: string) => {
+    if (!user) return; // Add user null check
     try {
       await toggleTaskCompletion(user.uid, taskId);
       await loadTasks(); // Reload to get updated data
@@ -82,6 +83,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
   };
 
   const handleDeleteTask = async (taskId: string) => {
+    if (!user) return; // Add user null check
     if (!window.confirm('Are you sure you want to delete this task?')) {
       return;
     }

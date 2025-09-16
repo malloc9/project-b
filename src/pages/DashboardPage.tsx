@@ -6,10 +6,14 @@ import {
   QuickActionCard 
 } from '../components/layout';
 import { usePlants } from '../hooks/usePlants'; // Import usePlants hook
+import { useProjects } from '../hooks/useProjects'; // Import useProjects hook
+import { useTasks } from '../hooks/useTasks'; // Import useTasks hook
 
 export function DashboardPage() {
   const { user } = useAuth();
   const { plants } = usePlants(user?.uid); // Call usePlants hook with userId
+  const { projects } = useProjects(user?.uid); // Call useProjects hook with userId
+  const { tasks } = useTasks(user?.uid); // Call useTasks hook with userId
 
   const quickActions = [
     {
@@ -42,6 +46,8 @@ export function DashboardPage() {
     },
   ];
 
+  const pendingTasks = tasks.filter(task => !task.completed);
+
   const stats = [
     {
       title: 'Plants Tracked',
@@ -52,14 +58,14 @@ export function DashboardPage() {
     },
     {
       title: 'Active Projects',
-      value: '0',
+      value: projects.length, // Use the actual number of projects
       icon: '🔨',
       description: 'Projects in progress',
       color: 'blue' as const,
     },
     {
       title: 'Pending Tasks',
-      value: '0',
+      value: pendingTasks.length, // Use the actual number of pending tasks
       icon: '✅',
       description: 'Tasks awaiting completion',
       color: 'purple' as const,

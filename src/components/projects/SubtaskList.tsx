@@ -14,6 +14,14 @@ const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) 
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Ensure user is authenticated before proceeding
+  if (!user) {
+    // This component should ideally be rendered within a ProtectedRoute
+    // or handle unauthenticated state more gracefully.
+    // For now, we'll just return null if user is not available.
+    return null; 
+  }
+
   const handleStatusChange = async (subtaskId: string, newStatus: TaskStatus) => {
     try {
       setLoading(subtaskId);

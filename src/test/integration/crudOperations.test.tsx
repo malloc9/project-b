@@ -248,6 +248,7 @@ describe('CRUD Operations Integration', () => {
 
     it('handles task creation', async () => {
       const newTask = {
+        userId: mockUser.uid, // Add userId
         title: 'New Task',
         description: 'Test task',
         dueDate: new Date('2024-02-15'),
@@ -255,7 +256,7 @@ describe('CRUD Operations Integration', () => {
       };
 
       const taskToCreate = { ...newTask, userId: 'test-user-id' };
-      await SimpleTaskService.createSimpleTask(taskToCreate);
+      await SimpleTaskService.createSimpleTask(mockUser.uid, newTask);
 
       expect(SimpleTaskService.createSimpleTask).toHaveBeenCalledWith(taskToCreate);
     });
@@ -263,7 +264,7 @@ describe('CRUD Operations Integration', () => {
     it('handles task completion', async () => {
       const completionUpdate = { completed: true };
 
-      await SimpleTaskService.updateSimpleTask('task-1', completionUpdate);
+      await SimpleTaskService.updateSimpleTask(mockUser.uid, 'task-1', completionUpdate);
 
       expect(SimpleTaskService.updateSimpleTask).toHaveBeenCalledWith(
         'task-1',
@@ -272,7 +273,7 @@ describe('CRUD Operations Integration', () => {
     });
 
     it('handles task deletion', async () => {
-      await SimpleTaskService.deleteSimpleTask('task-1');
+      await SimpleTaskService.deleteSimpleTask(mockUser.uid, 'task-1');
 
       expect(SimpleTaskService.deleteSimpleTask).toHaveBeenCalledWith('task-1');
     });
@@ -325,7 +326,7 @@ describe('CRUD Operations Integration', () => {
       vi.mocked(SimpleTaskService.deleteSimpleTask).mockRejectedValue(permissionError);
 
       try {
-        await SimpleTaskService.deleteSimpleTask('task-1');
+        await SimpleTaskService.deleteSimpleTask(mockUser.uid, 'task-1');
       } catch (error) {
         expect(error).toEqual(permissionError);
       }
@@ -350,7 +351,7 @@ describe('CRUD Operations Integration', () => {
 
       // This would typically be tested with a component that implements optimistic updates
       try {
-        await SimpleTaskService.updateSimpleTask('task-1', { completed: true });
+        await SimpleTaskService.updateSimpleTask(mockUser.uid, 'task-1', { completed: true });
       } catch (error) {
         expect(error).toEqual(updateError);
         // Component should revert the optimistic update
