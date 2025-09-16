@@ -94,7 +94,6 @@ export const initCalendarAuth = onCall(async (request) => {
 /**
  * Complete OAuth2 flow and store tokens
  */
-/*
 export const completeCalendarAuth = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
@@ -126,7 +125,6 @@ export const completeCalendarAuth = onCall(async (request) => {
     throw new HttpsError("internal", "Failed to complete calendar authentication");
   }
 });
-*/
 
 /**
  * Create a calendar event

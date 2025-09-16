@@ -41,7 +41,7 @@ const ProjectDetail: React.FC = () => {
       
       const [projectData, subtasksData] = await Promise.all([
         getProject(projectId, user.uid),
-        getProjectSubtasks(projectId)
+        getProjectSubtasks(projectId, user.uid)
       ]);
 
       if (!projectData) {
@@ -93,7 +93,7 @@ const ProjectDetail: React.FC = () => {
     if (!projectId || !user) return;
     
     try {
-      const updatedSubtasks = await getProjectSubtasks(projectId);
+      const updatedSubtasks = await getProjectSubtasks(projectId, user.uid);
       setSubtasks(updatedSubtasks);
       
       // Update project status based on subtasks

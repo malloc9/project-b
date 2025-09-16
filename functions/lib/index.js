@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initCalendarAuth = void 0;
+exports.completeCalendarAuth = exports.initCalendarAuth = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
@@ -58,39 +58,33 @@ exports.initCalendarAuth = (0, https_1.onCall)(async (request) => {
 /**
  * Complete OAuth2 flow and store tokens
  */
-/*
-export const completeCalendarAuth = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  const {code} = request.data;
-  if (!code) {
-    throw new HttpsError("invalid-argument", "Authorization code is required");
-  }
-
-  try {
-    const oauth2Client = getOAuth2Client();
-    const {tokens} = await oauth2Client.getToken(code);
-    
-    const calendarConfig: UserCalendarConfig = {
-      accessToken: tokens.access_token!,
-      refreshToken: tokens.refresh_token!,
-      expiryDate: tokens.expiry_date,
-    };
-
-    await db.collection("users").doc(request.auth.uid).update({
-      calendarConfig,
-      calendarConnected: true,
-    });
-
-    return {success: true};
-  } catch (error) {
-    console.error("Error completing calendar auth:", error);
-    throw new HttpsError("internal", "Failed to complete calendar authentication");
-  }
+exports.completeCalendarAuth = (0, https_1.onCall)(async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "User must be authenticated");
+    }
+    const { code } = request.data;
+    if (!code) {
+        throw new https_1.HttpsError("invalid-argument", "Authorization code is required");
+    }
+    try {
+        const oauth2Client = getOAuth2Client();
+        const { tokens } = await oauth2Client.getToken(code);
+        const calendarConfig = {
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token,
+            expiryDate: tokens.expiry_date,
+        };
+        await db.collection("users").doc(request.auth.uid).update({
+            calendarConfig,
+            calendarConnected: true,
+        });
+        return { success: true };
+    }
+    catch (error) {
+        console.error("Error completing calendar auth:", error);
+        throw new https_1.HttpsError("internal", "Failed to complete calendar authentication");
+    }
 });
-*/
 /**
  * Create a calendar event
  */

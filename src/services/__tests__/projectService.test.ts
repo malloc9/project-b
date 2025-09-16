@@ -292,7 +292,7 @@ describe('Project Service', () => {
           dueDate: new Date('2024-12-15')
         };
 
-        const result = await createSubtask(subtaskData);
+        const result = await createSubtask(subtaskData, mockUserId);
 
         expect(result).toBe(mockSubtaskId);
         expect(addDoc).toHaveBeenCalled();
@@ -308,7 +308,7 @@ describe('Project Service', () => {
           status: 'todo' as TaskStatus
         };
 
-        await expect(createSubtask(subtaskData)).rejects.toThrow();
+        await expect(createSubtask(subtaskData, mockUserId)).rejects.toThrow();
       });
     });
 
@@ -326,7 +326,7 @@ describe('Project Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getSubtask(mockSubtaskId);
+        const result = await getSubtask(mockSubtaskId, mockUserId);
 
         expect(result).toEqual(mockSubtask);
       });
@@ -337,7 +337,7 @@ describe('Project Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getSubtask(mockSubtaskId);
+        const result = await getSubtask(mockSubtaskId, mockUserId);
 
         expect(result).toBeNull();
       });
@@ -360,7 +360,7 @@ describe('Project Service', () => {
         };
         (getDocs as any).mockResolvedValue(mockQuerySnapshot);
 
-        const result = await getProjectSubtasks(mockProjectId);
+        const result = await getProjectSubtasks(mockProjectId, mockUserId);
 
         expect(result).toHaveLength(1);
         expect(result[0]).toEqual(mockSubtask);
@@ -372,7 +372,7 @@ describe('Project Service', () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
         const updates = { title: 'Updated Subtask' };
-        await updateSubtask(mockSubtaskId, updates);
+        await updateSubtask(mockSubtaskId, mockUserId, updates);
 
         expect(updateDoc).toHaveBeenCalledWith(
           expect.anything(),
@@ -388,7 +388,7 @@ describe('Project Service', () => {
       it('should delete a subtask successfully', async () => {
         (deleteDoc as any).mockResolvedValue(undefined);
 
-        await deleteSubtask(mockSubtaskId);
+        await deleteSubtask(mockSubtaskId, mockUserId);
 
         expect(deleteDoc).toHaveBeenCalled();
       });

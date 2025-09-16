@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OAuth Redirect</title>
+  <script type="module">
+    // This script runs in the popup window after Google redirects to it.
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+
+    if (window.opener && code) {
+      // Send the authorization code back to the main window.
+      window.opener.postMessage({ type: 'oauth_code', code, state }, window.location.origin);
+      window.close(); // Close the popup.
+    } else if (window.opener && urlParams.get('error')) {
+      // Handle errors, if any.
+      window.opener.postMessage({ type: 'oauth_error', error: urlParams.get('error'), error_description: urlParams.get('error_description') }, window.location.origin);
+      window.close(); // Close the popup.
+    } else {
+      // Fallback for direct access or unexpected scenarios.
+      document.body.textContent = 'OAuth process completed. You can close this window.';
+    }
+  </script>
+</head>
+<body>
+  Loading...
+</body>
+</html>

@@ -64,7 +64,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined
       };
 
-      await createSubtask(subtaskData);
+      await createSubtask(subtaskData, user.uid);
       onSuccess();
     } catch (err) {
       console.error('Error creating subtask:', err);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Subtask, TaskStatus } from '../../types';
 import { updateSubtask, deleteSubtask } from '../../services/projectService';
+import { useAuth } from '../../contexts/AuthContext';
 import { formatDate } from '../../utils/dateUtils';
 
 interface SubtaskListProps {
@@ -9,6 +10,7 @@ interface SubtaskListProps {
 }
 
 const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +18,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) 
     try {
       setLoading(subtaskId);
       setError(null);
-      await updateSubtask(subtaskId, { status: newStatus });
+      await updateSubtask(subtaskId, user.uid, { status: newStatus });
       onSubtaskUpdate();
     } catch (err) {
       console.error('Error updating subtask status:', err);
@@ -34,7 +36,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) 
     try {
       setLoading(subtaskId);
       setError(null);
-      await deleteSubtask(subtaskId);
+      await deleteSubtask(subtaskId, user.uid);
       onSubtaskUpdate();
     } catch (err) {
       console.error('Error deleting subtask:', err);

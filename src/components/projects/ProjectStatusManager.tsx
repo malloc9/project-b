@@ -40,7 +40,7 @@ const ProjectStatusManager: React.FC<ProjectStatusManagerProps> = ({
     try {
       setLoading(true);
       setError(null);
-      await updateSubtaskWithProjectSync(subtaskId, { status: newStatus });
+      await updateSubtaskWithProjectSync(subtaskId, project.userId, { status: newStatus });
       onUpdate();
     } catch (err) {
       console.error('Error updating subtask status:', err);
@@ -62,7 +62,7 @@ const ProjectStatusManager: React.FC<ProjectStatusManagerProps> = ({
         updates: { status: bulkStatus }
       }));
 
-      await bulkUpdateSubtasks(updates);
+      await bulkUpdateSubtasks(project.userId, updates);
       setSelectedSubtasks(new Set());
       onUpdate();
     } catch (err) {

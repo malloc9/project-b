@@ -108,8 +108,7 @@ export const getProject = async (projectId: string, userId: string): Promise<Pro
 export const getUserProjects = async (userId: string): Promise<Project[]> => {
   try {
     const q = query(
-      collection(db, 'projects'),
-      where('userId', '==', userId),
+      collection(db, 'users', userId, 'projects'),
       orderBy('updatedAt', 'desc')
     );
     
@@ -196,7 +195,7 @@ export const deleteProject = async (projectId: string, userId: string): Promise<
     // Get project and subtasks for calendar cleanup
     const [project, subtasks] = await Promise.all([
       getProject(projectId, userId),
-      getProjectSubtasks(projectId)
+      getProjectSubtasks(projectId, userId)
     ]);
     
     // Delete calendar events
@@ -251,16 +250,19 @@ export const deleteProject = async (projectId: string, userId: string): Promise<
 // ============================================================================
 
 export const createSubtask = async (
-  subtaskData: Omit<Subtask, 'id' | 'createdAt' | 'updatedAt'>
+  subtaskData: Omit<Subtask, 'id' | 'createdAt' | 'updatedAt'>,
+  userId: string
 ): Promise<string> => {
   try {
     const now = new Date();
-    const docRef = await addDoc(collection(db, 'subtasks'), {
+    const subtaskToSave = {
       ...subtaskData,
+      description: subtaskData.description || null, // Convert undefined or empty string to null
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now),
       dueDate: subtaskData.dueDate ? Timestamp.fromDate(subtaskData.dueDate) : null
-    });
+    };
+    const docRef = await addDoc(collection(db, 'users', userId, 'subtasks'), subtaskToSave);
     return docRef.id;
   } catch (error) {
     console.error('Error creating subtask:', error);
@@ -271,9 +273,9 @@ export const createSubtask = async (
   }
 };
 
-export const getSubtask = async (subtaskId: string): Promise<Subtask | null> => {
+export const getSubtask = async (subtaskId: string, userId: string): Promise<Subtask | null> => {
   try {
-    const docRef = doc(db, 'subtasks', subtaskId);
+    const docRef = doc(db, 'users', userId, 'subtasks', subtaskId);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {
@@ -297,10 +299,10 @@ export const getSubtask = async (subtaskId: string): Promise<Subtask | null> => 
   }
 };
 
-export const getProjectSubtasks = async (projectId: string): Promise<Subtask[]> => {
+export const getProjectSubtasks = async (projectId: string, userId: string): Promise<Subtask[]> => {
   try {
     const q = query(
-      collection(db, 'subtasks'),
+      collection(db, 'users', userId, 'subtasks'),
       where('projectId', '==', projectId),
       orderBy('createdAt', 'asc')
     );
@@ -331,10 +333,11 @@ export const getProjectSubtasks = async (projectId: string): Promise<Subtask[]> 
 
 export const updateSubtask = async (
   subtaskId: string,
+  userId: string,
   updates: Partial<Subtask>
 ): Promise<void> => {
   try {
-    const docRef = doc(db, 'subtasks', subtaskId);
+    const docRef = doc(db, 'users', userId, 'subtasks', subtaskId);
     const updateData: any = {
       ...updates,
       updatedAt: Timestamp.fromDate(new Date())
@@ -355,9 +358,9 @@ export const updateSubtask = async (
   }
 };
 
-export const deleteSubtask = async (subtaskId: string): Promise<void> => {
+export const deleteSubtask = async (subtaskId: string, userId: string): Promise<void> => {
   try {
-    const docRef = doc(db, 'subtasks', subtaskId);
+    const docRef = doc(db, 'users', userId, 'subtasks', subtaskId);
     await deleteDoc(docRef);
   } catch (error) {
     console.error('Error deleting subtask:', error);
@@ -634,14 +637,15 @@ export const getOverdueSubtasks = (subtasks: Subtask[]): Subtask[] => {
  */
 export const updateSubtaskWithProjectSync = async (
   subtaskId: string,
+  userId: string,
   updates: Partial<Subtask>
 ): Promise<void> => {
   try {
     // Update the subtask
-    await updateSubtask(subtaskId, updates);
+    await updateSubtask(subtaskId, userId, updates);
     
     // Get the subtask to find its project
-    const subtask = await getSubtask(subtaskId);
+    const subtask = await getSubtask(subtaskId, userId);
     if (!subtask) {
       throw new Error('Subtask not found');
     }
@@ -658,6 +662,7 @@ export const updateSubtaskWithProjectSync = async (
  * Bulk update multiple subtasks and sync project status
  */
 export const bulkUpdateSubtasks = async (
+  userId: string,
   updates: Array<{ id: string; updates: Partial<Subtask> }>
 ): Promise<void> => {
   try {
@@ -666,8 +671,8 @@ export const bulkUpdateSubtasks = async (
     // Update all subtasks and collect project IDs and user IDs
     await Promise.all(
       updates.map(async ({ id, updates: subtaskUpdates }) => {
-        await updateSubtask(id, subtaskUpdates);
-        const subtask = await getSubtask(id);
+        await updateSubtask(id, userId, subtaskUpdates);
+        const subtask = await getSubtask(id, userId);
         if (subtask) {
           projectUserIds.set(subtask.projectId, subtask.userId);
         }
@@ -700,7 +705,7 @@ export const getProjectProgressDetails = async (projectId: string, userId: strin
   try {
     const [project, subtasks] = await Promise.all([
       getProject(projectId, userId),
-      getProjectSubtasks(projectId)
+      getProjectSubtasks(projectId, userId)
     ]);
 
     if (!project) {
