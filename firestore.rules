@@ -22,7 +22,7 @@ service cloud.firestore {
       }
       
       // User's simple tasks subcollection
-      match /tasks/{taskId} {
+      match /simpleTasks/{taskId} {
         allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
       }
       

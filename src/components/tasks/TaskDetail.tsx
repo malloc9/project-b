@@ -26,7 +26,7 @@ const TaskDetail: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const taskData = await getSimpleTask(taskId);
+      const taskData = await getSimpleTask(user.uid, taskId);
       
       if (!taskData) {
         setError('Task not found');
@@ -52,7 +52,7 @@ const TaskDetail: React.FC = () => {
 
     try {
       setActionLoading(true);
-      await toggleTaskCompletion(taskId);
+      await toggleTaskCompletion(user.uid, taskId);
       await loadTask(); // Reload to get updated data
     } catch (err) {
       console.error('Error toggling task completion:', err);
@@ -71,7 +71,7 @@ const TaskDetail: React.FC = () => {
 
     try {
       setActionLoading(true);
-      await deleteSimpleTask(taskId);
+      await deleteSimpleTask(user.uid, taskId);
       navigate('/tasks');
     } catch (err) {
       console.error('Error deleting task:', err);

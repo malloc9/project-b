@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initCalendarAuth = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
@@ -42,23 +43,18 @@ async function getCalendarClient(userId) {
 /**
  * Initialize OAuth2 flow for Google Calendar access
  */
-/*
-export const initCalendarAuth = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "User must be authenticated");
-  }
-
-  const oauth2Client = getOAuth2Client();
-  
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: SCOPES,
-    prompt: "consent",
-  });
-
-  return {authUrl};
+exports.initCalendarAuth = (0, https_1.onCall)(async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "User must be authenticated");
+    }
+    const oauth2Client = getOAuth2Client();
+    const authUrl = oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: SCOPES,
+        prompt: "consent",
+    });
+    return { authUrl };
 });
-*/
 /**
  * Complete OAuth2 flow and store tokens
  */

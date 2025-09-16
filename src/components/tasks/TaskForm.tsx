@@ -35,7 +35,7 @@ const TaskForm: React.FC = () => {
 
     try {
       setInitialLoading(true);
-      const task = await getSimpleTask(taskId);
+      const task = await getSimpleTask(user.uid, taskId);
       
       if (!task) {
         navigate('/tasks');
@@ -98,9 +98,9 @@ const TaskForm: React.FC = () => {
       };
 
       if (isEditing && taskId) {
-        await updateSimpleTask(taskId, taskData);
+        await updateSimpleTask(user.uid, taskId, taskData);
       } else {
-        await createSimpleTask(taskData);
+        await createSimpleTask(user.uid, taskData);
       }
 
       navigate('/tasks');

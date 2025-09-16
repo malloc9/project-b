@@ -75,7 +75,6 @@ async function getCalendarClient(userId: string): Promise<any> {
 /**
  * Initialize OAuth2 flow for Google Calendar access
  */
-/*
 export const initCalendarAuth = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "User must be authenticated");
@@ -91,7 +90,6 @@ export const initCalendarAuth = onCall(async (request) => {
 
   return {authUrl};
 });
-*/
 
 /**
  * Complete OAuth2 flow and store tokens

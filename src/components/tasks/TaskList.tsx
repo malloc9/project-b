@@ -73,7 +73,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
 
   const handleToggleCompletion = async (taskId: string) => {
     try {
-      await toggleTaskCompletion(taskId);
+      await toggleTaskCompletion(user.uid, taskId);
       await loadTasks(); // Reload to get updated data
     } catch (err) {
       console.error('Error toggling task completion:', err);
@@ -87,7 +87,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
     }
 
     try {
-      await deleteSimpleTask(taskId);
+      await deleteSimpleTask(user.uid, taskId);
       await loadTasks(); // Reload to get updated data
     } catch (err) {
       console.error('Error deleting task:', err);

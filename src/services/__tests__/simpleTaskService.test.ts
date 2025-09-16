@@ -98,7 +98,7 @@ describe('Simple Task Service', () => {
           completed: false
         };
 
-        const result = await createSimpleTask(taskData);
+        const result = await createSimpleTask(mockUserId, taskData);
 
         expect(result).toBe(mockTaskId);
         expect(addDoc).toHaveBeenCalledTimes(1);
@@ -114,7 +114,7 @@ describe('Simple Task Service', () => {
           completed: false
         };
 
-        const result = await createSimpleTask(taskData);
+        const result = await createSimpleTask(mockUserId, taskData);
 
         expect(result).toBe(mockTaskId);
         expect(addDoc).toHaveBeenCalledTimes(1);
@@ -129,7 +129,7 @@ describe('Simple Task Service', () => {
           completed: false
         };
 
-        await expect(createSimpleTask(taskData)).rejects.toThrow();
+        await expect(createSimpleTask(mockUserId, taskData)).rejects.toThrow();
       });
     });
 
@@ -147,7 +147,7 @@ describe('Simple Task Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getSimpleTask(mockTaskId);
+        const result = await getSimpleTask(mockUserId, mockTaskId);
 
         expect(result).toEqual(mockTask);
         expect(getDoc).toHaveBeenCalled();
@@ -159,7 +159,7 @@ describe('Simple Task Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getSimpleTask(mockTaskId);
+        const result = await getSimpleTask(mockUserId, mockTaskId);
 
         expect(result).toBeNull();
       });
@@ -178,7 +178,7 @@ describe('Simple Task Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        const result = await getSimpleTask(mockTaskId);
+        const result = await getSimpleTask(mockUserId, mockTaskId);
 
         expect(result).toEqual(taskWithoutDueDate);
       });
@@ -186,7 +186,7 @@ describe('Simple Task Service', () => {
       it('should throw error when get fails', async () => {
         (getDoc as any).mockRejectedValue(new Error('Firestore error'));
 
-        await expect(getSimpleTask(mockTaskId)).rejects.toThrow();
+        await expect(getSimpleTask(mockUserId, mockTaskId)).rejects.toThrow();
       });
     });
 
@@ -225,7 +225,7 @@ describe('Simple Task Service', () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
         const updates = { title: 'Updated Task' };
-        await updateSimpleTask(mockTaskId, updates);
+        await updateSimpleTask(mockUserId, mockTaskId, updates);
 
         expect(updateDoc).toHaveBeenCalledTimes(1);
       });
@@ -234,7 +234,7 @@ describe('Simple Task Service', () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
         const updates = { dueDate: new Date('2024-12-31') };
-        await updateSimpleTask(mockTaskId, updates);
+        await updateSimpleTask(mockUserId, mockTaskId, updates);
 
         expect(updateDoc).toHaveBeenCalledTimes(1);
       });
@@ -242,7 +242,7 @@ describe('Simple Task Service', () => {
       it('should throw error when update fails', async () => {
         (updateDoc as any).mockRejectedValue(new Error('Firestore error'));
 
-        await expect(updateSimpleTask(mockTaskId, {})).rejects.toThrow();
+        await expect(updateSimpleTask(mockUserId, mockTaskId, {})).rejects.toThrow();
       });
     });
 
@@ -250,7 +250,7 @@ describe('Simple Task Service', () => {
       it('should delete a task successfully', async () => {
         (deleteDoc as any).mockResolvedValue(undefined);
 
-        await deleteSimpleTask(mockTaskId);
+        await deleteSimpleTask(mockUserId, mockTaskId);
 
         expect(deleteDoc).toHaveBeenCalled();
       });
@@ -258,7 +258,7 @@ describe('Simple Task Service', () => {
       it('should throw error when delete fails', async () => {
         (deleteDoc as any).mockRejectedValue(new Error('Firestore error'));
 
-        await expect(deleteSimpleTask(mockTaskId)).rejects.toThrow();
+        await expect(deleteSimpleTask(mockUserId, mockTaskId)).rejects.toThrow();
       });
     });
   });
@@ -438,7 +438,7 @@ describe('Simple Task Service', () => {
       it('should mark task as completed', async () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
-        await completeTask(mockTaskId);
+        await completeTask(mockUserId, mockTaskId);
 
         expect(updateDoc).toHaveBeenCalledTimes(1);
       });
@@ -448,7 +448,7 @@ describe('Simple Task Service', () => {
       it('should mark task as incomplete', async () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
-        await uncompleteTask(mockTaskId);
+        await uncompleteTask(mockUserId, mockTaskId);
 
         expect(updateDoc).toHaveBeenCalledTimes(1);
       });
@@ -470,7 +470,7 @@ describe('Simple Task Service', () => {
         (getDoc as any).mockResolvedValue(mockDocSnap);
         (updateDoc as any).mockResolvedValue(undefined);
 
-        await toggleTaskCompletion(mockTaskId);
+        await toggleTaskCompletion(mockUserId, mockTaskId);
 
         expect(updateDoc).toHaveBeenCalledTimes(1);
       });
@@ -481,7 +481,7 @@ describe('Simple Task Service', () => {
         };
         (getDoc as any).mockResolvedValue(mockDocSnap);
 
-        await expect(toggleTaskCompletion(mockTaskId)).rejects.toThrow('Task not found');
+        await expect(toggleTaskCompletion(mockUserId, mockTaskId)).rejects.toThrow('Task not found');
       });
     });
   });
@@ -496,7 +496,7 @@ describe('Simple Task Service', () => {
           { id: '2', updates: { completed: true } }
         ];
 
-        await bulkUpdateTasks(updates);
+        await bulkUpdateTasks(mockUserId, updates);
 
         expect(updateDoc).toHaveBeenCalledTimes(2);
       });
@@ -507,7 +507,7 @@ describe('Simple Task Service', () => {
         (updateDoc as any).mockResolvedValue(undefined);
 
         const taskIds = ['1', '2', '3'];
-        await bulkCompleteTasks(taskIds);
+        await bulkCompleteTasks(mockUserId, taskIds);
 
         expect(updateDoc).toHaveBeenCalledTimes(3);
       });
@@ -518,7 +518,7 @@ describe('Simple Task Service', () => {
         (deleteDoc as any).mockResolvedValue(undefined);
 
         const taskIds = ['1', '2', '3'];
-        await bulkDeleteTasks(taskIds);
+        await bulkDeleteTasks(mockUserId, taskIds);
 
         expect(deleteDoc).toHaveBeenCalledTimes(3);
       });

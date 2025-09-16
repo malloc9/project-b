@@ -21,6 +21,7 @@ import { createSimpleTaskCalendarEvent, updateCalendarEvent, deleteCalendarEvent
 // ============================================================================
 
 export const createSimpleTask = async (
+  userId: string,
   taskData: Omit<SimpleTask, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
   try {
@@ -41,13 +42,16 @@ export const createSimpleTask = async (
       }
     }
     
-    const docRef = await addDoc(collection(db, 'simpleTasks'), {
+    const taskToSave = {
       ...taskData,
-      calendarEventId,
+      description: taskData.description || null, // Convert undefined or empty string to null
+      calendarEventId: calendarEventId || null, // Convert undefined to null
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now),
       dueDate: taskData.dueDate ? Timestamp.fromDate(taskData.dueDate) : null
-    });
+    };
+    
+    const docRef = await addDoc(collection(db, 'users', userId, 'simpleTasks'), taskToSave);
     return docRef.id;
   } catch (error) {
     console.error('Error creating simple task:', error);
@@ -58,9 +62,9 @@ export const createSimpleTask = async (
   }
 };
 
-export const getSimpleTask = async (taskId: string): Promise<SimpleTask | null> => {
+export const getSimpleTask = async (userId: string, taskId: string): Promise<SimpleTask | null> => {
   try {
-    const docRef = doc(db, 'simpleTasks', taskId);
+    const docRef = doc(db, 'users', userId, 'simpleTasks', taskId);
     const docSnap = await getDoc(docRef);
     
     if (!docSnap.exists()) {
@@ -87,8 +91,7 @@ export const getSimpleTask = async (taskId: string): Promise<SimpleTask | null> 
 export const getUserSimpleTasks = async (userId: string): Promise<SimpleTask[]> => {
   try {
     const q = query(
-      collection(db, 'simpleTasks'),
-      where('userId', '==', userId),
+      collection(db, 'users', userId, 'simpleTasks'),
       orderBy('dueDate', 'asc')
     );
     
@@ -117,12 +120,13 @@ export const getUserSimpleTasks = async (userId: string): Promise<SimpleTask[]> 
 };
 
 export const updateSimpleTask = async (
+  userId: string,
   taskId: string,
   updates: Partial<SimpleTask>
 ): Promise<void> => {
   try {
     // Get current task for calendar sync
-    const currentTask = await getSimpleTask(taskId);
+    const currentTask = await getSimpleTask(userId, taskId);
     
     // Handle calendar sync for completed tasks
     if (updates.completed && currentTask?.calendarEventId) {
@@ -148,7 +152,7 @@ export const updateSimpleTask = async (
       }
     }
     
-    const docRef = doc(db, 'simpleTasks', taskId);
+    const docRef = doc(db, 'users', userId, 'simpleTasks', taskId);
     const updateData: any = {
       ...updates,
       updatedAt: Timestamp.fromDate(new Date())
@@ -169,10 +173,10 @@ export const updateSimpleTask = async (
   }
 };
 
-export const deleteSimpleTask = async (taskId: string): Promise<void> => {
+export const deleteSimpleTask = async (userId: string, taskId: string): Promise<void> => {
   try {
     // Get task for calendar cleanup
-    const task = await getSimpleTask(taskId);
+    const task = await getSimpleTask(userId, taskId);
     
     // Delete calendar event if it exists
     if (task?.calendarEventId) {
@@ -183,7 +187,7 @@ export const deleteSimpleTask = async (taskId: string): Promise<void> => {
       }
     }
     
-    const docRef = doc(db, 'simpleTasks', taskId);
+    const docRef = doc(db, 'users', userId, 'simpleTasks', taskId);
     await deleteDoc(docRef);
   } catch (error) {
     console.error('Error deleting simple task:', error);
@@ -362,14 +366,14 @@ export const uncompleteTask = async (taskId: string): Promise<void> => {
 /**
  * Toggle task completion status
  */
-export const toggleTaskCompletion = async (taskId: string): Promise<void> => {
+export const toggleTaskCompletion = async (userId: string, taskId: string): Promise<void> => {
   try {
-    const task = await getSimpleTask(taskId);
+    const task = await getSimpleTask(userId, taskId);
     if (!task) {
       throw new Error('Task not found');
     }
     
-    await updateSimpleTask(taskId, { completed: !task.completed });
+    await updateSimpleTask(userId, taskId, { completed: !task.completed });
   } catch (error) {
     console.error('Error toggling task completion:', error);
     throw error;
@@ -380,12 +384,13 @@ export const toggleTaskCompletion = async (taskId: string): Promise<void> => {
  * Bulk update multiple tasks
  */
 export const bulkUpdateTasks = async (
+  userId: string,
   updates: Array<{ id: string; updates: Partial<SimpleTask> }>
 ): Promise<void> => {
   try {
     await Promise.all(
       updates.map(({ id, updates: taskUpdates }) => 
-        updateSimpleTask(id, taskUpdates)
+        updateSimpleTask(userId, id, taskUpdates)
       )
     );
   } catch (error) {
@@ -397,14 +402,14 @@ export const bulkUpdateTasks = async (
 /**
  * Bulk complete multiple tasks
  */
-export const bulkCompleteTasks = async (taskIds: string[]): Promise<void> => {
+export const bulkCompleteTasks = async (userId: string, taskIds: string[]): Promise<void> => {
   try {
     const updates = taskIds.map(id => ({
       id,
       updates: { completed: true }
     }));
     
-    await bulkUpdateTasks(updates);
+    await bulkUpdateTasks(userId, updates);
   } catch (error) {
     console.error('Error bulk completing tasks:', error);
     throw error;
@@ -414,9 +419,9 @@ export const bulkCompleteTasks = async (taskIds: string[]): Promise<void> => {
 /**
  * Bulk delete multiple tasks
  */
-export const bulkDeleteTasks = async (taskIds: string[]): Promise<void> => {
+export const bulkDeleteTasks = async (userId: string, taskIds: string[]): Promise<void> => {
   try {
-    await Promise.all(taskIds.map(id => deleteSimpleTask(id)));
+    await Promise.all(taskIds.map(id => deleteSimpleTask(userId, id)));
   } catch (error) {
     console.error('Error bulk deleting tasks:', error);
     throw error;
