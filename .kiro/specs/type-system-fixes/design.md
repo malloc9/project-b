@@ -43,7 +43,7 @@ export interface Subtask { ... }
 // Service interfaces
 export interface AuthService { ... }
 export interface DatabaseService { ... }
-export interface CalendarService { ... }
+
 
 // Utility types
 export interface ApiResponse<T> { ... }

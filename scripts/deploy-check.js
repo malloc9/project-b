@@ -104,7 +104,7 @@ async function main() {
   allChecks &= checkFile('src/main.tsx', 'Main entry point');
   allChecks &= checkFile('src/config/firebase.ts', 'Firebase configuration');
   allChecks &= checkFile('src/contexts/AuthContext.tsx', 'Auth context');
-  allChecks &= checkFile('src/contexts/CalendarContext.tsx', 'Calendar context');
+  
   
   // Check service files
   log('\n🔧 Service Files:', 'yellow');
@@ -112,7 +112,7 @@ async function main() {
   allChecks &= checkFile('src/services/plantService.ts', 'Plant service');
   allChecks &= checkFile('src/services/projectService.ts', 'Project service');
   allChecks &= checkFile('src/services/simpleTaskService.ts', 'Task service');
-  allChecks &= checkFile('src/services/calendarService.ts', 'Calendar service');
+  
   
   // Check component structure
   log('\n🧩 Component Structure:', 'yellow');

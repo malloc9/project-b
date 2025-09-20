@@ -148,7 +148,7 @@ App
 - **PlantService**: Plant data operations and photo management
 - **ProjectService**: Project and subtask management
 - **SimpleTaskService**: Simple task operations
-- **CalendarService**: Google Calendar integration
+
 - **SyncService**: Offline synchronization
 - **ErrorLogger**: Error tracking and reporting
 

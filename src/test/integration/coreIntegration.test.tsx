@@ -10,7 +10,7 @@ describe('Core Integration Tests', () => {
       require('../../pages/PlantsPage');
       require('../../pages/ProjectsPage');
       require('../../pages/TasksPage');
-      require('../../pages/CalendarPage');
+
     }).not.toThrow();
   });
 
@@ -21,7 +21,7 @@ describe('Core Integration Tests', () => {
       require('../../services/plantService');
       require('../../services/projectService');
       require('../../services/simpleTaskService');
-      require('../../services/calendarService');
+
     }).not.toThrow();
   });
 
@@ -29,7 +29,7 @@ describe('Core Integration Tests', () => {
     // Test that all contexts can be imported
     expect(() => {
       require('../../contexts/AuthContext');
-      require('../../contexts/CalendarContext');
+
     }).not.toThrow();
   });
 

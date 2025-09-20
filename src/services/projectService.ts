@@ -17,7 +17,7 @@ import type { Project, Subtask, TaskStatus } from '../types';
 
 import { ErrorCode } from '../types/errors';
 import { createAppError } from '../types/errors';
-import { createProjectCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './calendarService';
+
 
 // ============================================================================
 // PROJECT CRUD OPERATIONS
@@ -28,21 +28,6 @@ export const createProject = async (
 ): Promise<string> => {
   try {
     const now = new Date();
-    
-    // Create calendar event if due date is provided
-    let calendarEventId: string | undefined;
-    if (projectData.dueDate) {
-      try {
-        calendarEventId = await createProjectCalendarEvent(
-          projectData.title,
-          projectData.description,
-          projectData.dueDate
-        );
-      } catch (calendarError) {
-        console.warn('Failed to create calendar event for project:', calendarError);
-        // Continue without calendar sync
-      }
-    }
     
     // Use user subcollection structure to match security rules
     const userProjectsCollection = collection(db, `users/${projectData.userId}/projects`);
@@ -61,11 +46,6 @@ export const createProject = async (
     // Only add dueDate if it's defined
     if (projectData.dueDate) {
       firestoreData.dueDate = Timestamp.fromDate(projectData.dueDate);
-    }
-    
-    // Only add calendarEventId if it's defined
-    if (calendarEventId) {
-      firestoreData.calendarEventId = calendarEventId;
     }
     
     const docRef = await addDoc(userProjectsCollection, firestoreData);
@@ -142,33 +122,6 @@ export const updateProject = async (
   updates: Partial<Project>
 ): Promise<void> => {
   try {
-    // Get current project for calendar sync
-    const currentProject = await getProject(projectId, userId);
-    
-    // Handle calendar sync for completed projects
-    if (updates.status === 'finished' && currentProject?.calendarEventId) {
-      try {
-        await deleteCalendarEvent(currentProject.calendarEventId);
-        updates.calendarEventId = undefined; // Remove calendar event ID
-      } catch (calendarError) {
-        console.warn('Failed to delete calendar event:', calendarError);
-      }
-    }
-
-    // Handle calendar sync for due date changes
-    if (updates.dueDate && currentProject?.calendarEventId && updates.dueDate !== currentProject.dueDate) {
-      try {
-        await updateCalendarEvent(currentProject.calendarEventId, {
-          title: `Project: ${updates.title || currentProject.title}`,
-          description: updates.description || currentProject.description,
-          startDate: updates.dueDate,
-          endDate: new Date(updates.dueDate.getTime() + 60 * 60000), // 1 hour
-        });
-      } catch (calendarError) {
-        console.warn('Failed to update calendar event:', calendarError);
-      }
-    }
-    
     const docRef = doc(db, 'users', userId, 'projects', projectId);
     const updateData: any = {
       ...updates,
@@ -192,32 +145,6 @@ export const updateProject = async (
 
 export const deleteProject = async (projectId: string, userId: string): Promise<void> => {
   try {
-    // Get project and subtasks for calendar cleanup
-    const [project, subtasks] = await Promise.all([
-      getProject(projectId, userId),
-      getProjectSubtasks(projectId, userId)
-    ]);
-    
-    // Delete calendar events
-    const calendarDeletions = [];
-    if (project?.calendarEventId) {
-      calendarDeletions.push(deleteCalendarEvent(project.calendarEventId));
-    }
-    subtasks.forEach(subtask => {
-      if (subtask.calendarEventId) {
-        calendarDeletions.push(deleteCalendarEvent(subtask.calendarEventId));
-      }
-    });
-    
-    // Execute calendar deletions (don't block on failures)
-    if (calendarDeletions.length > 0) {
-      try {
-        await Promise.allSettled(calendarDeletions);
-      } catch (calendarError) {
-        console.warn('Some calendar events failed to delete:', calendarError);
-      }
-    }
-    
     const batch = writeBatch(db);
     
     // Delete the project

@@ -159,11 +159,7 @@ interface CalendarReminder {
   minutes: number;
 }
 
-interface CalendarService {
-  createEvent: (event: CalendarEvent) => Promise<string>;
-  updateEvent: (eventId: string, event: Partial<CalendarEvent>) => Promise<void>;
-  deleteEvent: (eventId: string) => Promise<void>;
-}
+
 ```
 
 ### Component Hierarchy

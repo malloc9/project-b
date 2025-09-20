@@ -7,7 +7,7 @@ import type {
 import { FirestoreService, QueryHelpers } from './firebase';
 import { UnifiedStorageService as StorageService } from './unifiedStorageService';
 import { where } from 'firebase/firestore';
-import { createPlantCareCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './calendarService';
+
 
 /**
  * Service for managing plant data in Firestore
@@ -256,37 +256,18 @@ export class PlantService {
       // Generate unique task ID
       const taskId = `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Get plant info for calendar event
-      const plant = await this.getPlant(userId, plantId);
-      if (!plant) {
-        throw new Error('Plant not found');
-      }
-
-      // Create calendar event if due date is provided
-      let calendarEventId: string | undefined;
-      if (careTask.dueDate) {
-        try {
-          calendarEventId = await createPlantCareCalendarEvent(
-            careTask.title,
-            careTask.description || '',
-            careTask.dueDate,
-            plant.name
-          );
-        } catch (calendarError) {
-          console.warn('Failed to create calendar event for plant care task:', calendarError);
-          // Continue without calendar sync
-        }
-      }
-      
       // Create care task object
       const newCareTask: PlantCareTask = {
         id: taskId,
         plantId,
         ...careTask,
-        calendarEventId,
       };
 
       // Add care task to plant's careTasks array
+      const plant = await this.getPlant(userId, plantId);
+      if (!plant) {
+        throw new Error('Plant not found');
+      }
       const updatedCareTasks = [...plant.careTasks, newCareTask];
       await this.updatePlant(userId, plantId, { careTasks: updatedCareTasks });
 
@@ -319,30 +300,6 @@ export class PlantService {
         throw new Error('Care task not found');
       }
 
-      // Handle calendar sync for completed tasks
-      if (updates.completed && existingTask.calendarEventId) {
-        try {
-          await deleteCalendarEvent(existingTask.calendarEventId);
-          updates.calendarEventId = undefined; // Remove calendar event ID
-        } catch (calendarError) {
-          console.warn('Failed to delete calendar event:', calendarError);
-        }
-      }
-
-      // Handle calendar sync for due date changes
-      if (updates.dueDate && updates.dueDate !== existingTask.dueDate && existingTask.calendarEventId) {
-        try {
-          await updateCalendarEvent(existingTask.calendarEventId, {
-            title: `Plant Care: ${updates.title || existingTask.title}`,
-            description: updates.description || existingTask.description || `Care task for plant: ${plant.name}`,
-            startDate: updates.dueDate,
-            endDate: new Date(updates.dueDate.getTime() + 30 * 60000), // 30 minutes
-          });
-        } catch (calendarError) {
-          console.warn('Failed to update calendar event:', calendarError);
-        }
-      }
-
       // Find and update the care task
       const updatedCareTasks = plant.careTasks.map(task => 
         task.id === taskId ? { ...task, ...updates } : task
@@ -364,21 +321,6 @@ export class PlantService {
       const plant = await this.getPlant(userId, plantId);
       if (!plant) {
         throw new Error('Plant not found');
-      }
-
-      // Find the task to get calendar event ID
-      const taskToRemove = plant.careTasks.find(task => task.id === taskId);
-      if (!taskToRemove) {
-        throw new Error('Care task not found');
-      }
-
-      // Delete calendar event if it exists
-      if (taskToRemove.calendarEventId) {
-        try {
-          await deleteCalendarEvent(taskToRemove.calendarEventId);
-        } catch (calendarError) {
-          console.warn('Failed to delete calendar event:', calendarError);
-        }
       }
 
       // Remove care task from array

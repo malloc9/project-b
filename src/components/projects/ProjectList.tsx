@@ -20,6 +20,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    console.log('ProjectList user:', user);
     if (user) {
       loadProjects();
     }

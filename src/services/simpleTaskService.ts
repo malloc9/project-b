@@ -13,11 +13,7 @@ import {
 import { db } from "../config/firebase";
 import type { SimpleTask } from "../types";
 import { ErrorCode, createAppError } from "../types/errors";
-import {
-  createSimpleTaskCalendarEvent,
-  updateCalendarEvent,
-  deleteCalendarEvent,
-} from "./calendarService";
+
 
 // ============================================================================
 // SIMPLE TASK CRUD OPERATIONS
@@ -36,28 +32,9 @@ export const createSimpleTask = async (
   try {
     const now = new Date();
 
-    // Create calendar event if due date is provided
-    let calendarEventId: string | undefined;
-    if (taskData.dueDate) {
-      try {
-        calendarEventId = await createSimpleTaskCalendarEvent(
-          taskData.title,
-          taskData.description || "",
-          taskData.dueDate
-        );
-      } catch (calendarError) {
-        console.warn(
-          "Failed to create calendar event for simple task:",
-          calendarError
-        );
-        // Continue without calendar sync
-      }
-    }
-
     const taskToSave = {
       ...taskData,
       description: taskData.description || null, // Convert undefined or empty string to null
-      calendarEventId: calendarEventId || null, // Convert undefined to null
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now),
       dueDate: taskData.dueDate ? Timestamp.fromDate(taskData.dueDate) : null,
@@ -162,38 +139,6 @@ export const updateSimpleTask = async (
     );
   }
   try {
-    // Get current task for calendar sync
-    const currentTask = await getSimpleTask(userId, taskId);
-
-    // Handle calendar sync for completed tasks
-    if (updates.completed && currentTask?.calendarEventId) {
-      try {
-        await deleteCalendarEvent(currentTask.calendarEventId);
-        updates.calendarEventId = undefined; // Remove calendar event ID
-      } catch (calendarError) {
-        console.warn("Failed to delete calendar event:", calendarError);
-      }
-    }
-
-    // Handle calendar sync for due date changes
-    if (
-      updates.dueDate &&
-      currentTask?.calendarEventId &&
-      updates.dueDate !== currentTask.dueDate
-    ) {
-      try {
-        await updateCalendarEvent(currentTask.calendarEventId, {
-          title: `Task: ${updates.title || currentTask.title}`,
-          description:
-            updates.description || currentTask.description || "Household task",
-          startDate: updates.dueDate,
-          endDate: new Date(updates.dueDate.getTime() + 30 * 60000), // 30 minutes
-        });
-      } catch (calendarError) {
-        console.warn("Failed to update calendar event:", calendarError);
-      }
-    }
-
     const docRef = doc(db, "users", userId, "simpleTasks", taskId);
     const updateData: any = {
       ...updates,
@@ -226,18 +171,6 @@ export const deleteSimpleTask = async (
     );
   }
   try {
-    // Get task for calendar cleanup
-    const task = await getSimpleTask(userId, taskId);
-
-    // Delete calendar event if it exists
-    if (task?.calendarEventId) {
-      try {
-        await deleteCalendarEvent(task.calendarEventId);
-      } catch (calendarError) {
-        console.warn("Failed to delete calendar event:", calendarError);
-      }
-    }
-
     const docRef = doc(db, "users", userId, "simpleTasks", taskId);
     await deleteDoc(docRef);
   } catch (error) {

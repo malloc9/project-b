@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
-import { CalendarProvider } from './contexts/CalendarContext';
 import { AuthLayout, ProtectedRoute, PublicRoute } from './components/auth';
 import { AppLayout } from './components/layout';
 import { ErrorBoundary } from './components/error/ErrorBoundary';
@@ -36,7 +35,6 @@ function App() {
     <ErrorBoundary>
       <ErrorToastProvider>
         <AuthProvider>
-          <CalendarProvider>
             <AuthLayout>
               <Router>
                 <Suspense fallback={<LoadingSpinner />}>
@@ -188,7 +186,6 @@ function App() {
                 </Suspense>
               </Router>
             </AuthLayout>
-          </CalendarProvider>
         </AuthProvider>
       </ErrorToastProvider>
       <FirebaseDebug />

@@ -7,7 +7,6 @@ import { AuthService } from "../../services/authService";
 import { PlantService } from "../../services/plantService";
 import * as ProjectService from "../../services/projectService";
 import * as SimpleTaskService from "../../services/simpleTaskService";
-import * as CalendarService from "../../services/calendarService";
 
 // Mock types and enums
 vi.mock("../../types", () => ({
@@ -70,14 +69,6 @@ vi.mock("../../services/simpleTaskService", () => ({
   createSimpleTask: vi.fn(),
   updateTask: vi.fn(),
   deleteTask: vi.fn(),
-}));
-
-vi.mock("../../services/calendarService", () => ({
-  createCalendarEvent: vi.fn(),
-  updateCalendarEvent: vi.fn(),
-  deleteCalendarEvent: vi.fn(),
-  createProjectCalendarEvent: vi.fn(),
-  createTaskCalendarEvent: vi.fn(),
 }));
 
 // Mock React Router for navigation testing
@@ -144,28 +135,23 @@ describe("Complete Application Workflow Integration Tests", () => {
 
     // Mock plant service
     vi.mocked(PlantService.getUserPlants).mockResolvedValue([mockPlant]);
-    vi.mocked(PlantService.createPlant).mockResolvedValue('plant-1');
+    vi.mocked(PlantService.createPlant).mockResolvedValue("plant-1");
     vi.mocked(PlantService.updatePlant).mockResolvedValue(undefined);
     vi.mocked(PlantService.deletePlant).mockResolvedValue();
 
     // Mock project service
     vi.mocked(ProjectService.getUserProjects).mockResolvedValue([mockProject]);
-    vi.mocked(ProjectService.createProject).mockResolvedValue('project-1');
+    vi.mocked(ProjectService.createProject).mockResolvedValue("project-1");
     vi.mocked(ProjectService.updateProject).mockResolvedValue(undefined);
     vi.mocked(ProjectService.deleteProject).mockResolvedValue();
 
     // Mock task service
-    vi.mocked(SimpleTaskService.getUserSimpleTasks).mockResolvedValue([mockTask]);
-    vi.mocked(SimpleTaskService.createSimpleTask).mockResolvedValue('task-1');
+    vi.mocked(SimpleTaskService.getUserSimpleTasks).mockResolvedValue([
+      mockTask,
+    ]);
+    vi.mocked(SimpleTaskService.createSimpleTask).mockResolvedValue("task-1");
     vi.mocked(SimpleTaskService.updateSimpleTask).mockResolvedValue(undefined);
     vi.mocked(SimpleTaskService.deleteSimpleTask).mockResolvedValue();
-
-    // Mock calendar service
-    vi.mocked(CalendarService.createCalendarEvent).mockResolvedValue(
-      "calendar-event-123"
-    );
-    vi.mocked(CalendarService.updateCalendarEvent).mockResolvedValue();
-    vi.mocked(CalendarService.deleteCalendarEvent).mockResolvedValue();
   });
 
   afterEach(() => {
@@ -274,112 +260,6 @@ describe("Complete Application Workflow Integration Tests", () => {
         })
       );
     });
-  });
-
-  it("should handle project creation with subtasks and calendar integration", async () => {
-    const user = userEvent.setup();
-
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
-
-    // Navigate to projects page
-    await waitFor(() => {
-      expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
-    });
-
-    const projectsLink = screen.getByRole("link", { name: /projects/i });
-    await user.click(projectsLink);
-
-    // Click add project button
-    const addProjectButton = screen.getByRole("button", {
-      name: /add project/i,
-    });
-    await user.click(addProjectButton);
-
-    // Fill out project form
-    const titleInput = screen.getByLabelText(/project title/i);
-    await user.type(titleInput, "Kitchen Renovation");
-
-    const descriptionInput = screen.getByLabelText(/description/i);
-    await user.type(descriptionInput, "Complete kitchen renovation project");
-
-    // Set due date
-    const dueDateInput = screen.getByLabelText(/due date/i);
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 30);
-    await user.type(dueDateInput, futureDate.toISOString().split("T")[0]);
-
-    // Submit form
-    const saveButton = screen.getByRole("button", { name: /save project/i });
-    await user.click(saveButton);
-
-    // Verify project service was called
-    await waitFor(() => {
-      expect(ProjectService.createProject).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Kitchen Renovation",
-          description: "Complete kitchen renovation project",
-        })
-      );
-    });
-
-    // Verify calendar integration
-    expect(CalendarService.createCalendarEvent).toHaveBeenCalled();
-  });
-
-  it("should handle task creation and calendar synchronization", async () => {
-    const user = userEvent.setup();
-
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
-
-    // Navigate to tasks page
-    await waitFor(() => {
-      expect(screen.getByText(/welcome back/i)).toBeInTheDocument();
-    });
-
-    const tasksLink = screen.getByRole("link", { name: /tasks/i });
-    await user.click(tasksLink);
-
-    // Click add task button
-    const addTaskButton = screen.getByRole("button", { name: /add task/i });
-    await user.click(addTaskButton);
-
-    // Fill out task form
-    const titleInput = screen.getByLabelText(/task title/i);
-    await user.type(titleInput, "Buy groceries");
-
-    const descriptionInput = screen.getByLabelText(/description/i);
-    await user.type(descriptionInput, "Weekly grocery shopping");
-
-    // Set due date
-    const dueDateInput = screen.getByLabelText(/due date/i);
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    await user.type(dueDateInput, tomorrow.toISOString().split("T")[0]);
-
-    // Submit form
-    const saveButton = screen.getByRole("button", { name: /save task/i });
-    await user.click(saveButton);
-
-    // Verify task service was called
-    await waitFor(() => {
-      expect(SimpleTaskService.createSimpleTask).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: "Buy groceries",
-          description: "Weekly grocery shopping",
-        })
-      );
-    });
-
-    // Verify calendar integration
-    expect(CalendarService.createCalendarEvent).toHaveBeenCalled();
   });
 
   it("should handle responsive design across different screen sizes", async () => {

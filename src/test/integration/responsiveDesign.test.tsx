@@ -10,7 +10,7 @@ vi.mock('../../services/authService');
 vi.mock('../../services/plantService');
 vi.mock('../../services/projectService');
 vi.mock('../../services/simpleTaskService');
-vi.mock('../../services/calendarService');
+
 
 // Mock Firebase config and functions
 vi.mock('../../config/firebase', () => ({

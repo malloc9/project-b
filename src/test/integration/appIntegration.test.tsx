@@ -62,11 +62,7 @@ vi.mock('../../services/simpleTaskService', () => ({
   deleteTask: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('../../services/calendarService', () => ({
-  createEvent: vi.fn().mockResolvedValue('calendar-event-123'),
-  updateEvent: vi.fn().mockResolvedValue(undefined),
-  deleteEvent: vi.fn().mockResolvedValue(undefined),
-}));
+
 
 describe('Application Integration Tests', () => {
   beforeEach(() => {
