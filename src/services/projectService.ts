@@ -169,7 +169,7 @@ export const updateProject = async (
       }
     }
     
-    const docRef = doc(db, 'projects', projectId);
+    const docRef = doc(db, 'users', userId, 'projects', projectId);
     const updateData: any = {
       ...updates,
       updatedAt: Timestamp.fromDate(new Date())
@@ -221,12 +221,12 @@ export const deleteProject = async (projectId: string, userId: string): Promise<
     const batch = writeBatch(db);
     
     // Delete the project
-    const projectRef = doc(db, 'projects', projectId);
+    const projectRef = doc(db, 'users', userId, 'projects', projectId);
     batch.delete(projectRef);
     
     // Delete all associated subtasks
     const subtasksQuery = query(
-      collection(db, 'subtasks'),
+      collection(db, 'users', userId, 'subtasks'),
       where('projectId', '==', projectId)
     );
     const subtasksSnapshot = await getDocs(subtasksQuery);
