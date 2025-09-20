@@ -7,8 +7,9 @@ import { Base64StorageService } from './base64StorageService';
 import { CloudinaryStorageService } from './cloudinaryStorageService';
 import { ImgBBStorageService } from './imgbbStorageService';
 import { SupabaseStorageService } from './supabaseStorageService';
+import { FirebaseStorageService } from './firebaseStorageService';
 
-export type StorageProvider = 'base64' | 'cloudinary' | 'imgbb' | 'supabase';
+export type StorageProvider = 'base64' | 'cloudinary' | 'imgbb' | 'supabase' | 'firebase';
 
 interface StorageServiceInterface {
   uploadFile(filePath: string, file: File, metadata?: any): Promise<string>;
@@ -44,6 +45,13 @@ export class UnifiedStorageService {
           return SupabaseStorageService;
         }
         console.warn('Supabase not configured, falling back to base64 storage');
+        return Base64StorageService;
+
+      case 'firebase':
+        if (FirebaseStorageService.isConfigured()) {
+          return FirebaseStorageService;
+        }
+        console.warn('Firebase not configured, falling back to base64 storage');
         return Base64StorageService;
 
       case 'base64':
@@ -113,6 +121,7 @@ export class UnifiedStorageService {
       
       case 'base64':
       case 'imgbb':
+      case 'firebase':
       default:
         return originalUrl;
     }
@@ -133,7 +142,8 @@ export class UnifiedStorageService {
         return SupabaseStorageService.getThumbnailUrl(originalUrl, size);
       
       case 'base64':
-        // For base64, we'll need to generate thumbnails client-side
+      case 'firebase':
+        // For base64 and Firebase, we'll need to generate thumbnails client-side
         return originalUrl; // Return original for now
       
       default:
@@ -202,6 +212,14 @@ export class UnifiedStorageService {
           description: 'Open source Firebase alternative',
           freeLimit: '1GB storage, 2GB bandwidth/month',
           features: ['Image transformations', 'CDN delivery', 'Real-time updates']
+        };
+
+      case 'firebase':
+        return {
+          name: 'Firebase Storage',
+          description: 'Google-provided object storage for Firebase apps',
+          freeLimit: '5GB storage, 1GB/day download',
+          features: ['Secure file transfers', 'Google Cloud integration', 'Scalable infrastructure']
         };
 
       default:

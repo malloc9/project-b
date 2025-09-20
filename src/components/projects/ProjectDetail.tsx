@@ -27,6 +27,7 @@ const ProjectDetail: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
+    console.log('ProjectDetail user:', user);
     if (projectId && user) {
       loadProjectData();
     }
