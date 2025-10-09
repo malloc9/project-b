@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document outlines the requirements for a comprehensive property and household management application. The application will be a responsive web application running on Firebase with simple authentication, designed to help users manage their plants, household projects, and tasks with integrated calendar functionality.
+This document outlines the requirements for a comprehensive property and household management application. The application will be a responsive web application running on Firebase free tier with simple authentication, designed to help users manage their plants, household projects, and tasks with integrated calendar functionality.
 
 ## Requirements
 

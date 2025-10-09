@@ -128,8 +128,10 @@ export const updateProject = async (
       updatedAt: Timestamp.fromDate(new Date())
     };
     
-    // Convert Date objects to Timestamps
-    if (updates.dueDate) {
+    // Explicitly handle dueDate to ensure it's null if undefined
+    if (updates.dueDate === undefined) {
+      updateData.dueDate = null;
+    } else if (updates.dueDate !== undefined) {
       updateData.dueDate = Timestamp.fromDate(updates.dueDate);
     }
     
@@ -273,6 +275,8 @@ export const updateSubtask = async (
     // Convert Date objects to Timestamps
     if (updates.dueDate) {
       updateData.dueDate = Timestamp.fromDate(updates.dueDate);
+    } else if (updates.dueDate === undefined) {
+      updateData.dueDate = null;
     }
     
     await updateDoc(docRef, updateData);

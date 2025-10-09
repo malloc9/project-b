@@ -148,6 +148,8 @@ export const updateSimpleTask = async (
     // Convert Date objects to Timestamps
     if (updates.dueDate) {
       updateData.dueDate = Timestamp.fromDate(updates.dueDate);
+    } else if (updates.dueDate === undefined) {
+      updateData.dueDate = null;
     }
 
     await updateDoc(docRef, updateData);

@@ -1,50 +1,16 @@
-import { useAuth } from '../contexts/AuthContext';
 import { 
   ContentArea, 
   GridLayout, 
-  StatsCard, 
-  QuickActionCard 
+  StatsCard 
 } from '../components/layout';
 import { usePlants } from '../hooks/usePlants'; // Import usePlants hook
 import { useProjects } from '../hooks/useProjects'; // Import useProjects hook
 import { useTasks } from '../hooks/useTasks'; // Import useTasks hook
 
 export function DashboardPage() {
-  const { user } = useAuth();
   const { plants } = usePlants(); // Call usePlants hook with userId
   const { projects } = useProjects(); // Call useProjects hook with userId
   const { tasks } = useTasks(); // Call useTasks hook with userId
-
-  const quickActions = [
-    {
-      title: 'Plant Codex',
-      description: 'Manage your plants, upload photos, and track their growth over time',
-      href: '/plants',
-      icon: '🌱',
-      color: 'green' as const,
-    },
-    {
-      title: 'Projects',
-      description: 'Organize complex household projects with subtasks and deadlines',
-      href: '/projects',
-      icon: '🔨',
-      color: 'blue' as const,
-    },
-    {
-      title: 'Tasks',
-      description: 'Keep track of simple tasks and daily reminders',
-      href: '/tasks',
-      icon: '✅',
-      color: 'purple' as const,
-    },
-    {
-      title: 'Calendar',
-      description: 'View all scheduled items, deadlines, and plant care reminders',
-      href: '/calendar',
-      icon: '📅',
-      color: 'indigo' as const,
-    },
-  ];
 
   const pendingTasks = tasks.filter(task => !task.completed);
 
@@ -55,6 +21,7 @@ export function DashboardPage() {
       icon: '🌱',
       description: 'Active plants in your codex',
       color: 'green' as const,
+      href: '/plants',
     },
     {
       title: 'Active Projects',
@@ -62,6 +29,7 @@ export function DashboardPage() {
       icon: '🔨',
       description: 'Projects in progress',
       color: 'blue' as const,
+      href: '/projects',
     },
     {
       title: 'Pending Tasks',
@@ -69,6 +37,7 @@ export function DashboardPage() {
       icon: '✅',
       description: 'Tasks awaiting completion',
       color: 'purple' as const,
+      href: '/tasks',
     },
     {
       title: 'This Week',
@@ -76,31 +45,12 @@ export function DashboardPage() {
       icon: '📅',
       description: 'Upcoming deadlines',
       color: 'indigo' as const,
+      href: '/calendar',
     },
   ];
 
   return (
     <div className="space-y-6">
-      {/* Welcome header */}
-      <ContentArea className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <div className="text-5xl">👋</div>
-          <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Welcome back, {user?.displayName || 'User'}!
-            </h1>
-            <p className="text-gray-600 mt-2 text-base sm:text-lg">
-              Manage your household, plants, and projects all in one place
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-sm text-gray-500">
-              <span className="bg-white px-3 py-1 rounded-full">🏠 Household Management</span>
-              <span className="bg-white px-3 py-1 rounded-full">🌱 Plant Care</span>
-              <span className="bg-white px-3 py-1 rounded-full">📅 Calendar Sync</span>
-            </div>
-          </div>
-        </div>
-      </ContentArea>
-
       {/* Stats overview */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Overview</h2>
@@ -113,23 +63,7 @@ export function DashboardPage() {
               icon={stat.icon}
               description={stat.description}
               color={stat.color}
-            />
-          ))}
-        </GridLayout>
-      </div>
-
-      {/* Quick actions */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <GridLayout columns={2} gap="lg" className="lg:grid-cols-4">
-          {quickActions.map((action) => (
-            <QuickActionCard
-              key={action.title}
-              title={action.title}
-              description={action.description}
-              href={action.href}
-              icon={action.icon}
-              color={action.color}
+              href={stat.href}
             />
           ))}
         </GridLayout>
