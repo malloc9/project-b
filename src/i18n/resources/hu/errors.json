@@ -1,0 +1,37 @@
+{
+  "general": {
+    "unknownError": "Ismeretlen hiba történt",
+    "networkError": "Hálózati hiba",
+    "serverError": "Szerver hiba",
+    "notFound": "Nem található",
+    "unauthorized": "Nincs jogosultság",
+    "forbidden": "Tiltott",
+    "timeout": "Időtúllépés",
+    "connectionLost": "Kapcsolat megszakadt"
+  },
+  "auth": {
+    "loginFailed": "Bejelentkezés sikertelen",
+    "invalidCredentials": "Érvénytelen bejelentkezési adatok",
+    "accountLocked": "Fiók zárolva",
+    "passwordExpired": "Jelszó lejárt",
+    "emailNotVerified": "E-mail cím nincs megerősítve",
+    "userNotFound": "Felhasználó nem található",
+    "emailAlreadyExists": "Ez az e-mail cím már használatban van"
+  },
+  "validation": {
+    "fieldRequired": "A mező kitöltése kötelező",
+    "invalidEmail": "Érvénytelen e-mail cím",
+    "passwordTooShort": "A jelszó túl rövid",
+    "passwordsNotMatch": "A jelszavak nem egyeznek",
+    "invalidPhoneNumber": "Érvénytelen telefonszám",
+    "invalidDate": "Érvénytelen dátum"
+  },
+  "data": {
+    "loadFailed": "Adatok betöltése sikertelen",
+    "saveFailed": "Mentés sikertelen",
+    "deleteFailed": "Törlés sikertelen",
+    "updateFailed": "Frissítés sikertelen",
+    "notFound": "Az adat nem található",
+    "alreadyExists": "Az adat már létezik"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "labels": {
+    "title": "Title",
+    "description": "Description",
+    "dueDate": "Due Date",
+    "status": "Status",
+    "projectTitle": "Project Title",
+    "plantName": "Plant Name",
+    "species": "Species",
+    "photo": "Photo",
+    "photoDescription": "Description (optional)",
+    "taskTitle": "Task Title",
+    "every": "Every",
+    "period": "Period",
+    "endDate": "End Date (optional)",
+    "careTasks": "Care Tasks",
+    "recurrence": "Recurrence"
+  },
+  "placeholders": {
+    "enterTitle": "Enter title",
+    "enterDescription": "Enter description",
+    "enterPlantName": "Enter plant name",
+    "enterSpecies": "Enter species",
+    "enterTaskTitle": "Enter task title",
+    "selectDate": "Select date",
+    "selectStatus": "Select status",
+    "optional": "Optional"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add": "Add",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "upload": "Upload",
+    "submit": "Submit"
+  },
+  "validation": {
+    "required": "This field is required",
+    "titleRequired": "Title is required",
+    "descriptionRequired": "Description is required",
+    "dueDateRequired": "Due date is required",
+    "taskTitleRequired": "Task title is required",
+    "plantNameRequired": "Plant name is required",
+    "titleTooLong": "Title must be less than {{max}} characters",
+    "descriptionTooLong": "Description must be less than {{max}} characters",
+    "invalidDate": "Invalid date",
+    "invalidEmail": "Invalid email address",
+    "fieldRequired": "{{field}} is required",
+    "fieldTooLong": "{{field}} is too long (maximum {{max}} characters)",
+    "fieldTooShort": "{{field}} is too short (minimum {{min}} characters)"
+  },
+  "status": {
+    "notStarted": "Not Started",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "onHold": "On Hold"
+  },
+  "recurrence": {
+    "none": "None",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "days": "days",
+    "weeks": "weeks",
+    "months": "months",
+    "years": "years"
+  }
+}

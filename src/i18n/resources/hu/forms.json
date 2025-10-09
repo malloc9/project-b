@@ -1,0 +1,73 @@
+{
+  "labels": {
+    "title": "Cím",
+    "description": "Leírás",
+    "dueDate": "Határidő",
+    "status": "Állapot",
+    "projectTitle": "Projekt címe",
+    "plantName": "Növény neve",
+    "species": "Faj",
+    "photo": "Fotó",
+    "photoDescription": "Fotó leírása (opcionális)",
+    "taskTitle": "Feladat címe",
+    "every": "Minden",
+    "period": "Időszak",
+    "endDate": "Befejezés dátuma (opcionális)",
+    "careTasks": "Gondozási feladatok",
+    "recurrence": "Ismétlődés"
+  },
+  "placeholders": {
+    "enterTitle": "Adja meg a címet",
+    "enterDescription": "Adja meg a leírást",
+    "enterPlantName": "Adja meg a növény nevét",
+    "enterSpecies": "Adja meg a fajt",
+    "enterTaskTitle": "Adja meg a feladat címét",
+    "selectDate": "Válasszon dátumot",
+    "selectStatus": "Válasszon állapotot",
+    "optional": "Opcionális"
+  },
+  "buttons": {
+    "save": "Mentés",
+    "cancel": "Mégse",
+    "delete": "Törlés",
+    "add": "Hozzáadás",
+    "edit": "Szerkesztés",
+    "create": "Létrehozás",
+    "update": "Frissítés",
+    "upload": "Feltöltés",
+    "submit": "Küldés"
+  },
+  "validation": {
+    "required": "Ez a mező kötelező",
+    "titleRequired": "A cím megadása kötelező",
+    "descriptionRequired": "A leírás megadása kötelező",
+    "dueDateRequired": "A határidő megadása kötelező",
+    "taskTitleRequired": "A feladat címe kötelező",
+    "plantNameRequired": "A növény neve kötelező",
+    "titleTooLong": "A cím legfeljebb {{max}} karakter lehet",
+    "descriptionTooLong": "A leírás legfeljebb {{max}} karakter lehet",
+    "invalidDate": "Érvénytelen dátum",
+    "invalidEmail": "Érvénytelen e-mail cím",
+    "fieldRequired": "{{field}} megadása kötelező",
+    "fieldTooLong": "{{field}} túl hosszú (maximum {{max}} karakter)",
+    "fieldTooShort": "{{field}} túl rövid (minimum {{min}} karakter)"
+  },
+  "status": {
+    "notStarted": "Nem kezdődött el",
+    "inProgress": "Folyamatban",
+    "completed": "Befejezve",
+    "cancelled": "Megszakítva",
+    "onHold": "Felfüggesztve"
+  },
+  "recurrence": {
+    "none": "Nincs",
+    "daily": "Naponta",
+    "weekly": "Hetente",
+    "monthly": "Havonta",
+    "yearly": "Évente",
+    "days": "nap",
+    "weeks": "hét",
+    "months": "hónap",
+    "years": "év"
+  }
+}

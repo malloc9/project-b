@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthService } from '../../services/authService';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface PasswordResetFormProps {
   onSuccess?: () => void;
@@ -18,6 +19,7 @@ interface FormErrors {
 
 export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProps) {
   const { resetPassword } = useAuth();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     email: '',
   });
@@ -30,9 +32,9 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth:validation.emailRequired');
     } else if (!AuthService.validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('auth:validation.validEmailRequired');
     }
 
     setErrors(newErrors);
@@ -70,7 +72,7 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
       setIsSuccess(true);
       onSuccess?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
+      const errorMessage = error instanceof Error ? error.message : t('auth:validation.passwordResetFailed');
       setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
@@ -82,9 +84,9 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
       <div className="w-full max-w-md mx-auto">
         <div className="text-center space-y-4">
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
-            <h3 className="font-medium">Password reset email sent!</h3>
+            <h3 className="font-medium">{t('auth:passwordResetEmailSent')}</h3>
             <p className="text-sm mt-1">
-              Check your email for instructions to reset your password.
+              {t('auth:checkEmailForInstructions')}
             </p>
           </div>
           
@@ -92,7 +94,7 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
             onClick={onCancel}
             className="text-blue-600 hover:text-blue-500 focus:outline-none focus:underline"
           >
-            Back to sign in
+            {t('auth:backToSignIn')}
           </button>
         </div>
       </div>
@@ -104,10 +106,10 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
-            Reset Password
+            {t('auth:resetPassword')}
           </h2>
           <p className="text-sm text-gray-600 text-center mb-6">
-            Enter your email address and we'll send you a link to reset your password.
+            {t('auth:resetPasswordDescription')}
           </p>
         </div>
 
@@ -119,7 +121,7 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
+            {t('auth:emailAddress')}
           </label>
           <input
             id="email"
@@ -132,7 +134,7 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.email ? 'border-red-300' : 'border-gray-300'
             }`}
-            placeholder="Enter your email"
+            placeholder={t('auth:enterEmail')}
             disabled={isSubmitting}
           />
           {errors.email && (
@@ -149,10 +151,10 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
             {isSubmitting ? (
               <div className="flex items-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Sending...
+                {t('auth:sending')}
               </div>
             ) : (
-              'Send Reset Email'
+              t('auth:sendResetEmail')
             )}
           </button>
 
@@ -162,7 +164,7 @@ export function PasswordResetForm({ onSuccess, onCancel }: PasswordResetFormProp
             className="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             disabled={isSubmitting}
           >
-            Cancel
+            {t('common:cancel')}
           </button>
         </div>
       </form>

@@ -1,11 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
+import { I18nProvider } from './contexts/I18nContext';
 import { AuthLayout, ProtectedRoute, PublicRoute } from './components/auth';
 import { AppLayout } from './components/layout';
 import { ErrorBoundary } from './components/error/ErrorBoundary';
 import { ErrorToastProvider } from './components/error/ErrorToastContainer';
 import { FirebaseDebug } from './components/debug/FirebaseDebug';
+
+// Initialize i18n
+import './i18n';
 
 // Lazy load pages for code splitting
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
@@ -37,8 +41,9 @@ function App() {
         <AuthProvider>
             <AuthLayout>
               <Router>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
+                <I18nProvider>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
             {/* Public routes - redirect to dashboard if authenticated */}
             <Route 
               path="/login" 
@@ -182,13 +187,14 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-                  </Routes>
-                </Suspense>
+                    </Routes>
+                  </Suspense>
+                </I18nProvider>
               </Router>
             </AuthLayout>
         </AuthProvider>
+        <FirebaseDebug />
       </ErrorToastProvider>
-      <FirebaseDebug />
     </ErrorBoundary>
   );
 }

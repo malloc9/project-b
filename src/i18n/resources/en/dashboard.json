@@ -1,0 +1,31 @@
+{
+  "overview": "Overview",
+  "stats": {
+    "plantsTracked": "Plants Tracked",
+    "activeProjects": "Active Projects",
+    "pendingTasks": "Pending Tasks",
+    "thisWeek": "This Week",
+    "activePlantsInCodex": "Active plants in your codex",
+    "projectsInProgress": "Projects in progress",
+    "tasksAwaitingCompletion": "Tasks awaiting completion",
+    "upcomingDeadlines": "Upcoming deadlines"
+  },
+  "recentActivity": "Recent Activity",
+  "recentActivitySubtitle": "Your latest actions and updates",
+  "recentActivitiesWillAppear": "Your recent activities will appear here",
+  "startByAddingPlants": "Start by adding plants, creating projects, or managing tasks",
+  "upcomingItems": "Upcoming Items",
+  "upcomingItemsSubtitle": "Tasks and deadlines this week",
+  "noUpcomingItemsScheduled": "No upcoming items scheduled",
+  "plantCareRemindersWillShow": "Your plant care reminders and project deadlines will show here",
+  "gettingStarted": "Getting Started",
+  "gettingStartedSubtitle": "Tips to make the most of your household management system",
+  "tips": {
+    "addFirstPlant": "Add Your First Plant",
+    "addFirstPlantDescription": "Start by adding plants to your codex and upload photos to track their growth",
+    "createProject": "Create a Project",
+    "createProjectDescription": "Organize complex household tasks into projects with subtasks and deadlines",
+    "syncCalendar": "Sync Your Calendar",
+    "syncCalendarDescription": "Connect with Google Calendar to get reminders for all your tasks and plant care"
+  }
+}

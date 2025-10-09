@@ -1,0 +1,37 @@
+{
+  "general": {
+    "unknownError": "An unknown error occurred",
+    "networkError": "Network error",
+    "serverError": "Server error",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "timeout": "Request timeout",
+    "connectionLost": "Connection lost"
+  },
+  "auth": {
+    "loginFailed": "Login failed",
+    "invalidCredentials": "Invalid credentials",
+    "accountLocked": "Account locked",
+    "passwordExpired": "Password expired",
+    "emailNotVerified": "Email not verified",
+    "userNotFound": "User not found",
+    "emailAlreadyExists": "This email is already in use"
+  },
+  "validation": {
+    "fieldRequired": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "Password is too short",
+    "passwordsNotMatch": "Passwords do not match",
+    "invalidPhoneNumber": "Invalid phone number",
+    "invalidDate": "Invalid date"
+  },
+  "data": {
+    "loadFailed": "Failed to load data",
+    "saveFailed": "Failed to save",
+    "deleteFailed": "Failed to delete",
+    "updateFailed": "Failed to update",
+    "notFound": "Data not found",
+    "alreadyExists": "Data already exists"
+  }
+}

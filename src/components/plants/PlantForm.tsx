@@ -4,6 +4,7 @@ import { PlantService } from '../../services/plantService';
 import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface PlantFormProps {
   plant?: Plant | null; // null for create, Plant for edit
@@ -26,6 +27,7 @@ interface FormErrors {
 
 export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     name: plant?.name || '',
     species: plant?.species || '',
@@ -170,14 +172,14 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
         {/* Plant Name */}
         <div>
           <label htmlFor="plant-name" className="block text-sm font-medium text-gray-700 mb-1">
-            Plant Name *
+            {t('forms:labels.plantName')} *
           </label>
           <input
             id="plant-name"
             type="text"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="e.g., My Fiddle Leaf Fig"
+            placeholder={t('forms:placeholders.enterPlantName')}
             className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
               errors.name
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
@@ -193,14 +195,14 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
         {/* Species */}
         <div>
           <label htmlFor="plant-species" className="block text-sm font-medium text-gray-700 mb-1">
-            Species
+            {t('forms:labels.species')}
           </label>
           <input
             id="plant-species"
             type="text"
             value={formData.species}
             onChange={(e) => handleInputChange('species', e.target.value)}
-            placeholder="e.g., Ficus lyrata (optional)"
+            placeholder={t('forms:placeholders.enterSpecies') + ' (' + t('forms:placeholders.optional') + ')'}
             className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
               errors.species
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
@@ -219,14 +221,14 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
         {/* Description */}
         <div>
           <label htmlFor="plant-description" className="block text-sm font-medium text-gray-700 mb-1">
-            Description *
+            {t('forms:labels.description')} *
           </label>
           <textarea
             id="plant-description"
             rows={4}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
-            placeholder="Describe your plant, its location, care notes, or any other details..."
+            placeholder={t('forms:placeholders.enterDescription')}
             className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
               errors.description
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'

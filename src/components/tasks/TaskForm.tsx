@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createSimpleTask, getSimpleTask, updateSimpleTask } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface TaskFormData {
   title: string;
@@ -13,6 +14,7 @@ const TaskForm: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isEditing = Boolean(taskId);
 
   const [formData, setFormData] = useState<TaskFormData>({
@@ -64,13 +66,13 @@ const TaskForm: React.FC = () => {
     const newErrors: Partial<TaskFormData> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('forms:validation.titleRequired');
     }
 
     if (formData.dueDate) {
       const dueDate = new Date(formData.dueDate);
       if (isNaN(dueDate.getTime())) {
-        newErrors.dueDate = 'Please enter a valid date';
+        newErrors.dueDate = t('forms:validation.invalidDate');
       }
     }
 
@@ -106,7 +108,7 @@ const TaskForm: React.FC = () => {
       navigate('/tasks');
     } catch (err) {
       console.error('Error saving task:', err);
-      setErrors({ title: 'Failed to save task. Please try again.' });
+      setErrors({ title: t('common:error') });
     } finally {
       setLoading(false);
     }
@@ -135,7 +137,7 @@ const TaskForm: React.FC = () => {
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {isEditing ? 'Edit Task' : 'Create New Task'}
+            {isEditing ? t('forms:buttons.edit') + ' ' + t('navigation:tasks') : t('forms:buttons.create') + ' ' + t('navigation:tasks')}
           </h2>
         </div>
 
@@ -143,7 +145,7 @@ const TaskForm: React.FC = () => {
           {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Title *
+              {t('forms:labels.title')} *
             </label>
             <input
               type="text"
@@ -156,7 +158,7 @@ const TaskForm: React.FC = () => {
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                   : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
               }`}
-              placeholder="Enter task title"
+              placeholder={t('forms:placeholders.enterTaskTitle')}
               disabled={loading}
             />
             {errors.title && (
@@ -167,7 +169,7 @@ const TaskForm: React.FC = () => {
           {/* Description */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description
+              {t('forms:labels.description')}
             </label>
             <textarea
               id="description"
@@ -180,7 +182,7 @@ const TaskForm: React.FC = () => {
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                   : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
               }`}
-              placeholder="Enter task description (optional)"
+              placeholder={t('forms:placeholders.enterDescription') + ' (' + t('forms:placeholders.optional') + ')'}
               disabled={loading}
             />
             {errors.description && (
@@ -191,7 +193,7 @@ const TaskForm: React.FC = () => {
           {/* Due Date */}
           <div>
             <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
-              Due Date
+              {t('forms:labels.dueDate')}
             </label>
             <input
               type="date"
@@ -219,7 +221,7 @@ const TaskForm: React.FC = () => {
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               disabled={loading}
             >
-              Cancel
+              {t('forms:buttons.cancel')}
             </button>
             <button
               type="submit"
@@ -229,10 +231,10 @@ const TaskForm: React.FC = () => {
               {loading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {isEditing ? 'Updating...' : 'Creating...'}
+                  {isEditing ? t('forms:buttons.update') + '...' : t('forms:buttons.create') + '...'}
                 </div>
               ) : (
-                isEditing ? 'Update Task' : 'Create Task'
+                isEditing ? t('forms:buttons.update') + ' ' + t('navigation:tasks') : t('forms:buttons.create') + ' ' + t('navigation:tasks')
               )}
             </button>
           </div>

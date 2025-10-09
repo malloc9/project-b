@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { FirebaseInitService } from './services/firebaseInit'
+import './i18n'
 
 // Initialize Firebase with emulators in development
 const initializeFirebase = async () => {

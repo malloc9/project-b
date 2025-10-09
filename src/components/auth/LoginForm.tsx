@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthService } from '../../services/authService';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -20,6 +21,7 @@ interface FormErrors {
 
 export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
   const { login } = useAuth();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -32,14 +34,14 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('auth:validation.emailRequired');
     } else if (!AuthService.validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('auth:validation.validEmailRequired');
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = t('auth:validation.passwordRequired');
     }
 
     setErrors(newErrors);
@@ -76,7 +78,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       await login(formData.email, formData.password);
       onSuccess?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      const errorMessage = error instanceof Error ? error.message : t('auth:validation.loginFailed');
       setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
@@ -96,7 +98,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       await login(formData.email, formData.password);
       onSuccess?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Signup failed';
+      const errorMessage = error instanceof Error ? error.message : t('auth:validation.signupFailed');
       setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
@@ -108,7 +110,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            Sign In
+            {t('auth:signIn')}
           </h2>
         </div>
 
@@ -120,7 +122,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address
+            {t('auth:emailAddress')}
           </label>
           <input
             id="email"
@@ -133,7 +135,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.email ? 'border-red-300' : 'border-gray-300'
             }`}
-            placeholder="Enter your email"
+            placeholder={t('auth:enterEmail')}
             disabled={isSubmitting}
           />
           {errors.email && (
@@ -143,7 +145,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
+            {t('auth:password')}
           </label>
           <input
             id="password"
@@ -156,7 +158,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.password ? 'border-red-300' : 'border-gray-300'
             }`}
-            placeholder="Enter your password"
+            placeholder={t('auth:enterPassword')}
             disabled={isSubmitting}
           />
           {errors.password && (
@@ -173,10 +175,10 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             {isSubmitting ? (
               <div className="flex items-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Signing in...
+                {t('auth:signingIn')}
               </div>
             ) : (
-              'Sign In'
+              t('auth:signIn')
             )}
           </button>
         </div>
@@ -190,7 +192,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
               disabled={isSubmitting}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Creating Account...' : 'Create Test Account'}
+              {isSubmitting ? t('auth:creatingAccount') : t('auth:createTestAccount')}
             </button>
           </div>
         )}
@@ -202,7 +204,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             className="text-sm text-blue-600 hover:text-blue-500 focus:outline-none focus:underline"
             disabled={isSubmitting}
           >
-            Forgot your password?
+            {t('auth:forgotPassword')}
           </button>
         </div>
       </form>

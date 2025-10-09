@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginForm } from '../components/auth/LoginForm';
 import { PasswordResetForm } from '../components/auth/PasswordResetForm';
+import { useTranslation } from '../hooks/useTranslation';
 
 type ViewMode = 'login' | 'reset-password';
 
@@ -9,6 +10,7 @@ export function LoginPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('login');
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   // Get the intended destination from location state, default to dashboard
   const from = location.state?.from?.pathname || '/';
@@ -35,10 +37,10 @@ export function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Household Management
+            {t('auth:householdManagementTitle')}
           </h1>
           <p className="text-gray-600">
-            Manage your plants, projects, and tasks
+            {t('auth:managePlantsProjectsTasks')}
           </p>
         </div>
 
@@ -58,7 +60,7 @@ export function LoginPage() {
 
         <div className="text-center text-sm text-gray-500">
           <p>
-            Secure authentication powered by Firebase
+            {t('auth:secureAuthenticationPoweredBy')}
           </p>
         </div>
       </div>
