@@ -299,7 +299,7 @@ class ServiceWorkerManagerImpl implements ServiceWorkerManager {
       return;
     }
 
-    navigator.serviceWorker.controller.postMessage({
+    navigator.serviceWorker.controller?.postMessage({
       type: 'SKIP_WAITING'
     });
   }
@@ -413,7 +413,7 @@ class ServiceWorkerManagerImpl implements ServiceWorkerManager {
         clearTimeout(timeout);
       }, { once: true });
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller?.postMessage(
         {
           type: 'GET_CACHE_VERSION'
         },
@@ -445,7 +445,7 @@ class ServiceWorkerManagerImpl implements ServiceWorkerManager {
         clearTimeout(timeout);
       }, { once: true });
 
-      navigator.serviceWorker.controller.postMessage(
+      navigator.serviceWorker.controller?.postMessage(
         {
           type: 'CLEAR_OLD_CACHES'
         },
