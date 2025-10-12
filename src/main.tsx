@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { FirebaseInitService } from './services/firebaseInit'
+import { serviceWorkerManager } from './utils/serviceWorkerManager'
 import './i18n'
 
 // Initialize Firebase with emulators in development
@@ -26,6 +27,19 @@ const initializeFirebase = async () => {
 
 // Initialize Firebase before rendering
 initializeFirebase();
+
+// Register service worker
+if (serviceWorkerManager.isSupported()) {
+  serviceWorkerManager.register().then((registration) => {
+    if (registration) {
+      console.log('✅ Service Worker registered successfully');
+      // Check for updates on app load
+      serviceWorkerManager.checkForUpdates().catch(console.error);
+    }
+  }).catch((error) => {
+    console.error('❌ Service Worker registration failed:', error);
+  });
+}
 
 // Render the app
 createRoot(document.getElementById('root')!).render(

@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { NavigationBar } from './NavigationBar';
 import { Sidebar } from './Sidebar';
 import { LanguageSelector } from '../i18n/LanguageSelector';
+import { UpdateNotification } from '../common/UpdateNotification';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useServiceWorker } from '../../hooks/useServiceWorker';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -10,7 +12,11 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
   const { t } = useTranslation();
+  
+  // Service worker integration
+  const { updateAvailable, forceUpdate } = useServiceWorker();
 
   const toggleMobileSidebar = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -18,6 +24,20 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const closeMobileSidebar = () => {
     setIsMobileSidebarOpen(false);
+  };
+
+  const handleUpdateApp = async () => {
+    try {
+      await forceUpdate();
+      // forceUpdate already handles page reload
+    } catch (error) {
+      console.error('Failed to update app:', error);
+      throw error; // Re-throw to let UpdateNotification handle the error display
+    }
+  };
+
+  const handleDismissUpdate = () => {
+    setUpdateDismissed(true);
   };
 
   return (
@@ -77,6 +97,13 @@ export function AppLayout({ children }: AppLayoutProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
+
+      {/* Update notification */}
+      <UpdateNotification
+        isVisible={updateAvailable && !updateDismissed}
+        onUpdate={handleUpdateApp}
+        onDismiss={handleDismissUpdate}
+      />
     </div>
   );
 }
