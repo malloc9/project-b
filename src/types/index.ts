@@ -21,6 +21,7 @@ export interface RecurrencePattern {
   type: 'daily' | 'weekly' | 'monthly' | 'yearly';
   interval: number; // Every N days/weeks/months/years
   endDate?: Date;
+  seriesId?: string; // For managing recurring event series
 }
 
 // ============================================================================
@@ -102,6 +103,49 @@ export interface SimpleTask {
   updatedAt: Date;
 }
 
+// ============================================================================
+// CALENDAR TYPES
+// ============================================================================
+
+export interface NotificationSettings {
+  id: string;
+  type: 'browser' | 'in_app';
+  timing: number; // minutes before event
+  enabled: boolean;
+}
+
+export interface CalendarEvent {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  startDate: Date;
+  endDate: Date;
+  allDay: boolean;
+  type: 'task' | 'project' | 'plant_care' | 'custom';
+  sourceId?: string; // ID of the source task/project/plant
+  status: 'pending' | 'completed' | 'cancelled';
+  recurrence?: RecurrencePattern;
+  notifications: NotificationSettings[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CalendarView {
+  type: 'month' | 'week' | 'day';
+  currentDate: Date;
+  events: CalendarEvent[];
+  selectedDate?: Date;
+}
+
+// Type for creating new calendar events (without generated fields)
+export type CreateCalendarEventData = Omit<CalendarEvent, 'id' | 'createdAt' | 'updatedAt'>;
+
+// Type for updating calendar events (all fields optional except id)
+export type UpdateCalendarEventData = Partial<Omit<CalendarEvent, 'id' | 'userId' | 'createdAt'>> & {
+  id: string;
+};
+
 // Storage Service Interface (for plant photos)
 export interface StorageService {
   uploadPhoto: (file: File, path: string) => Promise<string>;
@@ -160,6 +204,14 @@ export interface TaskFilters {
   completed?: boolean;
   dueDateBefore?: Date;
   dueDateAfter?: Date;
+  searchTerm?: string;
+}
+
+export interface CalendarFilters {
+  type?: 'task' | 'project' | 'plant_care' | 'custom';
+  status?: 'pending' | 'completed' | 'cancelled';
+  startDate?: Date;
+  endDate?: Date;
   searchTerm?: string;
 }
 

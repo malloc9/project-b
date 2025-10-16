@@ -2,7 +2,8 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import type { SimpleTask, Project, PlantCareTask } from '../types';
 
-export interface CalendarEvent {
+// Legacy calendar event interface for react-big-calendar compatibility
+export interface LegacyCalendarEvent {
   title: string;
   start: Date;
   end: Date;
@@ -10,8 +11,8 @@ export interface CalendarEvent {
   resource?: any;
 }
 
-export const getEvents = async (userId: string): Promise<CalendarEvent[]> => {
-  const events: CalendarEvent[] = [];
+export const getEvents = async (userId: string): Promise<LegacyCalendarEvent[]> => {
+  const events: LegacyCalendarEvent[] = [];
 
   // Get simple tasks
   const tasksQuery = query(

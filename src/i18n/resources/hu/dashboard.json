@@ -25,7 +25,7 @@
     "addFirstPlantDescription": "Kezdje növények hozzáadásával a kódexhez és töltsön fel fotókat a növekedésük követéséhez",
     "createProject": "Hozzon létre egy projektet",
     "createProjectDescription": "Szervezze összetett háztartási feladatait projektekbe alfeladatokkal és határidőkkel",
-    "syncCalendar": "Szinkronizálja naptárát",
-    "syncCalendarDescription": "Kapcsolódjon a Google Naptárhoz, hogy emlékeztetőket kapjon minden feladatról és növénygondozásról"
+    "manageSchedule": "Kezelje ütemezését",
+    "manageScheduleDescription": "Tekintse meg az összes feladatát és növénygondozási tevékenységét a beépített naptárban"
   }
 }

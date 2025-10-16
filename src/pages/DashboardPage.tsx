@@ -1,20 +1,43 @@
+import { useState, useEffect } from 'react';
 import {
   ContentArea,
   GridLayout,
   StatsCard
 } from '../components/layout';
+import { CalendarSummary } from '../components/calendar';
+import { getUpcomingEvents } from '../services/calendarService';
+import { useAuth } from '../contexts/AuthContext';
 import { usePlants } from '../hooks/usePlants'; // Import usePlants hook
 import { useProjects } from '../hooks/useProjects'; // Import useProjects hook
 import { useTasks } from '../hooks/useTasks'; // Import useTasks hook
 import { useTranslation } from '../hooks/useTranslation';
 
 export function DashboardPage() {
+  const { user } = useAuth();
   const { plants } = usePlants(); // Call usePlants hook with userId
   const { projects } = useProjects(); // Call useProjects hook with userId
   const { tasks } = useTasks(); // Call useTasks hook with userId
   const { t } = useTranslation();
+  const [upcomingEventsCount, setUpcomingEventsCount] = useState(0);
 
   const pendingTasks = tasks.filter(task => !task.completed);
+
+  // Load upcoming events count for this week
+  useEffect(() => {
+    if (!user) return;
+
+    const loadUpcomingEvents = async () => {
+      try {
+        const events = await getUpcomingEvents(user.uid, 7); // Next 7 days
+        setUpcomingEventsCount(events.length);
+      } catch (err) {
+        console.error('Error loading upcoming events count:', err);
+        setUpcomingEventsCount(0);
+      }
+    };
+
+    loadUpcomingEvents();
+  }, [user]);
 
   const stats = [
     {
@@ -43,7 +66,7 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard:stats.thisWeek'),
-      value: '0',
+      value: upcomingEventsCount,
       icon: '📅',
       description: t('dashboard:stats.upcomingDeadlines'),
       color: 'indigo' as const,
@@ -71,7 +94,7 @@ export function DashboardPage() {
         </GridLayout>
       </div>
 
-      {/* Recent activity and upcoming items */}
+      {/* Recent activity and calendar summary */}
       <GridLayout columns={2} gap="lg">
         <ContentArea
           title={t('dashboard:recentActivity')}
@@ -88,20 +111,7 @@ export function DashboardPage() {
           </div>
         </ContentArea>
 
-        <ContentArea
-          title={t('dashboard:upcomingItems')}
-          subtitle={t('dashboard:upcomingItemsSubtitle')}
-        >
-          <div className="text-center py-8">
-            <div className="text-4xl mb-4">⏰</div>
-            <p className="text-gray-600 mb-4">
-              {t('dashboard:noUpcomingItemsScheduled')}
-            </p>
-            <p className="text-sm text-gray-500">
-              {t('dashboard:plantCareRemindersWillShow')}
-            </p>
-          </div>
-        </ContentArea>
+        <CalendarSummary />
       </GridLayout>
 
       {/* Tips and getting started */}

@@ -11,7 +11,17 @@ export class SupabaseStorageService {
   private static readonly SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
   private static readonly BUCKET_NAME = 'plant-photos';
 
-  private static supabase = createClient(this.SUPABASE_URL, this.SUPABASE_ANON_KEY);
+  private static _supabase: ReturnType<typeof createClient> | null = null;
+
+  private static get supabase() {
+    if (!this._supabase) {
+      if (!this.SUPABASE_URL || !this.SUPABASE_ANON_KEY) {
+        throw new Error('Supabase configuration missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY');
+      }
+      this._supabase = createClient(this.SUPABASE_URL, this.SUPABASE_ANON_KEY);
+    }
+    return this._supabase;
+  }
 
   /**
    * Upload file to Supabase Storage

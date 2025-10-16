@@ -38,11 +38,11 @@ function App() {
   return (
     <ErrorBoundary>
       <ErrorToastProvider>
-        <AuthProvider>
-            <AuthLayout>
-              <Router>
-                <I18nProvider>
-                  <Suspense fallback={<LoadingSpinner />}>
+        <I18nProvider>
+          <AuthProvider>
+              <AuthLayout>
+                <Router>
+                    <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
             {/* Public routes - redirect to dashboard if authenticated */}
             <Route 
@@ -189,10 +189,10 @@ function App() {
             />
                     </Routes>
                   </Suspense>
-                </I18nProvider>
-              </Router>
-            </AuthLayout>
-        </AuthProvider>
+                </Router>
+              </AuthLayout>
+          </AuthProvider>
+        </I18nProvider>
         <FirebaseDebug />
       </ErrorToastProvider>
     </ErrorBoundary>

@@ -84,8 +84,8 @@ export function NavigationBar() {
             {/* Offline indicator */}
             <OfflineIndicator />
             
-            {/* Language selector - desktop */}
-            <div className="hidden md:block">
+            {/* Language selector - tablet and mobile */}
+            <div className="hidden md:block lg:hidden">
               <LanguageSelector 
                 compact={true}
                 showFlag={true}

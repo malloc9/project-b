@@ -13,11 +13,277 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import type { Project, Subtask, TaskStatus } from '../types';
+import type { Project, Subtask, TaskStatus, CreateCalendarEventData, CalendarEvent } from '../types';
 
 import { ErrorCode } from '../types/errors';
 import { createAppError } from '../types/errors';
 
+// ============================================================================
+// CALENDAR INTEGRATION HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get calendar events by source type and ID for projects
+ */
+const getProjectCalendarEvents = async (
+  userId: string,
+  projectId: string
+): Promise<CalendarEvent[]> => {
+  try {
+    const q = query(
+      collection(db, "users", userId, "calendarEvents"),
+      where("type", "==", "project"),
+      where("sourceId", "==", projectId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const events: CalendarEvent[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      events.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+        startDate: data.startDate.toDate(),
+        endDate: data.endDate.toDate(),
+      } as CalendarEvent);
+    });
+
+    return events;
+  } catch (error) {
+    console.error("Error getting project calendar events:", error);
+    return [];
+  }
+};
+
+/**
+ * Get calendar events for subtasks
+ */
+const getSubtaskCalendarEvents = async (
+  userId: string,
+  projectId: string,
+  subtaskId: string
+): Promise<CalendarEvent[]> => {
+  try {
+    const sourceId = `${projectId}-${subtaskId}`;
+    const q = query(
+      collection(db, "users", userId, "calendarEvents"),
+      where("type", "==", "project"),
+      where("sourceId", "==", sourceId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const events: CalendarEvent[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      events.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+        startDate: data.startDate.toDate(),
+        endDate: data.endDate.toDate(),
+      } as CalendarEvent);
+    });
+
+    return events;
+  } catch (error) {
+    console.error("Error getting subtask calendar events:", error);
+    return [];
+  }
+};
+
+/**
+ * Create calendar event for a project
+ */
+const createProjectCalendarEvent = async (
+  userId: string,
+  project: Project
+): Promise<void> => {
+  if (!project.dueDate) return; // Skip projects without due dates
+
+  try {
+    const { createEvent } = await import('./calendarService');
+    
+    const eventData: CreateCalendarEventData = {
+      userId,
+      title: `Project: ${project.title}`,
+      description: project.description,
+      startDate: project.dueDate,
+      endDate: project.dueDate,
+      allDay: true,
+      type: 'project',
+      sourceId: project.id,
+      status: project.status === 'finished' ? 'completed' : 'pending',
+      notifications: []
+    };
+
+    await createEvent(userId, eventData);
+  } catch (error) {
+    console.error("Error creating project calendar event:", error);
+    // Don't throw - calendar event creation should not fail project creation
+  }
+};
+
+/**
+ * Create calendar event for a subtask
+ */
+const createSubtaskCalendarEvent = async (
+  userId: string,
+  subtask: Subtask,
+  projectTitle: string
+): Promise<void> => {
+  if (!subtask.dueDate) return; // Skip subtasks without due dates
+
+  try {
+    const { createEvent } = await import('./calendarService');
+    
+    const eventData: CreateCalendarEventData = {
+      userId,
+      title: `${projectTitle}: ${subtask.title}`,
+      description: subtask.description,
+      startDate: subtask.dueDate,
+      endDate: subtask.dueDate,
+      allDay: true,
+      type: 'project',
+      sourceId: `${subtask.projectId}-${subtask.id}`,
+      status: subtask.status === 'finished' ? 'completed' : 'pending',
+      notifications: []
+    };
+
+    await createEvent(userId, eventData);
+  } catch (error) {
+    console.error("Error creating subtask calendar event:", error);
+    // Don't throw - calendar event creation should not fail subtask creation
+  }
+};
+
+/**
+ * Update calendar event for a project
+ */
+const updateProjectCalendarEvent = async (
+  userId: string,
+  project: Project
+): Promise<void> => {
+  try {
+    const { updateEvent, deleteEvent } = await import('./calendarService');
+    const events = await getProjectCalendarEvents(userId, project.id);
+    
+    if (events.length === 0) {
+      // Create event if it doesn't exist and project has due date
+      if (project.dueDate) {
+        await createProjectCalendarEvent(userId, project);
+      }
+      return;
+    }
+
+    // Update existing event
+    const event = events[0]; // Should only be one event per project
+    
+    if (!project.dueDate) {
+      // Remove event if project no longer has due date
+      await deleteEvent(userId, event.id);
+      return;
+    }
+
+    // Update event with project changes
+    await updateEvent(userId, event.id, {
+      title: `Project: ${project.title}`,
+      description: project.description,
+      startDate: project.dueDate,
+      endDate: project.dueDate,
+      status: project.status === 'finished' ? 'completed' : 'pending'
+    });
+  } catch (error) {
+    console.error("Error updating project calendar event:", error);
+    // Don't throw - calendar event update should not fail project update
+  }
+};
+
+/**
+ * Update calendar event for a subtask
+ */
+const updateSubtaskCalendarEvent = async (
+  userId: string,
+  subtask: Subtask,
+  projectTitle: string
+): Promise<void> => {
+  try {
+    const { updateEvent, deleteEvent } = await import('./calendarService');
+    const events = await getSubtaskCalendarEvents(userId, subtask.projectId, subtask.id);
+    
+    if (events.length === 0) {
+      // Create event if it doesn't exist and subtask has due date
+      if (subtask.dueDate) {
+        await createSubtaskCalendarEvent(userId, subtask, projectTitle);
+      }
+      return;
+    }
+
+    // Update existing event
+    const event = events[0]; // Should only be one event per subtask
+    
+    if (!subtask.dueDate) {
+      // Remove event if subtask no longer has due date
+      await deleteEvent(userId, event.id);
+      return;
+    }
+
+    // Update event with subtask changes
+    await updateEvent(userId, event.id, {
+      title: `${projectTitle}: ${subtask.title}`,
+      description: subtask.description,
+      startDate: subtask.dueDate,
+      endDate: subtask.dueDate,
+      status: subtask.status === 'finished' ? 'completed' : 'pending'
+    });
+  } catch (error) {
+    console.error("Error updating subtask calendar event:", error);
+    // Don't throw - calendar event update should not fail subtask update
+  }
+};
+
+/**
+ * Delete calendar event for a project
+ */
+const deleteProjectCalendarEvent = async (
+  userId: string,
+  projectId: string
+): Promise<void> => {
+  try {
+    const { deleteEvent } = await import('./calendarService');
+    const events = await getProjectCalendarEvents(userId, projectId);
+    
+    // Delete all calendar events for this project
+    await Promise.all(events.map(event => deleteEvent(userId, event.id)));
+  } catch (error) {
+    console.error("Error deleting project calendar event:", error);
+    // Don't throw - calendar event deletion should not fail project deletion
+  }
+};
+
+/**
+ * Delete calendar event for a subtask
+ */
+const deleteSubtaskCalendarEvent = async (
+  userId: string,
+  projectId: string,
+  subtaskId: string
+): Promise<void> => {
+  try {
+    const { deleteEvent } = await import('./calendarService');
+    const events = await getSubtaskCalendarEvents(userId, projectId, subtaskId);
+    
+    // Delete all calendar events for this subtask
+    await Promise.all(events.map(event => deleteEvent(userId, event.id)));
+  } catch (error) {
+    console.error("Error deleting subtask calendar event:", error);
+    // Don't throw - calendar event deletion should not fail subtask deletion
+  }
+};
 
 // ============================================================================
 // PROJECT CRUD OPERATIONS
@@ -49,6 +315,22 @@ export const createProject = async (
     }
     
     const docRef = await addDoc(userProjectsCollection, firestoreData);
+
+    // Create calendar event for the new project
+    const createdProject: Project = {
+      id: docRef.id,
+      userId: projectData.userId,
+      title: projectData.title,
+      description: projectData.description,
+      status: projectData.status,
+      dueDate: projectData.dueDate,
+      subtasks: projectData.subtasks || [],
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await createProjectCalendarEvent(projectData.userId, createdProject);
+
     return docRef.id;
   } catch (error) {
     console.error('Error creating project:', error);
@@ -136,6 +418,12 @@ export const updateProject = async (
     }
     
     await updateDoc(docRef, updateData);
+
+    // Update calendar event for the project
+    const updatedProject = await getProject(projectId, userId);
+    if (updatedProject) {
+      await updateProjectCalendarEvent(userId, updatedProject);
+    }
   } catch (error) {
     console.error('Error updating project:', error);
     throw createAppError(
@@ -147,6 +435,17 @@ export const updateProject = async (
 
 export const deleteProject = async (projectId: string, userId: string): Promise<void> => {
   try {
+    // Delete calendar events for project and all subtasks first
+    await deleteProjectCalendarEvent(userId, projectId);
+    
+    // Get all subtasks to delete their calendar events
+    const subtasks = await getProjectSubtasks(projectId, userId);
+    await Promise.all(
+      subtasks.map(subtask => 
+        deleteSubtaskCalendarEvent(userId, projectId, subtask.id)
+      )
+    );
+
     const batch = writeBatch(db);
     
     // Delete the project
@@ -192,6 +491,26 @@ export const createSubtask = async (
       dueDate: subtaskData.dueDate ? Timestamp.fromDate(subtaskData.dueDate) : null
     };
     const docRef = await addDoc(collection(db, 'users', userId, 'subtasks'), subtaskToSave);
+
+    // Create calendar event for the new subtask
+    const createdSubtask: Subtask = {
+      id: docRef.id,
+      projectId: subtaskData.projectId,
+      userId: subtaskData.userId,
+      title: subtaskData.title,
+      description: subtaskData.description,
+      status: subtaskData.status,
+      dueDate: subtaskData.dueDate,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    // Get project title for calendar event
+    const project = await getProject(subtaskData.projectId, userId);
+    if (project) {
+      await createSubtaskCalendarEvent(userId, createdSubtask, project.title);
+    }
+
     return docRef.id;
   } catch (error) {
     console.error('Error creating subtask:', error);
@@ -280,6 +599,15 @@ export const updateSubtask = async (
     }
     
     await updateDoc(docRef, updateData);
+
+    // Update calendar event for the subtask
+    const updatedSubtask = await getSubtask(subtaskId, userId);
+    if (updatedSubtask) {
+      const project = await getProject(updatedSubtask.projectId, userId);
+      if (project) {
+        await updateSubtaskCalendarEvent(userId, updatedSubtask, project.title);
+      }
+    }
   } catch (error) {
     console.error('Error updating subtask:', error);
     throw createAppError(
@@ -291,6 +619,15 @@ export const updateSubtask = async (
 
 export const deleteSubtask = async (subtaskId: string, userId: string): Promise<void> => {
   try {
+    // Get subtask to find project ID for calendar event deletion
+    const subtask = await getSubtask(subtaskId, userId);
+    
+    // Delete calendar event first
+    if (subtask) {
+      await deleteSubtaskCalendarEvent(userId, subtask.projectId, subtaskId);
+    }
+
+    // Then delete the subtask
     const docRef = doc(db, 'users', userId, 'subtasks', subtaskId);
     await deleteDoc(docRef);
   } catch (error) {

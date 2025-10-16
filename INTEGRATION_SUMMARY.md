@@ -17,7 +17,7 @@ This document summarizes the complete integration of all features in the Househo
 - **Plant CRUD Operations**: Create, read, update, delete plants
 - **Photo Management**: Upload, display, and timeline view of plant photos
 - **Care Task Management**: Schedule and track plant care activities
-- **Calendar Integration**: Plant care tasks sync with Google Calendar
+- **Calendar Integration**: Plant care tasks appear in the built-in calendar
 - **Search and Filtering**: Find plants by name, species, or care requirements
 
 #### Project Management System
@@ -31,16 +31,16 @@ This document summarizes the complete integration of all features in the Househo
 #### Simple Task Management
 - **Task CRUD Operations**: Quick task creation and management
 - **Due Date Tracking**: Task scheduling and reminders
-- **Calendar Integration**: Tasks sync with Google Calendar
+- **Calendar Integration**: Tasks appear in the built-in calendar
 - **Completion Tracking**: Mark tasks as done
 - **Sorting and Filtering**: Organize tasks by due date and status
 
 #### Calendar Integration
-- **Google Calendar API**: Full integration with Google Calendar
-- **Event Synchronization**: Automatic sync of all tasks and deadlines
+- **Built-in Calendar**: Self-contained calendar system
+- **Event Synchronization**: Automatic display of all tasks and deadlines
 - **Real-time Updates**: Changes reflect immediately in calendar
-- **Error Handling**: Robust error handling for API failures
-- **Offline Support**: Queue operations when offline
+- **Error Handling**: Robust error handling for calendar operations
+- **Offline Support**: Calendar data cached for offline viewing
 
 ### 3. Technical Integration
 
@@ -139,7 +139,7 @@ App
 ### Data Flow
 1. **Authentication**: Firebase Auth → AuthContext → Protected Routes
 2. **Data Operations**: Components → Services → Firebase → Real-time Updates
-3. **Calendar Sync**: Task Changes → Calendar Service → Google Calendar API
+3. **Calendar Sync**: Task Changes → Calendar Service → Built-in Calendar Display
 4. **Offline Operations**: User Actions → Offline Queue → Background Sync
 5. **Error Handling**: Errors → Error Boundary → User Notification
 
@@ -218,7 +218,7 @@ App
 - [x] Plant codex with photo timeline
 - [x] Project management with subtasks
 - [x] Simple task management
-- [x] Google Calendar integration
+- [x] Built-in calendar integration
 - [x] Responsive design
 - [x] Offline functionality
 - [x] Error handling and recovery
