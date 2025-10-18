@@ -13,6 +13,7 @@ import {
 import { db } from "../config/firebase";
 import type { CalendarEvent } from "../types";
 import { ErrorCode, createAppError } from "../types/errors";
+import { QueryWrapper } from "./queryWrapper";
 
 // ============================================================================
 // PERFORMANCE OPTIMIZATION UTILITIES
@@ -159,13 +160,6 @@ export const getEventsForDateRangeOptimized = async (
   pageSize: number = 50,
   cursor?: PaginationCursor
 ): Promise<PaginatedResult<CalendarEvent>> => {
-  if (!userId) {
-    throw createAppError(
-      ErrorCode.DB_PERMISSION_DENIED,
-      "Cannot get calendar events: User not authenticated."
-    );
-  }
-
   if (startDate > endDate) {
     throw createAppError(
       ErrorCode.VALIDATION_ERROR,
@@ -182,58 +176,61 @@ export const getEventsForDateRangeOptimized = async (
     return cached;
   }
 
-  try {
-    // Build optimized query
-    let q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("startDate", ">=", Timestamp.fromDate(startDate)),
-      where("startDate", "<=", Timestamp.fromDate(endDate)),
-      orderBy("startDate", "asc"),
-      limit(pageSize)
-    );
+  // Use QueryWrapper to handle authentication and retry logic
+  return QueryWrapper.executeWithAuthValidation(
+    async (authenticatedUserId: string) => {
+      // Build optimized query
+      let q = query(
+        collection(db, "users", authenticatedUserId, "calendarEvents"),
+        where("startDate", ">=", Timestamp.fromDate(startDate)),
+        where("startDate", "<=", Timestamp.fromDate(endDate)),
+        orderBy("startDate", "asc"),
+        limit(pageSize)
+      );
 
-    // Add pagination cursor if provided
-    if (cursor?.lastDoc) {
-      q = query(q, startAfter(cursor.lastDoc));
-    }
-
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
-    let lastDoc: QueryDocumentSnapshot | undefined;
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-      lastDoc = doc;
-    });
-
-    const result: PaginatedResult<CalendarEvent> = {
-      data: events,
-      cursor: {
-        lastDoc,
-        hasMore: events.length === pageSize,
-        pageSize
+      // Add pagination cursor if provided
+      if (cursor?.lastDoc) {
+        q = query(q, startAfter(cursor.lastDoc));
       }
-    };
 
-    // Cache the result
-    calendarCache.set(cacheKey, result, 2 * 60 * 1000); // 2 minutes TTL for paginated results
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
+      let lastDoc: QueryDocumentSnapshot | undefined;
 
-    return result;
-  } catch (error) {
-    console.error("Error getting events for date range:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get events for date range"
-    );
-  }
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+        lastDoc = doc;
+      });
+
+      const result: PaginatedResult<CalendarEvent> = {
+        data: events,
+        cursor: {
+          lastDoc,
+          hasMore: events.length === pageSize,
+          pageSize
+        }
+      };
+
+      // Cache the result
+      calendarCache.set(cacheKey, result, 2 * 60 * 1000); // 2 minutes TTL for paginated results
+
+      return result;
+    },
+    userId,
+    {
+      maxRetries: 3,
+      retryDelay: 1000,
+      requireAuth: true
+    }
+  );
 };
 
 /**
@@ -244,13 +241,6 @@ export const getEventsForMonthOptimized = async (
   year: number,
   month: number
 ): Promise<CalendarEvent[]> => {
-  if (!userId) {
-    throw createAppError(
-      ErrorCode.DB_PERMISSION_DENIED,
-      "Cannot get calendar events: User not authenticated."
-    );
-  }
-
   // Create cache key for the month
   const cacheKey = `month-${userId}-${year}-${month}`;
   
@@ -260,42 +250,45 @@ export const getEventsForMonthOptimized = async (
     return cached;
   }
 
-  try {
-    const { start, end } = getMemoizedMonthRange(year, month);
-    
-    const q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("startDate", ">=", Timestamp.fromDate(start)),
-      where("startDate", "<=", Timestamp.fromDate(end)),
-      orderBy("startDate", "asc")
-    );
+  // Use QueryWrapper to handle authentication and retry logic
+  return QueryWrapper.executeWithAuthValidation(
+    async (authenticatedUserId: string) => {
+      const { start, end } = getMemoizedMonthRange(year, month);
+      
+      const q = query(
+        collection(db, "users", authenticatedUserId, "calendarEvents"),
+        where("startDate", ">=", Timestamp.fromDate(start)),
+        where("startDate", "<=", Timestamp.fromDate(end)),
+        orderBy("startDate", "asc")
+      );
 
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-    });
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+      });
 
-    // Cache the result for 5 minutes
-    calendarCache.set(cacheKey, events, 5 * 60 * 1000);
+      // Cache the result for 5 minutes
+      calendarCache.set(cacheKey, events, 5 * 60 * 1000);
 
-    return events;
-  } catch (error) {
-    console.error("Error getting events for month:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get events for month"
-    );
-  }
+      return events;
+    },
+    userId,
+    {
+      maxRetries: 3,
+      retryDelay: 1000,
+      requireAuth: true
+    }
+  );
 };
 
 /**
@@ -306,13 +299,6 @@ export const getEventsForCalendarViewOptimized = async (
   year: number,
   month: number
 ): Promise<CalendarEvent[]> => {
-  if (!userId) {
-    throw createAppError(
-      ErrorCode.DB_PERMISSION_DENIED,
-      "Cannot get calendar events: User not authenticated."
-    );
-  }
-
   // Create cache key for the calendar view
   const cacheKey = `calendar-view-${userId}-${year}-${month}`;
   
@@ -322,42 +308,45 @@ export const getEventsForCalendarViewOptimized = async (
     return cached;
   }
 
-  try {
-    const { start, end } = getCalendarViewRange(year, month);
-    
-    const q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("startDate", ">=", Timestamp.fromDate(start)),
-      where("startDate", "<=", Timestamp.fromDate(end)),
-      orderBy("startDate", "asc")
-    );
+  // Use QueryWrapper to handle authentication and retry logic
+  return QueryWrapper.executeWithAuthValidation(
+    async (authenticatedUserId: string) => {
+      const { start, end } = getCalendarViewRange(year, month);
+      
+      const q = query(
+        collection(db, "users", authenticatedUserId, "calendarEvents"),
+        where("startDate", ">=", Timestamp.fromDate(start)),
+        where("startDate", "<=", Timestamp.fromDate(end)),
+        orderBy("startDate", "asc")
+      );
 
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-    });
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+      });
 
-    // Cache the result for 3 minutes (shorter TTL for view data)
-    calendarCache.set(cacheKey, events, 3 * 60 * 1000);
+      // Cache the result for 3 minutes (shorter TTL for view data)
+      calendarCache.set(cacheKey, events, 3 * 60 * 1000);
 
-    return events;
-  } catch (error) {
-    console.error("Error getting events for calendar view:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get events for calendar view"
-    );
-  }
+      return events;
+    },
+    userId,
+    {
+      maxRetries: 3,
+      retryDelay: 1000,
+      requireAuth: true
+    }
+  );
 };
 
 /**

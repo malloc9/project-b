@@ -253,6 +253,8 @@ export class I18nErrorHandler implements TranslationErrorHandler {
       ns?: string;
       defaultValue?: string;
       count?: number;
+      lng?: string;
+      fallbackLng?: string;
       [key: string]: any;
     } = {}
   ): string => {
@@ -262,12 +264,25 @@ export class I18nErrorHandler implements TranslationErrorHandler {
         throw new Error(`Invalid translation key: ${key}`);
       }
 
+      // Check if i18n is initialized
+      if (!i18n.isInitialized) {
+        console.warn('i18n not initialized, using fallback');
+        return options.defaultValue || this.getFallbackForMissingKey(key, options.ns);
+      }
+
+      // Prepare translation options with safe defaults
+      const translationOptions = {
+        ...options,
+        defaultValue: options.defaultValue || undefined,
+        fallbackLng: options.fallbackLng || ['en', 'hu'],
+      };
+
       // Attempt translation
       const fullKey = options.ns ? `${options.ns}:${key}` : key;
-      const result = i18n.t(fullKey, options);
+      const result = i18n.t(fullKey, translationOptions);
 
       // Check if translation was successful
-      if (result === fullKey || result === key) {
+      if (result === fullKey || result === key || !result) {
         // Translation not found, use fallback
         return this.onMissingKey(key, options.ns);
       }

@@ -30,6 +30,11 @@ service cloud.firestore {
       match /plantCareTasks/{taskId} {
         allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
       }
+      
+      // User's calendar events subcollection
+      match /calendarEvents/{eventId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
     }
     
     // Top-level collections (alternative data structure)

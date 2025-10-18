@@ -6,38 +6,55 @@ import {
 } from '../components/layout';
 import { CalendarSummary } from '../components/calendar';
 import { getUpcomingEvents } from '../services/calendarService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthenticatedUser } from '../hooks/useAuthenticatedUser';
 import { usePlants } from '../hooks/usePlants'; // Import usePlants hook
 import { useProjects } from '../hooks/useProjects'; // Import useProjects hook
 import { useTasks } from '../hooks/useTasks'; // Import useTasks hook
 import { useTranslation } from '../hooks/useTranslation';
+import { classifyFirebaseError, getErrorMessage } from '../utils/authenticationErrors';
 
 export function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuthenticatedUser();
   const { plants } = usePlants(); // Call usePlants hook with userId
   const { projects } = useProjects(); // Call useProjects hook with userId
   const { tasks } = useTasks(); // Call useTasks hook with userId
   const { t } = useTranslation();
   const [upcomingEventsCount, setUpcomingEventsCount] = useState(0);
+  const [eventsError, setEventsError] = useState<string | null>(null);
+  const [eventsLoading, setEventsLoading] = useState(false);
 
   const pendingTasks = tasks.filter(task => !task.completed);
 
   // Load upcoming events count for this week
   useEffect(() => {
-    if (!user) return;
+    // Don't load events if authentication is still loading or user is not authenticated
+    if (isLoading || !isAuthenticated || !user) {
+      return;
+    }
 
     const loadUpcomingEvents = async () => {
+      console.log('Loading upcoming events for user:', user.uid);
+      console.log('Auth state:', { isLoading, isAuthenticated, user: !!user });
+      
+      setEventsLoading(true);
+      setEventsError(null);
+      
       try {
         const events = await getUpcomingEvents(user.uid, 7); // Next 7 days
         setUpcomingEventsCount(events.length);
+        console.log('Successfully loaded events:', events.length);
       } catch (err) {
         console.error('Error loading upcoming events count:', err);
+        const authError = classifyFirebaseError(err);
+        setEventsError(getErrorMessage(authError));
         setUpcomingEventsCount(0);
+      } finally {
+        setEventsLoading(false);
       }
     };
 
     loadUpcomingEvents();
-  }, [user]);
+  }, [user, isAuthenticated, isLoading]);
 
   const stats = [
     {
@@ -66,10 +83,10 @@ export function DashboardPage() {
     },
     {
       title: t('dashboard:stats.thisWeek'),
-      value: upcomingEventsCount,
+      value: eventsLoading ? '...' : upcomingEventsCount,
       icon: '📅',
-      description: t('dashboard:stats.upcomingDeadlines'),
-      color: 'indigo' as const,
+      description: eventsError || t('dashboard:stats.upcomingDeadlines'),
+      color: eventsError ? 'red' as const : 'indigo' as const,
       href: '/calendar',
     },
   ];

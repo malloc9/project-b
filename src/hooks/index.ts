@@ -3,3 +3,4 @@
 
 export { useCalendarFilters } from './useCalendarFilters';
 export { useNotifications } from './useNotifications';
+export { useAuthenticatedUser, useRequireAuthenticatedUser } from './useAuthenticatedUser';

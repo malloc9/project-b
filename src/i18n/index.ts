@@ -92,7 +92,8 @@ const errorHandlingConfig = {
       return `[PARSE ERROR: ${key}]`;
     } else {
       console.error(errorMessage);
-      return defaultValue || key;
+      // Return a more user-friendly fallback in production
+      return defaultValue || '';
     }
   },
 };

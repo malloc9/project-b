@@ -7,14 +7,15 @@ import {
 } from '@heroicons/react/24/outline';
 import type { CalendarEvent } from '../../types';
 import { getEventsForDate, getUpcomingEvents, getOverdueEvents } from '../../services/calendarService';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuthenticatedUser } from '../../hooks/useAuthenticatedUser';
+import { classifyFirebaseError, getErrorMessage } from '../../utils/authenticationErrors';
 
 interface CalendarSummaryProps {
   className?: string;
 }
 
 export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuthenticatedUser();
   const [todayEvents, setTodayEvents] = useState<CalendarEvent[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([]);
   const [overdueEvents, setOverdueEvents] = useState<CalendarEvent[]>([]);
@@ -22,7 +23,10 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    // Don't load events if authentication is still loading or user is not authenticated
+    if (isLoading || !isAuthenticated || !user) {
+      return;
+    }
 
     const loadCalendarData = async () => {
       setLoading(true);
@@ -51,14 +55,15 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
 
       } catch (err) {
         console.error('Error loading calendar summary:', err);
-        setError('Failed to load calendar data');
+        const authError = classifyFirebaseError(err);
+        setError(getErrorMessage(authError));
       } finally {
         setLoading(false);
       }
     };
 
     loadCalendarData();
-  }, [user]);
+  }, [user, isAuthenticated, isLoading]);
 
   const getEventTypeColor = (type: CalendarEvent['type']) => {
     switch (type) {

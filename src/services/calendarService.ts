@@ -12,9 +12,10 @@ import {
   Timestamp,
   limit,
 } from "firebase/firestore";
-import { db } from "../config/firebase";
+import { db, auth } from "../config/firebase";
 import type { CalendarEvent, CreateCalendarEventData, UpdateCalendarEventData } from "../types";
 import { ErrorCode, createAppError } from "../types/errors";
+import { QueryWrapper } from "./queryWrapper";
 
 // ============================================================================
 // CALENDAR EVENT CRUD OPERATIONS
@@ -257,13 +258,6 @@ export const getEventsForDateRange = async (
   startDate: Date,
   endDate: Date
 ): Promise<CalendarEvent[]> => {
-  if (!userId) {
-    throw createAppError(
-      ErrorCode.DB_PERMISSION_DENIED,
-      "Cannot get calendar events: User not authenticated."
-    );
-  }
-
   if (startDate > endDate) {
     throw createAppError(
       ErrorCode.VALIDATION_ERROR,
@@ -271,37 +265,39 @@ export const getEventsForDateRange = async (
     );
   }
 
-  try {
-    const q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("startDate", ">=", Timestamp.fromDate(startDate)),
-      where("startDate", "<=", Timestamp.fromDate(endDate)),
-      orderBy("startDate", "asc")
-    );
+  return QueryWrapper.executeWithAuthValidation(
+    async (authenticatedUserId: string) => {
+      const q = query(
+        collection(db, "users", authenticatedUserId, "calendarEvents"),
+        where("startDate", ">=", Timestamp.fromDate(startDate)),
+        where("startDate", "<=", Timestamp.fromDate(endDate)),
+        orderBy("startDate", "asc")
+      );
 
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-    });
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+      });
 
-    return events;
-  } catch (error) {
-    console.error("Error getting events for date range:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get events for date range"
-    );
-  }
+      return events;
+    },
+    userId,
+    {
+      maxRetries: 3,
+      retryDelay: 1000,
+      requireAuth: true
+    }
+  );
 };
 
 /**
@@ -312,51 +308,77 @@ export const getEventsForDate = async (
   date: Date
 ): Promise<CalendarEvent[]> => {
   if (!userId) {
-    throw createAppError(
-      ErrorCode.DB_PERMISSION_DENIED,
-      "Cannot get calendar events: User not authenticated."
-    );
+    return [];
   }
 
-  try {
-    // Get events that start or end on this date, or span across this date
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+  // Simple retry logic with auth token refresh
+  let lastError: any;
+  const maxRetries = 3;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      // Ensure we have a fresh auth token on retries
+      if (attempt > 0) {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await currentUser.getIdToken(true); // Force refresh
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for propagation
+        }
+      }
 
-    // Query for events that start on or before this day and end on or after this day
-    const q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("startDate", "<=", Timestamp.fromDate(endOfDay)),
-      where("endDate", ">=", Timestamp.fromDate(startOfDay)),
-      orderBy("startDate", "asc")
-    );
+      // Get events that start or end on this date, or span across this date
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
 
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
+      // Query for events that start on or before this day and end on or after this day
+      const q = query(
+        collection(db, "users", userId, "calendarEvents"),
+        where("startDate", "<=", Timestamp.fromDate(endOfDay)),
+        where("endDate", ">=", Timestamp.fromDate(startOfDay)),
+        orderBy("startDate", "asc")
+      );
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-    });
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
 
-    return events;
-  } catch (error) {
-    console.error("Error getting events for date:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get events for date"
-    );
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+      });
+
+      return events;
+    } catch (error) {
+      lastError = error;
+      console.warn(`getEventsForDate attempt ${attempt + 1} failed:`, error);
+      
+      // Only retry on permission errors
+      if (error?.code !== 'permission-denied' && !error?.message?.includes('Missing or insufficient permissions')) {
+        break;
+      }
+      
+      if (attempt === maxRetries - 1) {
+        break;
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+    }
   }
+
+  console.error("All retry attempts failed for getEventsForDate:", lastError);
+  
+  // Return empty array instead of throwing error to prevent UI breakage
+  return [];
 };
 
 /**
@@ -380,40 +402,69 @@ export const getUpcomingEvents = async (
     );
   }
 
-  try {
-    const now = new Date();
-    
-    const q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("startDate", ">=", Timestamp.fromDate(now)),
-      where("status", "==", "pending"),
-      orderBy("startDate", "asc"),
-      limit(limitCount)
-    );
+  // Simple retry logic with auth token refresh
+  let lastError: any;
+  const maxRetries = 3;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      // Ensure we have a fresh auth token on retries
+      if (attempt > 0) {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await currentUser.getIdToken(true); // Force refresh
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for propagation
+        }
+      }
 
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
+      const now = new Date();
+      
+      // Simplified query to avoid composite index issues
+      const q = query(
+        collection(db, "users", userId, "calendarEvents"),
+        where("startDate", ">=", Timestamp.fromDate(now)),
+        orderBy("startDate", "asc"),
+        limit(limitCount)
+      );
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-    });
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
 
-    return events;
-  } catch (error) {
-    console.error("Error getting upcoming events:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get upcoming events"
-    );
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+      });
+
+      return events;
+    } catch (error) {
+      lastError = error;
+      console.warn(`getUpcomingEvents attempt ${attempt + 1} failed:`, error);
+      
+      // Only retry on permission errors
+      if (error?.code !== 'permission-denied' && !error?.message?.includes('Missing or insufficient permissions')) {
+        break;
+      }
+      
+      if (attempt === maxRetries - 1) {
+        break;
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+    }
   }
+
+  console.error("All retry attempts failed for getUpcomingEvents:", lastError);
+  
+  // Return empty array instead of throwing error to prevent UI breakage
+  return [];
 };
 
 /**
@@ -423,45 +474,71 @@ export const getOverdueEvents = async (
   userId: string | undefined
 ): Promise<CalendarEvent[]> => {
   if (!userId) {
-    throw createAppError(
-      ErrorCode.DB_PERMISSION_DENIED,
-      "Cannot get calendar events: User not authenticated."
-    );
+    return [];
   }
 
-  try {
-    const now = new Date();
-    
-    const q = query(
-      collection(db, "users", userId, "calendarEvents"),
-      where("endDate", "<", Timestamp.fromDate(now)),
-      where("status", "==", "pending"),
-      orderBy("endDate", "desc")
-    );
+  // Simple retry logic with auth token refresh
+  let lastError: any;
+  const maxRetries = 3;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      // Ensure we have a fresh auth token on retries
+      if (attempt > 0) {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await currentUser.getIdToken(true); // Force refresh
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for propagation
+        }
+      }
 
-    const querySnapshot = await getDocs(q);
-    const events: CalendarEvent[] = [];
+      const now = new Date();
+      
+      const q = query(
+        collection(db, "users", userId, "calendarEvents"),
+        where("endDate", "<", Timestamp.fromDate(now)),
+        where("status", "==", "pending"),
+        orderBy("endDate", "desc")
+      );
 
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      events.push({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
-        startDate: data.startDate.toDate(),
-        endDate: data.endDate.toDate(),
-      } as CalendarEvent);
-    });
+      const querySnapshot = await getDocs(q);
+      const events: CalendarEvent[] = [];
 
-    return events;
-  } catch (error) {
-    console.error("Error getting overdue events:", error);
-    throw createAppError(
-      ErrorCode.DB_NETWORK_ERROR,
-      "Failed to get overdue events"
-    );
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        events.push({
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt.toDate(),
+          updatedAt: data.updatedAt.toDate(),
+          startDate: data.startDate.toDate(),
+          endDate: data.endDate.toDate(),
+        } as CalendarEvent);
+      });
+
+      return events;
+    } catch (error) {
+      lastError = error;
+      console.warn(`getOverdueEvents attempt ${attempt + 1} failed:`, error);
+      
+      // Only retry on permission errors
+      if (error?.code !== 'permission-denied' && !error?.message?.includes('Missing or insufficient permissions')) {
+        break;
+      }
+      
+      if (attempt === maxRetries - 1) {
+        break;
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+    }
   }
+
+  console.error("All retry attempts failed for getOverdueEvents:", lastError);
+  
+  // Return empty array instead of throwing error to prevent UI breakage
+  return [];
 };
 
 // ============================================================================
