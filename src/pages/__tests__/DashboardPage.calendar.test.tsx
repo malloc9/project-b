@@ -183,7 +183,9 @@ describe('DashboardPage Calendar Integration', () => {
       // Check that all main sections are present
       expect(screen.getByText('dashboard:overview')).toBeInTheDocument();
       expect(screen.getByTestId('calendar-summary')).toBeInTheDocument();
-      expect(screen.getByText('dashboard:gettingStarted')).toBeInTheDocument();
+      
+      // Getting started section should not be present
+      expect(screen.queryByText('dashboard:gettingStarted')).not.toBeInTheDocument();
       
       // Check that stats cards are rendered
       const statsCards = screen.getAllByTestId('stats-card');
