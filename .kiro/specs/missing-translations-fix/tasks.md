@@ -54,6 +54,15 @@
     - Update plant-related components with proper translation keys
     - _Requirements: 1.1, 1.4, 4.1_
 
+  - [ ] 5.3 Implement Projects page translations
+    - Create projects.json translation files for English and Hungarian
+    - Replace hardcoded strings in ProjectList component: "Projects", "New Project", "Search projects...", "All Status", status labels, empty states
+    - Replace hardcoded strings in ProjectDetail component: "Description", "Due Date", "Progress", "Status", "Subtasks", "Add Subtask", "Edit", "Delete"
+    - Replace hardcoded strings in ProjectForm component: "Create New Project", "Edit Project", "Project Title", form labels, validation messages
+    - Replace hardcoded strings in ProjectProgressTracker component: "Project Overview", "Total Projects", "Completed", "In Progress", "Overdue", progress labels
+    - Update all project-related status labels and action buttons with proper translation keys
+    - _Requirements: 1.1, 1.4, 4.1, 4.2_
+
 - [x] 6. Implement date and time localization
   - [x] 6.1 Update date formatting functions
     - Modify formatEventDate function to use localized date formats

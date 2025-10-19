@@ -21,7 +21,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
   selectedProject,
   subtasks = []
 }) => {
-  const { formatDate } = useTranslation();
+  const { t, formatDate } = useTranslation();
   const projectStats = getProjectStatistics(projects);
   const subtaskStats = selectedProject ? getSubtaskStatistics(subtasks) : null;
   const overdueProjects = getOverdueProjects(projects);
@@ -73,10 +73,10 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
     <div className="space-y-6">
       {/* Overall Project Statistics */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Project Overview</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">{t('projects:projectOverview')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="Total Projects"
+            title={t('projects:totalProjects')}
             value={projectStats.total}
             icon={
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,9 +85,9 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
             }
           />
           <StatCard
-            title="Completed"
+            title={t('projects:completed')}
             value={projectStats.completed}
-            subtitle={`${projectStats.completionRate}% completion rate`}
+            subtitle={`${projectStats.completionRate}% ${t('projects:completionRate')}`}
             color="text-green-600"
             icon={
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
             }
           />
           <StatCard
-            title="In Progress"
+            title={t('projects:inProgress')}
             value={projectStats.inProgress}
             color="text-blue-600"
             icon={
@@ -106,7 +106,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
             }
           />
           <StatCard
-            title="Overdue"
+            title={t('projects:overdue')}
             value={projectStats.overdue}
             color="text-red-600"
             icon={
@@ -120,11 +120,11 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
 
       {/* Progress Visualization */}
       <div className="bg-white shadow rounded-lg p-6">
-        <h4 className="text-md font-medium text-gray-900 mb-4">Progress Breakdown</h4>
+        <h4 className="text-md font-medium text-gray-900 mb-4">{t('projects:progressBreakdown')}</h4>
         <div className="space-y-4">
           <div>
             <div className="flex justify-between text-sm text-gray-600 mb-1">
-              <span>Overall Completion</span>
+              <span>{t('projects:overallCompletion')}</span>
               <span>{projectStats.completionRate}%</span>
             </div>
             <ProgressBar percentage={projectStats.completionRate} />
@@ -133,7 +133,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-gray-600">To Do</span>
+                <span className="text-gray-600">{t('projects:toDo')}</span>
                 <span className="text-gray-900">{projectStats.todo}</span>
               </div>
               <ProgressBar 
@@ -144,7 +144,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-blue-600">In Progress</span>
+                <span className="text-blue-600">{t('projects:inProgress')}</span>
                 <span className="text-blue-900">{projectStats.inProgress}</span>
               </div>
               <ProgressBar 
@@ -155,7 +155,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-green-600">Completed</span>
+                <span className="text-green-600">{t('projects:completed')}</span>
                 <span className="text-green-900">{projectStats.completed}</span>
               </div>
               <ProgressBar 
@@ -172,26 +172,26 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
       {selectedProject && subtaskStats && (
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            {selectedProject.title} - Subtask Progress
+            {selectedProject.title} - {t('projects:subtaskProgress')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
-              title="Total Subtasks"
+              title={t('projects:totalSubtasks')}
               value={subtaskStats.total}
             />
             <StatCard
-              title="Completed"
+              title={t('projects:completed')}
               value={subtaskStats.completed}
-              subtitle={`${subtaskStats.completionRate}% complete`}
+              subtitle={`${subtaskStats.completionRate}% ${t('projects:complete')}`}
               color="text-green-600"
             />
             <StatCard
-              title="In Progress"
+              title={t('projects:inProgress')}
               value={subtaskStats.inProgress}
               color="text-blue-600"
             />
             <StatCard
-              title="Overdue"
+              title={t('projects:overdue')}
               value={subtaskStats.overdue}
               color="text-red-600"
             />
@@ -208,15 +208,15 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
               <svg className="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
-              <h4 className="text-sm font-medium text-red-800">Overdue Items</h4>
+              <h4 className="text-sm font-medium text-red-800">{t('projects:overdueItems')}</h4>
             </div>
             <div className="space-y-2">
               {overdueProjects.map(project => (
                 <div key={project.id} className="text-sm text-red-700">
-                  <span className="font-medium">Project:</span> {project.title}
+                  <span className="font-medium">{t('projects:project')}:</span> {project.title}
                   {project.dueDate && (
                     <span className="text-red-600 ml-2">
-                      (Due: {formatDate(project.dueDate)})
+                      ({t('projects:due')}: {formatDate(project.dueDate)})
                     </span>
                   )}
                 </div>
@@ -226,7 +226,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
                   <span className="font-medium">Subtask:</span> {subtask.title}
                   {subtask.dueDate && (
                     <span className="text-red-600 ml-2">
-                      (Due: {formatDate(subtask.dueDate)})
+                      ({t('projects:due')}: {formatDate(subtask.dueDate)})
                     </span>
                   )}
                 </div>
@@ -242,15 +242,15 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
               <svg className="h-5 w-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <h4 className="text-sm font-medium text-yellow-800">Due Soon (Next 7 Days)</h4>
+              <h4 className="text-sm font-medium text-yellow-800">{t('projects:dueSoon')}</h4>
             </div>
             <div className="space-y-2">
               {projectsDueSoon.map(project => (
                 <div key={project.id} className="text-sm text-yellow-700">
-                  <span className="font-medium">Project:</span> {project.title}
+                  <span className="font-medium">{t('projects:project')}:</span> {project.title}
                   {project.dueDate && (
                     <span className="text-yellow-600 ml-2">
-                      (Due: {formatDate(project.dueDate)})
+                      ({t('projects:due')}: {formatDate(project.dueDate)})
                     </span>
                   )}
                 </div>
@@ -260,7 +260,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
                   <span className="font-medium">Subtask:</span> {subtask.title}
                   {subtask.dueDate && (
                     <span className="text-yellow-600 ml-2">
-                      (Due: {formatDate(subtask.dueDate)})
+                      ({t('projects:due')}: {formatDate(subtask.dueDate)})
                     </span>
                   )}
                 </div>
@@ -281,7 +281,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-sm font-medium text-green-800">
-              All projects and subtasks are on track! 🎉
+              {t('projects:allOnTrack')}
             </span>
           </div>
         </div>

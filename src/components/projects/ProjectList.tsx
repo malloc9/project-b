@@ -41,7 +41,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
       setProjects(userProjects);
     } catch (err) {
       console.error('Error loading projects:', err);
-      setError('Failed to load projects');
+      setError(t('errors:failedToLoadData', { defaultValue: 'Failed to load projects' }));
     } finally {
       setLoading(false);
     }
@@ -79,11 +79,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
   const getStatusLabel = (status: TaskStatus): string => {
     switch (status) {
       case 'todo':
-        return 'To Do';
+        return t('projects:statusLabels.todo');
       case 'in_progress':
-        return 'In Progress';
+        return t('projects:statusLabels.in_progress');
       case 'finished':
-        return 'Finished';
+        return t('projects:statusLabels.finished');
       default:
         return status;
     }
@@ -107,7 +107,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error</h3>
+            <h3 className="text-sm font-medium text-red-800">{t('errors:error')}</h3>
             <div className="mt-2 text-sm text-red-700">
               <p>{error}</p>
             </div>
@@ -116,7 +116,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                 onClick={loadProjects}
                 className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
               >
-                Try Again
+                {t('common:tryAgain')}
               </button>
             </div>
           </div>
@@ -129,7 +129,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Projects</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('projects:title')}</h2>
         <Link
           to="/projects/new"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -137,7 +137,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
           <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          New Project
+          {t('projects:newProject')}
         </Link>
       </div>
 
@@ -145,7 +145,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
-            {t('searchProjects')}
+            {t('projects:searchProjects')}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -157,7 +157,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
               id="search"
               name="search"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Search projects..."
+              placeholder={t('projects:searchProjects')}
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -166,7 +166,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
         </div>
         <div className="sm:w-48">
           <label htmlFor="status-filter" className="sr-only">
-            {t('filterByStatus')}
+            {t('projects:filterByStatus')}
           </label>
           <select
             id="status-filter"
@@ -175,10 +175,10 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as TaskStatus | 'all')}
           >
-            <option value="all">All Status</option>
-            <option value="todo">To Do</option>
-            <option value="in_progress">In Progress</option>
-            <option value="finished">Finished</option>
+            <option value="all">{t('projects:allStatus')}</option>
+            <option value="todo">{t('projects:statusLabels.todo')}</option>
+            <option value="in_progress">{t('projects:statusLabels.in_progress')}</option>
+            <option value="finished">{t('projects:statusLabels.finished')}</option>
           </select>
         </div>
       </div>
@@ -199,11 +199,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
               d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No projects found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('projects:noProjectsFound')}</h3>
           <p className="mt-1 text-sm text-gray-500">
             {projects.length === 0
-              ? "Get started by creating your first project."
-              : "Try adjusting your search or filter criteria."}
+              ? t('projects:getStartedMessage')
+              : t('projects:adjustFiltersMessage')}
           </p>
           {projects.length === 0 && (
             <div className="mt-6">
@@ -214,7 +214,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                 <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                New Project
+                {t('projects:newProject')}
               </Link>
             </div>
           )}
@@ -260,7 +260,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                   {/* Progress Bar */}
                   <div className="mt-4">
                     <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
-                      <span>Progress</span>
+                      <span>{t('projects:progress')}</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -276,7 +276,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                     <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    <span>{project.subtasks.length} subtask{project.subtasks.length !== 1 ? 's' : ''}</span>
+                    <span>{project.subtasks.length} {project.subtasks.length === 1 ? t('projects:subtask') : t('projects:subtasks_plural')}</span>
                   </div>
 
                   {/* Due date */}
@@ -286,7 +286,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span>
-                        {overdue ? 'Overdue: ' : 'Due: '}
+                        {overdue ? `${t('projects:overdue')}: ` : `${t('projects:due')}: `}
                         {formatDate(project.dueDate)}
                       </span>
                     </div>
@@ -298,13 +298,13 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                       className="text-blue-600 hover:text-blue-500 text-sm font-medium"
                       onClick={() => onProjectSelect?.(project)}
                     >
-                      View Details
+                      {t('projects:viewDetails')}
                     </Link>
                     <Link
                       to={`/projects/${project.id}/edit`}
                       className="text-gray-600 hover:text-gray-500 text-sm font-medium"
                     >
-                      Edit
+                      {t('projects:edit')}
                     </Link>
                   </div>
                 </div>

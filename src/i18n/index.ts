@@ -14,6 +14,7 @@ import huLoading from './resources/hu/loading.json';
 import huAccessibility from './resources/hu/accessibility.json';
 import huSystem from './resources/hu/system.json';
 import huPlants from './resources/hu/plants.json';
+import huProjects from './resources/hu/projects.json';
 
 import enCommon from './resources/en/common.json';
 import enNavigation from './resources/en/navigation.json';
@@ -26,6 +27,7 @@ import enLoading from './resources/en/loading.json';
 import enAccessibility from './resources/en/accessibility.json';
 import enSystem from './resources/en/system.json';
 import enPlants from './resources/en/plants.json';
+import enProjects from './resources/en/projects.json';
 
 // Translation resources organized by language and namespace
 const resources = {
@@ -41,6 +43,7 @@ const resources = {
     accessibility: huAccessibility,
     system: huSystem,
     plants: huPlants,
+    projects: huProjects,
   },
   en: {
     common: enCommon,
@@ -54,6 +57,7 @@ const resources = {
     accessibility: enAccessibility,
     system: enSystem,
     plants: enPlants,
+    projects: enProjects,
   },
 };
 
@@ -165,7 +169,7 @@ i18n
     
     // Namespace configuration
     defaultNS: 'common',
-    ns: ['common', 'navigation', 'auth', 'dashboard', 'forms', 'errors', 'calendar', 'loading', 'accessibility', 'system', 'plants'],
+    ns: ['common', 'navigation', 'auth', 'dashboard', 'forms', 'errors', 'calendar', 'loading', 'accessibility', 'system', 'plants', 'projects'],
     
     // Interpolation configuration with error handling
     interpolation: {
