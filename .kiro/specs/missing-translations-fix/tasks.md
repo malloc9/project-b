@@ -54,7 +54,15 @@
     - Update plant-related components with proper translation keys
     - _Requirements: 1.1, 1.4, 4.1_
 
-  - [ ] 5.3 Implement Projects page translations
+  - [x] 5.4 Implement Tasks page translations
+    - Create tasks.json translation files for English and Hungarian
+    - Replace hardcoded strings in TaskList component: "Tasks", "New Task", "Search tasks...", filter options, status labels, empty states
+    - Replace hardcoded strings in TaskDetail component: "Task Details", "Edit", "Delete", "Description", "Due Date", "Created", "Last Updated", status labels
+    - Update confirmation dialogs and error messages with proper translation keys
+    - Add translation keys for task-related status labels and action buttons
+    - _Requirements: 1.1, 1.4, 4.1, 4.2_
+
+  - [x] 5.3 Implement Projects page translations
     - Create projects.json translation files for English and Hungarian
     - Replace hardcoded strings in ProjectList component: "Projects", "New Project", "Search projects...", "All Status", status labels, empty states
     - Replace hardcoded strings in ProjectDetail component: "Description", "Due Date", "Progress", "Status", "Subtasks", "Add Subtask", "Edit", "Delete"
