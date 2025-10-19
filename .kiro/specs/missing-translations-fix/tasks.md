@@ -53,7 +53,7 @@
     - Ensure all form validation messages use translation system
     - _Requirements: 1.1, 4.1, 4.2, 4.4_
 
-  - [ ] 5.2 Implement Plant Codex page translations
+  - [x] 5.2 Implement Plant Codex page translations
     - Create plants.json translation files for English and Hungarian
     - Replace hardcoded strings in PlantsPage component: "Plant Codex", "Manage your plant collection...", "Add Plant", "Back to Plants"
     - Add translation keys for plant statistics: "Total Plants", "Photos Uploaded", "Care Tasks", descriptions

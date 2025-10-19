@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { PlantPhoto } from '../../types';
 import { format, formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface PhotoViewerProps {
   photo: PlantPhoto;
@@ -11,6 +12,7 @@ interface PhotoViewerProps {
 }
 
 export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: PhotoViewerProps) {
+  const { t } = useTranslation('accessibility');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -53,7 +55,7 @@ export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: Ph
   }, [currentIndex, photos.length]);
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this photo? This action cannot be undone.')) {
+    if (window.confirm(t('deletePhotoConfirm', { defaultValue: 'Are you sure you want to delete this photo? This action cannot be undone.' }))) {
       onDelete(photo.id);
     }
   };
@@ -81,7 +83,7 @@ export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: Ph
             <button
               onClick={handleDelete}
               className="p-2 text-gray-300 hover:text-red-400 transition-colors"
-              title="Delete photo"
+              title={t('deletePhoto')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -90,7 +92,7 @@ export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: Ph
             <button
               onClick={onClose}
               className="p-2 text-gray-300 hover:text-white transition-colors"
-              title="Close (Esc)"
+              title={t('closeEsc')}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -105,7 +107,7 @@ export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: Ph
         <button
           onClick={handlePrevious}
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-colors z-10"
-          title="Previous photo (←)"
+          title={t('previousPhoto')}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -117,7 +119,7 @@ export function PhotoViewer({ photo, photos, onClose, onDelete, onNavigate }: Ph
         <button
           onClick={handleNext}
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-colors z-10"
-          title="Next photo (→)"
+          title={t('nextPhoto')}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

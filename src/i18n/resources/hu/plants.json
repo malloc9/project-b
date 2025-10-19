@@ -36,5 +36,41 @@
     "noPlants": "Nem találhatók növények",
     "noResultsWithFilters": "Próbálja meg módosítani a szűrőket, vagy adja hozzá az első növényét a kezdéshez.",
     "noResultsEmpty": "Adja hozzá az első növényét a gyűjtemény elkezdéséhez."
+  },
+  "detail": {
+    "tabs": {
+      "overview": "Áttekintés",
+      "photos": "Fotók",
+      "careTasks": "Gondozási Feladatok"
+    },
+    "plantInformation": "Növény Információk",
+    "quickStats": "Gyors Statisztikák",
+    "fields": {
+      "name": "Név",
+      "species": "Faj",
+      "description": "Leírás",
+      "added": "Hozzáadva",
+      "lastUpdated": "Utoljára Frissítve"
+    },
+    "stats": {
+      "photosUploaded": "Feltöltött fotók",
+      "careTasks": "Gondozási feladatok",
+      "completedTasks": "Befejezett feladatok"
+    },
+    "actions": {
+      "edit": "Szerkesztés",
+      "delete": "Törlés",
+      "backToPlants": "← Vissza a növényekhez"
+    },
+    "alerts": {
+      "overdueTasks": "lejárt gondozási feladat",
+      "overdueTasksPlural": "lejárt gondozási feladat",
+      "nextTask": "Következő gondozási feladat:"
+    },
+    "notFound": {
+      "title": "Növény nem található",
+      "message": "A keresett növény nem létezik vagy törölve lett."
+    },
+    "deleteConfirm": "Biztosan törölni szeretné a(z) \"{name}\" növényt? Ez a művelet nem vonható vissza."
   }
 }

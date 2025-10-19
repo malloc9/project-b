@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { Plant, PlantCareTask } from '../../types';
 import { PlantService } from '../../services/plantService';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { PhotoTimeline } from './PhotoTimeline';
 import { CareTaskList } from './CareTaskList';
 import { LoadingSpinner } from '../common/LoadingSpinner';
@@ -17,6 +18,7 @@ interface PlantDetailProps {
 
 export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailProps) {
   const { user } = useAuth();
+  const { t } = useTranslation('plants');
   const [plant, setPlant] = useState<Plant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
   const handleDelete = async () => {
     if (!user || !plant) return;
 
-    if (window.confirm(`Are you sure you want to delete "${plant.name}"? This action cannot be undone.`)) {
+    if (window.confirm(t('detail.deleteConfirm', { name: plant.name }))) {
       try {
         await PlantService.deletePlant(user.uid, plant.id);
         onDelete?.(plant.id);
@@ -107,16 +109,16 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
       <div className="text-center py-12">
         <span className="text-6xl mb-4 block">🌱</span>
         <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Plant not found
+          {t('detail.notFound.title')}
         </h3>
         <p className="text-gray-600 mb-4">
-          The plant you're looking for doesn't exist or has been deleted.
+          {t('detail.notFound.message')}
         </p>
         <button
           onClick={onBack}
           className="text-green-600 hover:text-green-700 font-medium"
         >
-          ← Back to plants
+          {t('detail.actions.backToPlants')}
         </button>
       </div>
     );
@@ -178,9 +180,9 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
               <p className="text-gray-700 mb-4">{plant.description}</p>
               
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                <span>📸 {plant.photos.length} photos</span>
-                <span>💧 {plant.careTasks.length} care tasks</span>
-                <span>📅 Added {format(plant.createdAt, 'MMM d, yyyy')}</span>
+                <span>📸 {plant.photos.length} {t('detail.stats.photosUploaded')}</span>
+                <span>💧 {plant.careTasks.length} {t('detail.stats.careTasks')}</span>
+                <span>📅 {t('detail.fields.added')} {format(plant.createdAt, 'MMM d, yyyy')}</span>
               </div>
             </div>
           </div>
@@ -194,7 +196,7 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              Edit
+              {t('detail.actions.edit')}
             </button>
             <button
               onClick={handleDelete}
@@ -203,7 +205,7 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-              Delete
+              {t('detail.actions.delete')}
             </button>
           </div>
         </div>
@@ -216,7 +218,7 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-                {overdueTasks.length} overdue care task{overdueTasks.length !== 1 ? 's' : ''}
+                {overdueTasks.length} {overdueTasks.length === 1 ? t('detail.alerts.overdueTasks') : t('detail.alerts.overdueTasksPlural')}
               </div>
             )}
             
@@ -225,7 +227,7 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
-                Next care task: {upcomingTasks[0].title} ({formatDistanceToNow(upcomingTasks[0].dueDate, { addSuffix: true })})
+                {t('detail.alerts.nextTask')} {upcomingTasks[0].title} ({formatDistanceToNow(upcomingTasks[0].dueDate, { addSuffix: true })})
               </div>
             )}
           </div>
@@ -237,9 +239,9 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8 px-6">
             {[
-              { id: 'overview', label: 'Overview', icon: '📋' },
-              { id: 'photos', label: 'Photos', icon: '📸', count: plant.photos.length },
-              { id: 'care', label: 'Care Tasks', icon: '💧', count: plant.careTasks.length },
+              { id: 'overview', label: t('detail.tabs.overview'), icon: '📋' },
+              { id: 'photos', label: t('detail.tabs.photos'), icon: '📸', count: plant.photos.length },
+              { id: 'care', label: t('detail.tabs.careTasks'), icon: '💧', count: plant.careTasks.length },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -271,30 +273,30 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
           {activeTab === 'overview' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Plant Information</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">{t('detail.plantInformation')}</h3>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Name</dt>
+                    <dt className="text-sm font-medium text-gray-500">{t('detail.fields.name')}</dt>
                     <dd className="mt-1 text-sm text-gray-900">{plant.name}</dd>
                   </div>
                   {plant.species && (
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Species</dt>
+                      <dt className="text-sm font-medium text-gray-500">{t('detail.fields.species')}</dt>
                       <dd className="mt-1 text-sm text-gray-900">{plant.species}</dd>
                     </div>
                   )}
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Description</dt>
+                    <dt className="text-sm font-medium text-gray-500">{t('detail.fields.description')}</dt>
                     <dd className="mt-1 text-sm text-gray-900">{plant.description}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Added</dt>
+                    <dt className="text-sm font-medium text-gray-500">{t('detail.fields.added')}</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {format(plant.createdAt, 'MMMM d, yyyy')} ({formatDistanceToNow(plant.createdAt, { addSuffix: true })})
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
+                    <dt className="text-sm font-medium text-gray-500">{t('detail.fields.lastUpdated')}</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {format(plant.updatedAt, 'MMMM d, yyyy')} ({formatDistanceToNow(plant.updatedAt, { addSuffix: true })})
                     </dd>
@@ -304,21 +306,21 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
 
               {/* Quick stats */}
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Stats</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-3">{t('detail.quickStats')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-2xl font-bold text-gray-900">{plant.photos.length}</div>
-                    <div className="text-sm text-gray-600">Photos uploaded</div>
+                    <div className="text-sm text-gray-600">{t('detail.stats.photosUploaded')}</div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-2xl font-bold text-gray-900">{plant.careTasks.length}</div>
-                    <div className="text-sm text-gray-600">Care tasks</div>
+                    <div className="text-sm text-gray-600">{t('detail.stats.careTasks')}</div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-2xl font-bold text-gray-900">
                       {plant.careTasks.filter(task => task.completed).length}
                     </div>
-                    <div className="text-sm text-gray-600">Completed tasks</div>
+                    <div className="text-sm text-gray-600">{t('detail.stats.completedTasks')}</div>
                   </div>
                 </div>
               </div>

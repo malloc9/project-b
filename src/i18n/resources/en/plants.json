@@ -36,5 +36,41 @@
     "noPlants": "No plants found",
     "noResultsWithFilters": "Try adjusting your filters or add your first plant to get started.",
     "noResultsEmpty": "Add your first plant to start building your collection."
+  },
+  "detail": {
+    "tabs": {
+      "overview": "Overview",
+      "photos": "Photos",
+      "careTasks": "Care Tasks"
+    },
+    "plantInformation": "Plant Information",
+    "quickStats": "Quick Stats",
+    "fields": {
+      "name": "Name",
+      "species": "Species",
+      "description": "Description",
+      "added": "Added",
+      "lastUpdated": "Last Updated"
+    },
+    "stats": {
+      "photosUploaded": "Photos uploaded",
+      "careTasks": "Care tasks",
+      "completedTasks": "Completed tasks"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "backToPlants": "← Back to plants"
+    },
+    "alerts": {
+      "overdueTasks": "overdue care task",
+      "overdueTasksPlural": "overdue care tasks",
+      "nextTask": "Next care task:"
+    },
+    "notFound": {
+      "title": "Plant not found",
+      "message": "The plant you're looking for doesn't exist or has been deleted."
+    },
+    "deleteConfirm": "Are you sure you want to delete \"{name}\"? This action cannot be undone."
   }
 }

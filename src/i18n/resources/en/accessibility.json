@@ -37,6 +37,7 @@
   "editPlant": "Edit plant",
   "deletePlant": "Delete plant",
   "deletePhoto": "Delete photo",
+  "deletePhotoConfirm": "Are you sure you want to delete this photo? This action cannot be undone.",
   "backToPlants": "Back to plants",
   "closeEsc": "Close (Esc)",
   "previousPhoto": "Previous photo (←)",

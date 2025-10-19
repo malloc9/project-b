@@ -37,6 +37,7 @@
   "editPlant": "Növény szerkesztése",
   "deletePlant": "Növény törlése",
   "deletePhoto": "Fotó törlése",
+  "deletePhotoConfirm": "Biztosan törölni szeretné ezt a fotót? Ez a művelet nem vonható vissza.",
   "backToPlants": "Vissza a növényekhez",
   "closeEsc": "Bezárás (Esc)",
   "previousPhoto": "Előző fotó (←)",
