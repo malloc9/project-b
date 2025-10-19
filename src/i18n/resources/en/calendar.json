@@ -126,5 +126,15 @@
     "thursday": "Thu",
     "friday": "Fri",
     "saturday": "Sat"
+  },
+  "page": {
+    "title": "Calendar",
+    "subtitle": "Manage your events and schedule",
+    "viewToggle": {
+      "month": "Month",
+      "day": "Day"
+    },
+    "newEvent": "New Event",
+    "loginRequired": "Please log in to view your calendar."
   }
 }

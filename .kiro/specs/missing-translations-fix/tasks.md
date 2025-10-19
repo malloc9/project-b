@@ -33,12 +33,18 @@
     - Add translation keys for retry, health check, and recovery actions
     - _Requirements: 1.1, 5.1, 5.2_
 
-- [ ] 4. Implement accessibility translations
+- [x] 4. Implement accessibility translations
   - [x] 4.1 Update screen reader text
     - Replace hardcoded sr-only text like "Close", "Open main menu"
     - Add translation keys for ARIA labels and descriptions
     - Update focus management and navigation accessibility text
     - _Requirements: 1.1, 5.4_
+
+  - [x] 4.2 Fix CalendarPage component translations
+    - Replace hardcoded strings in CalendarPage: "Calendar", "Manage your events and schedule", "Month", "Day", "New Event", "Please log in to view your calendar."
+    - Update view toggle buttons and header text to use translation keys
+    - Add missing translation keys to calendar.json files
+    - _Requirements: 1.1, 3.1, 4.1_
 
 - [x] 5. Update form and validation translations
   - [x] 5.1 Add missing form element translations

@@ -126,5 +126,15 @@
     "thursday": "Csü",
     "friday": "Pén",
     "saturday": "Szo"
+  },
+  "page": {
+    "title": "Naptár",
+    "subtitle": "Események és ütemezés kezelése",
+    "viewToggle": {
+      "month": "Hónap",
+      "day": "Nap"
+    },
+    "newEvent": "Új Esemény",
+    "loginRequired": "Kérjük, jelentkezzen be a naptár megtekintéséhez."
   }
 }

@@ -6,11 +6,13 @@ import { EventDetailsModal } from '../components/calendar/EventDetailsModal';
 import { EventForm } from '../components/calendar/EventForm';
 import type { CalendarEvent } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 type ViewType = 'month' | 'day';
 
 export function CalendarPage() {
   const { user } = useAuth();
+  const { t } = useTranslation('calendar');
   const [currentView, setCurrentView] = useState<ViewType>('month');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -71,7 +73,7 @@ export function CalendarPage() {
   if (!user) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-500">Please log in to view your calendar.</div>
+        <div className="text-gray-500">{t('page.loginRequired')}</div>
       </div>
     );
   }
@@ -81,8 +83,8 @@ export function CalendarPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-          <p className="text-gray-600">Manage your events and schedule</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('page.title')}</h1>
+          <p className="text-gray-600">{t('page.subtitle')}</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -99,7 +101,7 @@ export function CalendarPage() {
               `}
             >
               <CalendarIcon className="h-4 w-4" />
-              Month
+              {t('page.viewToggle.month')}
             </button>
             <button
               onClick={() => handleViewChange('day')}
@@ -112,7 +114,7 @@ export function CalendarPage() {
               `}
             >
               <ClockIcon className="h-4 w-4" />
-              Day
+              {t('page.viewToggle.day')}
             </button>
           </div>
 
@@ -122,7 +124,7 @@ export function CalendarPage() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <PlusIcon className="h-4 w-4" />
-            New Event
+            {t('page.newEvent')}
           </button>
         </div>
       </div>
