@@ -10,7 +10,7 @@ import {
   updateProjectStatusFromSubtasks
 } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 import SubtaskList from './SubtaskList';
 import SubtaskForm from './SubtaskForm';
 
@@ -18,6 +18,7 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { formatDate } = useTranslation();
   
   const [project, setProject] = useState<Project | null>(null);
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);

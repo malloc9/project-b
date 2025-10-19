@@ -10,13 +10,14 @@ import {
   deleteSimpleTask
 } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface TaskListProps {
   onTaskSelect?: (task: SimpleTask) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
+  const { t, formatDate } = useTranslation();
   const { user } = useAuth();
   const [tasks, setTasks] = useState<SimpleTask[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<SimpleTask[]>([]);
@@ -153,7 +154,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
-            Search tasks
+            {t('searchTasks')}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -174,7 +175,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
         </div>
         <div className="sm:w-48">
           <label htmlFor="completion-filter" className="sr-only">
-            Filter by completion
+            {t('filterByCompletion')}
           </label>
           <select
             id="completion-filter"
@@ -190,7 +191,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
         </div>
         <div className="sm:w-48">
           <label htmlFor="sort-order" className="sr-only">
-            Sort order
+            {t('sortOrder')}
           </label>
           <select
             id="sort-order"

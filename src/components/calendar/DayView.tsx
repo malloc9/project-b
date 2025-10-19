@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { PlusIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from '../../hooks/useTranslation';
 import type { CalendarEvent } from '../../types';
 import { getEventsForDate, createEvent } from '../../services/calendarService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -34,6 +35,7 @@ export function DayView({
   onEventCreate,
   className = ''
 }: DayViewProps) {
+  const { t, language } = useTranslation();
   const { user } = useAuth();
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -171,7 +173,7 @@ export function DayView({
         setEvents(dayEvents);
       } catch (err) {
         console.error('Error loading day events:', err);
-        setError('Failed to load events for this day');
+        setError(t('calendar:dayView.errorLoading'));
       } finally {
         setLoading(false);
       }
@@ -336,7 +338,8 @@ export function DayView({
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+    const locale = language === 'hu' ? 'hu-HU' : 'en-US';
+    return date.toLocaleDateString(locale, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -352,13 +355,13 @@ export function DayView({
   if (error) {
     return (
       <div className={`bg-red-50 border border-red-200 rounded-md p-4 ${className}`}>
-        <div className="text-red-800 text-sm font-medium">Error loading day view</div>
+        <div className="text-red-800 text-sm font-medium">{t('calendar:dayView.errorLoading')}</div>
         <div className="text-red-700 text-sm mt-1">{error}</div>
         <button
           onClick={() => window.location.reload()}
           className="mt-2 bg-red-100 hover:bg-red-200 px-3 py-1 rounded text-sm text-red-800"
         >
-          Retry
+          {t('calendar:dayView.retry')}
         </button>
       </div>
     );
@@ -371,7 +374,7 @@ export function DayView({
         <button
           onClick={() => navigateDay('prev')}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Previous day"
+          aria-label={t('calendar:dayView.previousDay')}
         >
           <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
         </button>
@@ -381,14 +384,14 @@ export function DayView({
             {formatDate(selectedDate)}
           </h2>
           {isToday(selectedDate) && (
-            <span className="text-sm text-blue-500 font-medium">Today</span>
+            <span className="text-sm text-blue-500 font-medium">{t('calendar:today')}</span>
           )}
         </div>
         
         <button
           onClick={() => navigateDay('next')}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Next day"
+          aria-label={t('calendar:dayView.nextDay')}
         >
           <ChevronRightIcon className="h-5 w-5 text-gray-600" />
         </button>
@@ -397,7 +400,7 @@ export function DayView({
       {/* All-day events section */}
       {positionedEvents.some(event => event.allDay) && (
         <div className="border-b bg-gray-50 p-3">
-          <div className="text-xs font-medium text-gray-500 mb-2">All Day</div>
+          <div className="text-xs font-medium text-gray-500 mb-2">{t('calendar:dayView.allDay')}</div>
           <div className="space-y-1">
             {positionedEvents
               .filter(event => event.allDay)
@@ -580,7 +583,7 @@ export function DayView({
           className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
         >
           <PlusIcon className="h-4 w-4" />
-          Add Event
+          {t('calendar:dayView.addEvent')}
         </button>
       </div>
     </div>

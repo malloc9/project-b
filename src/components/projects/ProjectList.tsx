@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { Project, TaskStatus } from '../../types';
 import { getUserProjects, filterProjectsByStatus, searchProjects } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 import { calculateProjectProgress } from '../../services/projectService';
 
 interface ProjectListProps {
@@ -11,6 +11,7 @@ interface ProjectListProps {
 }
 
 const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
+  const { t, formatDate } = useTranslation();
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
@@ -144,7 +145,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
-            Search projects
+            {t('searchProjects')}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -165,7 +166,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
         </div>
         <div className="sm:w-48">
           <label htmlFor="status-filter" className="sr-only">
-            Filter by status
+            {t('filterByStatus')}
           </label>
           <select
             id="status-filter"

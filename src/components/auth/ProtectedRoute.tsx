@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,12 +14,16 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { t } = useTranslation(['loading']);
 
   // Show loading spinner while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-2" role="status" aria-hidden="true"></div>
+          <p className="text-gray-600">{t('loading:authenticating', { defaultValue: 'Authenticating...' })}</p>
+        </div>
       </div>
     );
   }
@@ -43,12 +48,16 @@ export function ProtectedRoute({ children, redirectTo = '/login' }: ProtectedRou
  */
 export function PublicRoute({ children, redirectTo = '/' }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
+  const { t } = useTranslation(['loading']);
 
   // Show loading spinner while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-2" role="status" aria-hidden="true"></div>
+          <p className="text-gray-600">{t('loading:authenticating', { defaultValue: 'Authenticating...' })}</p>
+        </div>
       </div>
     );
   }

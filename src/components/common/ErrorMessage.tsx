@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface ErrorMessageProps {
   message: string;
   onRetry?: () => void;
@@ -5,6 +7,7 @@ interface ErrorMessageProps {
 }
 
 export function ErrorMessage({ message, onRetry, className = '' }: ErrorMessageProps) {
+  const { t } = useTranslation(['errors', 'system']);
   return (
     <div className={`bg-red-50 border border-red-200 rounded-md p-4 ${className}`}>
       <div className="flex">
@@ -24,7 +27,7 @@ export function ErrorMessage({ message, onRetry, className = '' }: ErrorMessageP
           </svg>
         </div>
         <div className="ml-3 flex-1">
-          <h3 className="text-sm font-medium text-red-800">Error</h3>
+          <h3 className="text-sm font-medium text-red-800">{t('errors:general.unknownError', { defaultValue: 'Error' })}</h3>
           <p className="mt-1 text-sm text-red-700">{message}</p>
           {onRetry && (
             <div className="mt-3">
@@ -32,7 +35,7 @@ export function ErrorMessage({ message, onRetry, className = '' }: ErrorMessageP
                 onClick={onRetry}
                 className="text-sm font-medium text-red-800 hover:text-red-900 underline"
               >
-                Try again
+                {t('system:retry', { defaultValue: 'Try again' })}
               </button>
             </div>
           )}

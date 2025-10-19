@@ -109,23 +109,29 @@ export function isUpcoming(date: Date, daysAhead: number = 7): boolean {
   return date >= now && date <= futureDate;
 }
 
-export function formatRelativeDate(date: Date): string {
+export function formatRelativeDate(
+  date: Date, 
+  t?: (key: string, options?: any) => string,
+  locale: string = 'en-US'
+): string {
   const now = new Date();
   const diffInMs = date.getTime() - now.getTime();
   const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
 
   if (diffInDays === 0) {
-    return 'Today';
+    return t ? t('calendar:today', { defaultValue: 'Today' }) : 'Today';
   } else if (diffInDays === 1) {
-    return 'Tomorrow';
+    return t ? t('calendar:tomorrow', { defaultValue: 'Tomorrow' }) : 'Tomorrow';
   } else if (diffInDays === -1) {
-    return 'Yesterday';
+    return t ? t('calendar:yesterday', { defaultValue: 'Yesterday' }) : 'Yesterday';
   } else if (diffInDays > 1 && diffInDays <= 7) {
-    return `In ${diffInDays} days`;
+    const count = diffInDays;
+    return t ? t('calendar:relativeTime.inDays', { count, defaultValue: `In ${count} days` }) : `In ${count} days`;
   } else if (diffInDays < -1 && diffInDays >= -7) {
-    return `${Math.abs(diffInDays)} days ago`;
+    const count = Math.abs(diffInDays);
+    return t ? t('calendar:relativeTime.daysAgo', { count, defaultValue: `${count} days ago` }) : `${count} days ago`;
   } else {
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(locale);
   }
 }
 

@@ -8,7 +8,7 @@ import {
   getOverdueSubtasks,
   getSubtasksDueSoon
 } from '../../services/projectService';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface ProjectProgressTrackerProps {
   projects: Project[];
@@ -21,6 +21,7 @@ const ProjectProgressTracker: React.FC<ProjectProgressTrackerProps> = ({
   selectedProject,
   subtasks = []
 }) => {
+  const { formatDate } = useTranslation();
   const projectStats = getProjectStatistics(projects);
   const subtaskStats = selectedProject ? getSubtaskStatistics(subtasks) : null;
   const overdueProjects = getOverdueProjects(projects);

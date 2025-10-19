@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LoadingSpinner } from './LoadingSpinner';
 import { useServiceWorker } from '../../hooks/useServiceWorker';
+import { useTranslation } from 'react-i18next';
 import type { UpdateError } from '../../utils/serviceWorkerManager';
 
 interface UpdateNotificationProps {
@@ -16,6 +17,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
   onDismiss,
   className = ''
 }) => {
+  const { t } = useTranslation(['system', 'loading', 'common', 'accessibility']);
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
@@ -157,10 +159,10 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
               </div>
               <div>
                 <h3 className="font-semibold text-sm mobile:text-base">
-                  App Update Available
+                  {t('system:updateAvailable', { defaultValue: 'App Update Available' })}
                 </h3>
                 <p className="text-blue-100 text-xs mobile:text-sm">
-                  A new version is ready to install
+                  {t('system:updateReady', { defaultValue: 'A new version is ready to install' })}
                 </p>
               </div>
             </div>
@@ -170,7 +172,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
               <button
                 onClick={handleDismiss}
                 className="text-blue-200 hover:text-white transition-colors p-1 -mt-1 -mr-1"
-                aria-label="Dismiss notification"
+                aria-label={t('accessibility:dismissNotification')}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -185,7 +187,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
-              <span>You're offline. Update will retry when connection is restored.</span>
+              <span>{t('system:offlineMessage', { defaultValue: "You're offline. Update will retry when connection is restored." })}</span>
             </div>
           )}
 
@@ -195,7 +197,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
               <div className="flex items-start justify-between">
                 <span>{updateError}</span>
                 {retryCount > 0 && (
-                  <span className="text-red-200 text-xs ml-2">({retryCount} attempts)</span>
+                  <span className="text-red-200 text-xs ml-2">({retryCount} {t('system:attempts', { defaultValue: 'attempts' })})</span>
                 )}
               </div>
             </div>
@@ -211,7 +213,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{errorHistory.length} previous error(s) - Click for options</span>
+                <span>{errorHistory.length} {t('system:previousErrors', { defaultValue: 'previous error(s) - Click for options' })}</span>
               </button>
             </div>
           )}
@@ -228,21 +230,21 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                 {isUpdating ? (
                   <>
                     <LoadingSpinner size="sm" className="text-blue-600" />
-                    <span>Updating...</span>
+                    <span>{t('system:updating', { defaultValue: 'Updating...' })}</span>
                   </>
                 ) : retryCount > 0 ? (
                   <>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Retry with Smart Backoff</span>
+                    <span>{t('system:retryWithSmartBackoff', { defaultValue: 'Retry with Smart Backoff' })}</span>
                   </>
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Update Now</span>
+                    <span>{t('system:updateNow', { defaultValue: 'Update Now' })}</span>
                   </>
                 )}
               </button>
@@ -252,7 +254,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                   onClick={handleDismiss}
                   className="mobile:flex-shrink-0 bg-blue-500 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-400 transition-colors text-sm mobile:text-base mobile:hidden"
                 >
-                  Later
+                  {t('system:later', { defaultValue: 'Later' })}
                 </button>
               )}
             </div>
@@ -260,7 +262,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
             {/* Advanced options */}
             {showAdvancedOptions && !isUpdating && (
               <div className="mt-2 pt-2 border-t border-blue-500">
-                <div className="text-blue-100 text-xs mb-2">Advanced Recovery Options:</div>
+                <div className="text-blue-100 text-xs mb-2">{t('system:advancedRecoveryOptions', { defaultValue: 'Advanced Recovery Options:' })}</div>
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-col mobile:flex-row gap-2">
                     <button
@@ -270,7 +272,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>Health Check</span>
+                      <span>{t('system:healthCheck', { defaultValue: 'Health Check' })}</span>
                     </button>
                     <button
                       onClick={handleRecovery}
@@ -279,7 +281,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      <span>Full Recovery</span>
+                      <span>{t('system:fullRecovery', { defaultValue: 'Full Recovery' })}</span>
                     </button>
                   </div>
                   <button
@@ -289,7 +291,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <span>Clear Error History</span>
+                    <span>{t('system:clearErrorHistory', { defaultValue: 'Clear Error History' })}</span>
                   </button>
                 </div>
               </div>
@@ -303,7 +305,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
                 <div className="flex-1 bg-blue-500 rounded-full h-1">
                   <div className="bg-white h-1 rounded-full animate-pulse" style={{ width: '60%' }}></div>
                 </div>
-                <span>Installing update...</span>
+                <span>{t('system:installingUpdate', { defaultValue: 'Installing update...' })}</span>
               </div>
             </div>
           )}

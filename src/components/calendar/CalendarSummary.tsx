@@ -9,6 +9,7 @@ import type { CalendarEvent } from '../../types';
 import { getEventsForDate, getUpcomingEvents, getOverdueEvents } from '../../services/calendarService';
 import { useAuthenticatedUser } from '../../hooks/useAuthenticatedUser';
 import { classifyFirebaseError, getErrorMessage } from '../../utils/authenticationErrors';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface CalendarSummaryProps {
   className?: string;
@@ -16,6 +17,7 @@ interface CalendarSummaryProps {
 
 export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
   const { user, isAuthenticated, isLoading } = useAuthenticatedUser();
+  const { t, formatTime, formatDate } = useTranslation();
   const [todayEvents, setTodayEvents] = useState<CalendarEvent[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([]);
   const [overdueEvents, setOverdueEvents] = useState<CalendarEvent[]>([]);
@@ -96,15 +98,9 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
   };
 
   const formatEventTime = (event: CalendarEvent) => {
-    if (event.allDay) return 'All day';
+    if (event.allDay) return t('calendar:allDay');
     
-    const startTime = new Date(event.startDate).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-    
-    return startTime;
+    return formatTime(event.startDate);
   };
 
   const formatEventDate = (date: Date) => {
@@ -118,14 +114,12 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
     tomorrow.setHours(0, 0, 0, 0);
     
     if (eventDate.getTime() === today.getTime()) {
-      return 'Today';
+      return t('calendar:today');
     } else if (eventDate.getTime() === tomorrow.getTime()) {
-      return 'Tomorrow';
+      return t('calendar:tomorrow');
     } else {
-      return eventDate.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
-      });
+      // Use the formatDate from useTranslation hook which already handles locale
+      return formatDate(eventDate);
     }
   };
 
@@ -159,13 +153,13 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CalendarIcon className="h-5 w-5 text-gray-600" />
-            <h3 className="text-lg font-semibold text-gray-900">Calendar Summary</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('calendar:summary')}</h3>
           </div>
           <a
             href="/calendar"
             className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
           >
-            View Calendar
+            {t('calendar:viewCalendar')}
             <ArrowRightIcon className="h-4 w-4" />
           </a>
         </div>
@@ -175,9 +169,9 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
         {!hasAnyEvents ? (
           <div className="text-center py-8">
             <CalendarIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600 mb-2">No upcoming events</p>
+            <p className="text-gray-600 mb-2">{t('calendar:noUpcomingEvents')}</p>
             <p className="text-sm text-gray-500">
-              Your calendar is clear for now
+              {t('calendar:calendarClearForNow')}
             </p>
           </div>
         ) : (
@@ -187,7 +181,7 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
-                  <h4 className="text-sm font-medium text-red-700">Overdue</h4>
+                  <h4 className="text-sm font-medium text-red-700">{t('calendar:overdue')}</h4>
                 </div>
                 <div className="space-y-2">
                   {overdueEvents.map((event) => (
@@ -205,7 +199,7 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
                         </p>
                       </div>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getEventTypeColor(event.type)}`}>
-                        {event.type.replace('_', ' ')}
+                        {t(`calendar:eventTypes.${event.type === 'plant_care' ? 'plantCare' : event.type}`)}
                       </span>
                     </div>
                   ))}
@@ -218,7 +212,7 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <ClockIcon className="h-4 w-4 text-blue-500" />
-                  <h4 className="text-sm font-medium text-gray-700">Today</h4>
+                  <h4 className="text-sm font-medium text-gray-700">{t('calendar:today')}</h4>
                 </div>
                 <div className="space-y-2">
                   {todayEvents.map((event) => (
@@ -236,7 +230,7 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
                         </p>
                       </div>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getEventTypeColor(event.type)}`}>
-                        {event.type.replace('_', ' ')}
+                        {t(`calendar:eventTypes.${event.type === 'plant_care' ? 'plantCare' : event.type}`)}
                       </span>
                     </div>
                   ))}
@@ -249,7 +243,7 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <CalendarIcon className="h-4 w-4 text-gray-500" />
-                  <h4 className="text-sm font-medium text-gray-700">Upcoming</h4>
+                  <h4 className="text-sm font-medium text-gray-700">{t('calendar:upcoming')}</h4>
                 </div>
                 <div className="space-y-2">
                   {upcomingEvents.map((event) => (
@@ -267,7 +261,7 @@ export function CalendarSummary({ className = '' }: CalendarSummaryProps) {
                         </p>
                       </div>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getEventTypeColor(event.type)}`}>
-                        {event.type.replace('_', ' ')}
+                        {t(`calendar:eventTypes.${event.type === 'plant_care' ? 'plantCare' : event.type}`)}
                       </span>
                     </div>
                   ))}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { Plant } from '../types';
 import { PlantService } from '../services/plantService';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { ContentArea, GridLayout, StatsCard } from '../components/layout';
 import { PlantList, PlantDetail, PlantForm } from '../components/plants';
 
@@ -9,6 +10,7 @@ type ViewMode = 'list' | 'detail' | 'create' | 'edit';
 
 export function PlantsPage() {
   const { user } = useAuth();
+  const { t } = useTranslation('plants');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -96,24 +98,24 @@ export function PlantsPage() {
 
   const plantStatsData = [
     {
-      title: 'Total Plants',
+      title: t('stats.totalPlants'),
       value: stats.totalPlants.toString(),
       icon: '🌱',
-      description: 'Plants in your collection',
+      description: t('stats.plantsInCollection'),
       color: 'green' as const,
     },
     {
-      title: 'Photos Uploaded',
+      title: t('stats.photosUploaded'),
       value: stats.totalPhotos.toString(),
       icon: '📸',
-      description: 'Growth photos captured',
+      description: t('stats.growthPhotosCaptured'),
       color: 'blue' as const,
     },
     {
-      title: 'Care Tasks',
+      title: t('stats.careTasks'),
       value: stats.totalCareTasks.toString(),
       icon: '💧',
-      description: 'Scheduled care reminders',
+      description: t('stats.scheduledCareReminders'),
       color: 'indigo' as const,
     },
   ];
@@ -122,22 +124,22 @@ export function PlantsPage() {
     <div className="space-y-6">
       {/* Page header */}
       <ContentArea
-        title="Plant Codex"
-        subtitle="Manage your plant collection, track growth with photos, and schedule care tasks"
+        title={t('pageTitle')}
+        subtitle={t('pageSubtitle')}
         actions={
           viewMode === 'list' ? (
             <button 
               onClick={() => setViewMode('create')}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
-              Add Plant
+              {t('addPlant')}
             </button>
           ) : (
             <button 
               onClick={handleBack}
               className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
-              ← Back to Plants
+              {t('backToPlants')}
             </button>
           )
         }

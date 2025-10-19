@@ -7,6 +7,7 @@ import { PhotoViewer } from './PhotoViewer';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
 import { format, formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface PhotoTimelineProps {
   plantId: string;
@@ -16,6 +17,7 @@ interface PhotoTimelineProps {
 
 export function PhotoTimeline({ plantId, photos, onPhotosChange }: PhotoTimelineProps) {
   const { user } = useAuth();
+  const { t } = useTranslation(['loading', 'common']);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<PlantPhoto | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -109,7 +111,7 @@ export function PhotoTimeline({ plantId, photos, onPhotosChange }: PhotoTimeline
             {isUploading ? (
               <>
                 <LoadingSpinner size="sm" className="mr-2" />
-                Uploading...
+                {t('loading:processing', { defaultValue: 'Uploading...' })}
               </>
             ) : (
               'Quick Upload'

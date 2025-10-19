@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Plant Codex",
+  "pageSubtitle": "Manage your plant collection, track growth with photos, and schedule care tasks",
+  "addPlant": "Add Plant",
+  "backToPlants": "← Back to Plants",
+  "stats": {
+    "totalPlants": "Total Plants",
+    "photosUploaded": "Photos Uploaded",
+    "careTasks": "Care Tasks",
+    "plantsInCollection": "Plants in your collection",
+    "growthPhotosCaptured": "Growth photos captured",
+    "scheduledCareReminders": "Scheduled care reminders"
+  },
+  "tasks": {
+    "overdue": "overdue task",
+    "overduePlural": "overdue tasks",
+    "next": "Next:",
+    "noCareTasks": "No care tasks scheduled",
+    "updated": "Updated"
+  },
+  "search": {
+    "placeholder": "Search plants by name, species, or description...",
+    "filters": "Filters",
+    "clearAll": "Clear all",
+    "species": "Species",
+    "speciesPlaceholder": "Filter by species...",
+    "careTasks": "Care Tasks",
+    "allPlants": "All plants",
+    "withTasks": "With care tasks",
+    "withoutTasks": "Without care tasks"
+  },
+  "results": {
+    "plant": "plant",
+    "plants": "plants",
+    "found": "found",
+    "noPlants": "No plants found",
+    "noResultsWithFilters": "Try adjusting your filters or add your first plant to get started.",
+    "noResultsEmpty": "Add your first plant to start building your collection."
+  }
+}

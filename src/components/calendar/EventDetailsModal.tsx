@@ -13,6 +13,7 @@ import {
 import type { CalendarEvent } from '../../types';
 import { deleteEvent, updateEvent } from '../../services/calendarService';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface EventDetailsModalProps {
   event: CalendarEvent | null;
@@ -29,6 +30,7 @@ export function EventDetailsModal({
   onEdit,
   onEventUpdated 
 }: EventDetailsModalProps) {
+  const { t, language, formatDate: formatDateTranslation, formatTime } = useTranslation();
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
@@ -39,7 +41,7 @@ export function EventDetailsModal({
   const handleDelete = async () => {
     if (!user || !event) return;
     
-    const confirmed = window.confirm('Are you sure you want to delete this event?');
+    const confirmed = window.confirm(t('calendar:eventDetails.confirmDelete'));
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -51,7 +53,7 @@ export function EventDetailsModal({
       onClose();
     } catch (err) {
       console.error('Error deleting event:', err);
-      setError('Failed to delete event');
+      setError(t('calendar:eventDetails.deleteError'));
     } finally {
       setIsDeleting(false);
     }
@@ -69,7 +71,7 @@ export function EventDetailsModal({
       onEventUpdated?.();
     } catch (err) {
       console.error('Error updating event status:', err);
-      setError('Failed to update event status');
+      setError(t('calendar:eventDetails.updateError'));
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -98,15 +100,15 @@ export function EventDetailsModal({
   const getEventTypeLabel = (type: CalendarEvent['type']) => {
     switch (type) {
       case 'task':
-        return 'Task';
+        return t('calendar:eventTypes.task');
       case 'project':
-        return 'Project';
+        return t('calendar:eventTypes.project');
       case 'plant_care':
-        return 'Plant Care';
+        return t('calendar:eventTypes.plantCare');
       case 'custom':
-        return 'Custom Event';
+        return t('calendar:eventTypes.custom');
       default:
-        return 'Event';
+        return t('calendar:eventTypes.custom');
     }
   };
 
@@ -137,20 +139,13 @@ export function EventDetailsModal({
     }
   };
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
+  const formatEventDate = (date: Date) => {
+    const locale = language === 'hu' ? 'hu-HU' : 'en-US';
+    return new Intl.DateTimeFormat(locale, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
-    }).format(date);
-  };
-
-  const formatTime = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
     }).format(date);
   };
 
@@ -161,11 +156,11 @@ export function EventDetailsModal({
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Event Details</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('calendar:eventDetails.title')}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Close modal"
+            aria-label={t('accessibility:closeModal')}
           >
             <XMarkIcon className="h-5 w-5 text-gray-500" />
           </button>
@@ -208,7 +203,7 @@ export function EventDetailsModal({
           {/* Description */}
           {event.description && (
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-1">Description</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-1">{t('calendar:eventDetails.description')}</h4>
               <p className="text-sm text-gray-600">{event.description}</p>
             </div>
           )}
@@ -217,7 +212,7 @@ export function EventDetailsModal({
           <div className="space-y-2">
             <div className="flex items-center text-sm text-gray-600">
               <CalendarIcon className="h-4 w-4 mr-2" />
-              <span>{formatDate(event.startDate)}</span>
+              <span>{formatEventDate(event.startDate)}</span>
             </div>
             
             {!event.allDay && (
@@ -236,11 +231,11 @@ export function EventDetailsModal({
           {/* Recurrence Info */}
           {event.recurrence && (
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-1">Recurrence</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-1">{t('calendar:eventDetails.recurrence')}</h4>
               <p className="text-sm text-gray-600">
-                Repeats {event.recurrence.type} 
-                {event.recurrence.interval > 1 && ` every ${event.recurrence.interval}`}
-                {event.recurrence.endDate && ` until ${formatDate(event.recurrence.endDate)}`}
+                {t('calendar:eventDetails.repeats', { type: event.recurrence.type })}
+                {event.recurrence.interval > 1 && ` ${t('calendar:eventDetails.every', { interval: event.recurrence.interval })}`}
+                {event.recurrence.endDate && ` ${t('calendar:eventDetails.until', { date: formatEventDate(event.recurrence.endDate) })}`}
               </p>
             </div>
           )}
@@ -248,13 +243,13 @@ export function EventDetailsModal({
           {/* Notifications */}
           {event.notifications && event.notifications.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-1">Notifications</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-1">{t('calendar:eventDetails.notifications')}</h4>
               <div className="space-y-1">
                 {event.notifications.map((notification) => (
                   <p key={notification.id} className="text-sm text-gray-600">
-                    {notification.type === 'browser' ? 'Browser' : 'In-app'} notification 
-                    {notification.timing > 0 && ` ${notification.timing} minutes before`}
-                    {!notification.enabled && ' (disabled)'}
+                    {notification.type === 'browser' ? t('calendar:eventDetails.browserNotification') : t('calendar:eventDetails.inAppNotification')}
+                    {notification.timing > 0 && ` ${t('calendar:eventDetails.minutesBefore', { minutes: notification.timing })}`}
+                    {!notification.enabled && ` ${t('calendar:eventDetails.disabled')}`}
                   </p>
                 ))}
               </div>
@@ -269,7 +264,7 @@ export function EventDetailsModal({
                 className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
               >
                 <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-1" />
-                View source {getEventTypeLabel(event.type).toLowerCase()}
+                {t('calendar:eventDetails.viewSource', { type: getEventTypeLabel(event.type).toLowerCase() })}
               </a>
             </div>
           )}
@@ -296,7 +291,7 @@ export function EventDetailsModal({
               ) : (
                 <CheckCircleIcon className="h-4 w-4 mr-2" />
               )}
-              {event.status === 'completed' ? 'Mark Pending' : 'Mark Complete'}
+              {event.status === 'completed' ? t('calendar:eventDetails.markPending') : t('calendar:eventDetails.markComplete')}
             </button>
           </div>
 
@@ -308,7 +303,7 @@ export function EventDetailsModal({
                 className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 <PencilIcon className="h-4 w-4 mr-2" />
-                Edit
+                {t('calendar:eventDetails.edit')}
               </button>
             )}
 
@@ -323,7 +318,7 @@ export function EventDetailsModal({
               ) : (
                 <TrashIcon className="h-4 w-4 mr-2" />
               )}
-              Delete
+              {t('calendar:eventDetails.delete')}
             </button>
           </div>
         </div>

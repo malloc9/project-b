@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import type { CalendarEvent, CalendarFilters as CalendarFiltersType } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface CalendarFiltersProps {
   onFiltersChange: (filters: CalendarFiltersType) => void;
@@ -13,6 +14,7 @@ export function CalendarFilters({
   initialFilters = {},
   className = ''
 }: CalendarFiltersProps) {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState<CalendarFiltersType>(initialFilters);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm || '');
@@ -70,7 +72,7 @@ export function CalendarFilters({
         </div>
         <input
           type="text"
-          placeholder="Search events by title or description..."
+          placeholder={t('calendar:filters.searchPlaceholder', 'Search events by title or description...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -90,7 +92,7 @@ export function CalendarFilters({
           `}
         >
           <FunnelIcon className="h-4 w-4 mr-1" />
-          Filters
+          {t('calendar:filters.filters', 'Filters')}
         </button>
 
         {/* Event Type Quick Filters */}
@@ -107,7 +109,7 @@ export function CalendarFilters({
             `}
           >
             <div className={`w-2 h-2 rounded-full mr-2 ${getTypeColor(type)}`} />
-            {getTypeLabel(type)}
+            {getTypeLabel(type, t)}
           </button>
         ))}
 
@@ -125,7 +127,7 @@ export function CalendarFilters({
             `}
           >
             {getStatusIcon(status)}
-            {getStatusLabel(status)}
+            {getStatusLabel(status, t)}
           </button>
         ))}
 
@@ -136,7 +138,7 @@ export function CalendarFilters({
             className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200 hover:bg-red-200 transition-colors"
           >
             <XMarkIcon className="h-4 w-4 mr-1" />
-            Clear All
+            {t('calendar:filters.clearAll', 'Clear All')}
           </button>
         )}
       </div>
@@ -144,13 +146,13 @@ export function CalendarFilters({
       {/* Advanced Filters */}
       {showAdvancedFilters && (
         <div className="border-t border-gray-200 pt-4">
-          <h4 className="text-sm font-medium text-gray-900 mb-3">Advanced Filters</h4>
+          <h4 className="text-sm font-medium text-gray-900 mb-3">{t('calendar:filters.advancedFilters', 'Advanced Filters')}</h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Date Range */}
             <div>
               <label htmlFor="start-date" className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date
+                {t('calendar:filters.startDate', 'Start Date')}
               </label>
               <input
                 id="start-date"
@@ -163,7 +165,7 @@ export function CalendarFilters({
 
             <div>
               <label htmlFor="end-date" className="block text-sm font-medium text-gray-700 mb-1">
-                End Date
+                {t('calendar:filters.endDate', 'End Date')}
               </label>
               <input
                 id="end-date"
@@ -177,35 +179,35 @@ export function CalendarFilters({
             {/* Event Type Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Event Type
+                {t('calendar:filters.eventType', 'Event Type')}
               </label>
               <select
                 value={filters.type || ''}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">All Types</option>
-                <option value="task">Tasks</option>
-                <option value="project">Projects</option>
-                <option value="plant_care">Plant Care</option>
-                <option value="custom">Custom Events</option>
+                <option value="">{t('calendar:filters.allTypes', 'All Types')}</option>
+                <option value="task">{t('calendar:filters.tasks', 'Tasks')}</option>
+                <option value="project">{t('calendar:filters.projects', 'Projects')}</option>
+                <option value="plant_care">{t('calendar:filters.plantCare', 'Plant Care')}</option>
+                <option value="custom">{t('calendar:filters.customEvents', 'Custom Events')}</option>
               </select>
             </div>
 
             {/* Status Dropdown */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                {t('calendar:filters.status', 'Status')}
               </label>
               <select
                 value={filters.status || ''}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="">{t('calendar:filters.allStatuses', 'All Statuses')}</option>
+                <option value="pending">{t('calendar:filters.pending', 'Pending')}</option>
+                <option value="completed">{t('calendar:filters.completed', 'Completed')}</option>
+                <option value="cancelled">{t('calendar:filters.cancelled', 'Cancelled')}</option>
               </select>
             </div>
           </div>
@@ -217,13 +219,16 @@ export function CalendarFilters({
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">
-              {getActiveFiltersCount()} filter{getActiveFiltersCount() !== 1 ? 's' : ''} active
+              {getActiveFiltersCount()} {getActiveFiltersCount() === 1 
+                ? t('calendar:filters.filtersActive', 'filter') 
+                : t('calendar:filters.filtersActiveMultiple', 'filters')
+              } {t('calendar:filters.active', 'active')}
             </span>
             <button
               onClick={clearFilters}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
             >
-              Clear all filters
+              {t('calendar:filters.clearAllFilters', 'Clear all filters')}
             </button>
           </div>
         </div>
@@ -252,18 +257,18 @@ function getTypeColor(type: CalendarEvent['type']): string {
   }
 }
 
-function getTypeLabel(type: CalendarEvent['type']): string {
+function getTypeLabel(type: CalendarEvent['type'], t: any): string {
   switch (type) {
     case 'task':
-      return 'Tasks';
+      return t('calendar:filters.tasks', 'Tasks');
     case 'project':
-      return 'Projects';
+      return t('calendar:filters.projects', 'Projects');
     case 'plant_care':
-      return 'Plant Care';
+      return t('calendar:filters.plantCare', 'Plant Care');
     case 'custom':
-      return 'Custom';
+      return t('calendar:filters.customEvents', 'Custom Events');
     default:
-      return 'Unknown';
+      return t('common:unknown', 'Unknown');
   }
 }
 
@@ -280,15 +285,15 @@ function getStatusIcon(status: CalendarEvent['status']): React.ReactNode {
   }
 }
 
-function getStatusLabel(status: CalendarEvent['status']): string {
+function getStatusLabel(status: CalendarEvent['status'], t: any): string {
   switch (status) {
     case 'pending':
-      return 'Pending';
+      return t('calendar:filters.pending', 'Pending');
     case 'completed':
-      return 'Completed';
+      return t('calendar:filters.completed', 'Completed');
     case 'cancelled':
-      return 'Cancelled';
+      return t('calendar:filters.cancelled', 'Cancelled');
     default:
-      return 'Unknown';
+      return t('common:unknown', 'Unknown');
   }
 }

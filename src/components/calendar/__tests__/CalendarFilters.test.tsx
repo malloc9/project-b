@@ -11,6 +11,44 @@ vi.mock('@heroicons/react/24/outline', () => ({
   XMarkIcon: () => <div data-testid="x-mark-icon" />
 }));
 
+// Mock useTranslation hook
+vi.mock('../../../hooks/useTranslation', () => ({
+  useTranslation: () => ({
+    t: (key: string, fallback?: string) => {
+      // Return fallback or key for testing
+      if (fallback) return fallback;
+      
+      // Map some common keys to expected values
+      const translations: Record<string, string> = {
+        'calendar:filters.searchPlaceholder': 'Search events by title or description...',
+        'calendar:filters.filters': 'Filters',
+        'calendar:filters.clearAll': 'Clear All',
+        'calendar:filters.advancedFilters': 'Advanced Filters',
+        'calendar:filters.startDate': 'Start Date',
+        'calendar:filters.endDate': 'End Date',
+        'calendar:filters.eventType': 'Event Type',
+        'calendar:filters.status': 'Status',
+        'calendar:filters.allTypes': 'All Types',
+        'calendar:filters.allStatuses': 'All Statuses',
+        'calendar:filters.tasks': 'Tasks',
+        'calendar:filters.projects': 'Projects',
+        'calendar:filters.plantCare': 'Plant Care',
+        'calendar:filters.customEvents': 'Custom Events',
+        'calendar:filters.pending': 'Pending',
+        'calendar:filters.completed': 'Completed',
+        'calendar:filters.cancelled': 'Cancelled',
+        'calendar:filters.filtersActive': 'filter',
+        'calendar:filters.filtersActiveMultiple': 'filters',
+        'calendar:filters.active': 'active',
+        'calendar:filters.clearAllFilters': 'Clear all filters',
+        'common:unknown': 'Unknown'
+      };
+      
+      return translations[key] || key;
+    }
+  })
+}));
+
 const mockOnFiltersChange = vi.fn();
 
 const renderCalendarFilters = (props = {}) => {
@@ -46,7 +84,7 @@ describe('CalendarFilters', () => {
     expect(screen.getByText('Tasks')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
     expect(screen.getByText('Plant Care')).toBeInTheDocument();
-    expect(screen.getByText('Custom')).toBeInTheDocument();
+    expect(screen.getByText('Custom Events')).toBeInTheDocument();
   });
 
   it('renders status filter buttons', () => {
@@ -309,7 +347,7 @@ describe('CalendarFilters', () => {
     const tasksButton = screen.getByText('Tasks');
     const projectsButton = screen.getByText('Projects');
     const plantCareButton = screen.getByText('Plant Care');
-    const customButton = screen.getByText('Custom');
+    const customButton = screen.getByText('Custom Events');
     
     // Check that each button has the correct color indicator
     expect(tasksButton.querySelector('.bg-blue-500')).toBeInTheDocument();

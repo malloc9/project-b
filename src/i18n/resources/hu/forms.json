@@ -14,7 +14,14 @@
     "period": "Időszak",
     "endDate": "Befejezés dátuma (opcionális)",
     "careTasks": "Gondozási feladatok",
-    "recurrence": "Ismétlődés"
+    "recurrence": "Ismétlődés",
+    "markAsCompleted": "Befejezettként jelölés",
+    "repeatThisTask": "Feladat ismétlése",
+    "startDate": "Kezdés dátuma",
+    "startTime": "Kezdés ideje",
+    "endTime": "Befejezés ideje",
+    "allDayEvent": "Egész napos esemény",
+    "notifications": "Értesítések"
   },
   "placeholders": {
     "enterTitle": "Adja meg a címet",
@@ -24,7 +31,11 @@
     "enterTaskTitle": "Adja meg a feladat címét",
     "selectDate": "Válasszon dátumot",
     "selectStatus": "Válasszon állapotot",
-    "optional": "Opcionális"
+    "optional": "Opcionális",
+    "careTaskExample": "pl. Növény öntözése, Trágyázás, Átültetés",
+    "careTaskDescription": "Opcionális: Adjon meg részleteket erről a gondozási feladatról...",
+    "enterEventTitle": "Adja meg az esemény címét",
+    "enterEventDescription": "Adja meg az esemény leírását (opcionális)"
   },
   "buttons": {
     "save": "Mentés",
@@ -50,7 +61,10 @@
     "invalidEmail": "Érvénytelen e-mail cím",
     "fieldRequired": "{{field}} megadása kötelező",
     "fieldTooLong": "{{field}} túl hosszú (maximum {{max}} karakter)",
-    "fieldTooShort": "{{field}} túl rövid (minimum {{min}} karakter)"
+    "fieldTooShort": "{{field}} túl rövid (minimum {{min}} karakter)",
+    "textExceedsMaxLength": "A szöveg túllépi a maximális {{max}} karakter hosszúságot",
+    "invalidDueDate": "Érvénytelen határidő",
+    "intervalRange": "Az intervallum {{min}} és {{max}} között kell legyen"
   },
   "status": {
     "notStarted": "Nem kezdődött el",
@@ -65,9 +79,42 @@
     "weekly": "Hetente",
     "monthly": "Havonta",
     "yearly": "Évente",
-    "days": "nap",
-    "weeks": "hét",
-    "months": "hónap",
-    "years": "év"
+    "days": "Nap(ok)",
+    "weeks": "Hét/Hetek",
+    "months": "Hónap(ok)",
+    "years": "Év(ek)"
+  },
+  "titles": {
+    "editCareTask": "Gondozási feladat szerkesztése",
+    "addCareTask": "Gondozási feladat hozzáadása",
+    "createTask": "Feladat létrehozása",
+    "updateTask": "Feladat frissítése",
+    "editPlant": "Növény szerkesztése",
+    "addNewPlant": "Új növény hozzáadása",
+    "createPlant": "Növény létrehozása",
+    "updatePlant": "Növény frissítése",
+    "editEvent": "Esemény szerkesztése",
+    "createEvent": "Esemény létrehozása",
+    "updateEvent": "Esemény frissítése"
+  },
+  "messages": {
+    "unsavedChanges": "Nem mentett változtatásai vannak. Biztosan megszakítja?",
+    "leaveEmptyToRepeat": "Hagyja üresen a végtelen ismétléshez",
+    "creating": "Létrehozás...",
+    "updating": "Frissítés...",
+    "updatePlantInfo": "Frissítse a növény adatait alább.",
+    "addPlantInfo": "Adjon hozzá egy új növényt a gyűjteményéhez. A növény létrehozása után feltölthet fotókat és gondozási feladatokat adhat hozzá.",
+    "speciesOptional": "Opcionális: A növényfaj tudományos vagy közönséges neve",
+    "describeYourPlant": "Írja le a növény helyét, gondozási igényeit vagy bármilyen megjegyzést",
+    "mustBeLoggedIn": "Be kell jelentkeznie a növények mentéséhez",
+    "failedToSavePlant": "A növény mentése sikertelen",
+    "failedToSaveEvent": "Az esemény mentése sikertelen. Kérjük, próbálja újra.",
+    "saving": "Mentés...",
+    "noNotificationsSet": "Nincsenek értesítések beállítva",
+    "minBefore": "perccel előtte"
+  },
+  "notifications": {
+    "inApp": "Alkalmazáson belül",
+    "browser": "Böngésző"
   }
 }

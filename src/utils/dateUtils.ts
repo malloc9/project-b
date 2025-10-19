@@ -3,10 +3,10 @@
  */
 
 /**
- * Format a date to a readable string
+ * Format a date to a readable string with locale support
  */
-export const formatDate = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
+export const formatDate = (date: Date, locale: string = 'en-US'): string => {
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
@@ -14,15 +14,18 @@ export const formatDate = (date: Date): string => {
 };
 
 /**
- * Format a date to include time
+ * Format a date to include time with locale support
  */
-export const formatDateTime = (date: Date): string => {
-  return new Intl.DateTimeFormat('en-US', {
+export const formatDateTime = (date: Date, locale: string = 'en-US'): string => {
+  const timeFormat = locale === 'hu-HU' ? { hour12: false } : { hour12: true };
+  
+  return new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    ...timeFormat
   }).format(date);
 };
 
@@ -34,35 +37,71 @@ export const formatDateForInput = (date: Date): string => {
 };
 
 /**
- * Get relative time string (e.g., "2 days ago", "in 3 hours")
+ * Get relative time string with localization support
+ * @param date - The date to compare
+ * @param t - Translation function
+ * @param locale - Locale for number formatting
  */
-export const getRelativeTime = (date: Date): string => {
+export const getRelativeTime = (
+  date: Date, 
+  t?: (key: string, options?: any) => string,
+  locale: string = 'en-US'
+): string => {
   const now = new Date();
   const diffInMs = date.getTime() - now.getTime();
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
   const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
 
-  if (Math.abs(diffInDays) >= 1) {
-    if (diffInDays > 0) {
-      return `in ${diffInDays} day${diffInDays > 1 ? 's' : ''}`;
+  // If translation function is not provided, fall back to English
+  if (!t) {
+    if (Math.abs(diffInDays) >= 1) {
+      if (diffInDays > 0) {
+        return `in ${diffInDays} day${diffInDays > 1 ? 's' : ''}`;
+      } else {
+        return `${Math.abs(diffInDays)} day${Math.abs(diffInDays) > 1 ? 's' : ''} ago`;
+      }
+    } else if (Math.abs(diffInHours) >= 1) {
+      if (diffInHours > 0) {
+        return `in ${diffInHours} hour${diffInHours > 1 ? 's' : ''}`;
+      } else {
+        return `${Math.abs(diffInHours)} hour${Math.abs(diffInHours) > 1 ? 's' : ''} ago`;
+      }
+    } else if (Math.abs(diffInMinutes) >= 1) {
+      if (diffInMinutes > 0) {
+        return `in ${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''}`;
+      } else {
+        return `${Math.abs(diffInMinutes)} minute${Math.abs(diffInMinutes) > 1 ? 's' : ''} ago`;
+      }
     } else {
-      return `${Math.abs(diffInDays)} day${Math.abs(diffInDays) > 1 ? 's' : ''} ago`;
+      return 'just now';
+    }
+  }
+
+  // Use translations when available
+  if (Math.abs(diffInDays) >= 1) {
+    const count = Math.abs(diffInDays);
+    if (diffInDays > 0) {
+      return t('calendar:relativeTime.inDays', { count, defaultValue: `in ${count} day${count > 1 ? 's' : ''}` });
+    } else {
+      return t('calendar:relativeTime.daysAgo', { count, defaultValue: `${count} day${count > 1 ? 's' : ''} ago` });
     }
   } else if (Math.abs(diffInHours) >= 1) {
+    const count = Math.abs(diffInHours);
     if (diffInHours > 0) {
-      return `in ${diffInHours} hour${diffInHours > 1 ? 's' : ''}`;
+      return t('calendar:relativeTime.inHours', { count, defaultValue: `in ${count} hour${count > 1 ? 's' : ''}` });
     } else {
-      return `${Math.abs(diffInHours)} hour${Math.abs(diffInHours) > 1 ? 's' : ''} ago`;
+      return t('calendar:relativeTime.hoursAgo', { count, defaultValue: `${count} hour${count > 1 ? 's' : ''} ago` });
     }
   } else if (Math.abs(diffInMinutes) >= 1) {
+    const count = Math.abs(diffInMinutes);
     if (diffInMinutes > 0) {
-      return `in ${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''}`;
+      return t('calendar:relativeTime.inMinutes', { count, defaultValue: `in ${count} minute${count > 1 ? 's' : ''}` });
     } else {
-      return `${Math.abs(diffInMinutes)} minute${Math.abs(diffInMinutes) > 1 ? 's' : ''} ago`;
+      return t('calendar:relativeTime.minutesAgo', { count, defaultValue: `${count} minute${count > 1 ? 's' : ''} ago` });
     }
   } else {
-    return 'just now';
+    return t('calendar:relativeTime.justNow', { defaultValue: 'just now' });
   }
 };
 
@@ -144,16 +183,23 @@ export const getDaysBetween = (startDate: Date, endDate: Date): number => {
 };
 
 /**
- * Format date for display with relative context
+ * Format date for display with relative context and localization support
+ * @param date - The date to format
+ * @param t - Translation function
+ * @param locale - Locale for date formatting
  */
-export const formatDateWithContext = (date: Date): string => {
+export const formatDateWithContext = (
+  date: Date, 
+  t?: (key: string, options?: any) => string,
+  locale: string = 'en-US'
+): string => {
   if (isToday(date)) {
-    return 'Today';
+    return t ? t('calendar:today', { defaultValue: 'Today' }) : 'Today';
   } else if (isTomorrow(date)) {
-    return 'Tomorrow';
+    return t ? t('calendar:tomorrow', { defaultValue: 'Tomorrow' }) : 'Tomorrow';
   } else if (isYesterday(date)) {
-    return 'Yesterday';
+    return t ? t('calendar:yesterday', { defaultValue: 'Yesterday' }) : 'Yesterday';
   } else {
-    return formatDate(date);
+    return formatDate(date, locale);
   }
 };

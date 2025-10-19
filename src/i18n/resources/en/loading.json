@@ -1,0 +1,14 @@
+{
+  "loading": "Loading...",
+  "loadingData": "Loading data...",
+  "pleaseWait": "Please wait",
+  "loadingCalendar": "Loading calendar...",
+  "loadingEvents": "Loading events...",
+  "loadingPlants": "Loading plants...",
+  "loadingProjects": "Loading projects...",
+  "loadingTasks": "Loading tasks...",
+  "initializing": "Initializing...",
+  "authenticating": "Authenticating...",
+  "synchronizing": "Synchronizing...",
+  "processing": "Processing..."
+}

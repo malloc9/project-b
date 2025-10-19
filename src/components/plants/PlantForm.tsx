@@ -84,7 +84,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
     e.preventDefault();
     
     if (!user) {
-      setErrors({ general: 'You must be logged in to save plants' });
+      setErrors({ general: t('forms:messages.mustBeLoggedIn') });
       return;
     }
 
@@ -131,7 +131,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
     } catch (err) {
       console.error('Error saving plant:', err);
       setErrors({ 
-        general: err instanceof Error ? err.message : 'Failed to save plant' 
+        general: err instanceof Error ? err.message : t('forms:messages.failedToSavePlant') 
       });
     } finally {
       setIsSubmitting(false);
@@ -140,7 +140,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
 
   const handleCancel = () => {
     if (isDirty) {
-      if (window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+      if (window.confirm(t('forms:messages.unsavedChanges'))) {
         onCancel?.();
       }
     } else {
@@ -152,12 +152,12 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
     <div className="bg-white border border-gray-200 rounded-lg p-6">
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-900">
-          {isEditing ? 'Edit Plant' : 'Add New Plant'}
+          {isEditing ? t('forms:titles.editPlant') : t('forms:titles.addNewPlant')}
         </h2>
         <p className="mt-1 text-sm text-gray-600">
           {isEditing 
-            ? 'Update your plant information below.'
-            : 'Add a new plant to your collection. You can upload photos and add care tasks after creating the plant.'
+            ? t('forms:messages.updatePlantInfo')
+            : t('forms:messages.addPlantInfo')
           }
         </p>
       </div>
@@ -214,7 +214,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             <p className="mt-1 text-sm text-red-600">{errors.species}</p>
           )}
           <p className="mt-1 text-xs text-gray-500">
-            Optional: Scientific or common name of the plant species
+            {t('forms:messages.speciesOptional')}
           </p>
         </div>
 
@@ -240,7 +240,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             <p className="mt-1 text-sm text-red-600">{errors.description}</p>
           )}
           <p className="mt-1 text-xs text-gray-500">
-            Describe your plant's location, care requirements, or any notes
+            {t('forms:messages.describeYourPlant')}
           </p>
         </div>
 
@@ -252,7 +252,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting}
           >
-            Cancel
+            {t('forms:buttons.cancel')}
           </button>
           <button
             type="submit"
@@ -261,8 +261,8 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
           >
             {isSubmitting && <LoadingSpinner size="sm" className="mr-2" />}
             {isSubmitting 
-              ? (isEditing ? 'Updating...' : 'Creating...') 
-              : (isEditing ? 'Update Plant' : 'Create Plant')
+              ? (isEditing ? t('forms:messages.updating') : t('forms:messages.creating')) 
+              : (isEditing ? t('forms:titles.updatePlant') : t('forms:titles.createPlant'))
             }
           </button>
         </div>

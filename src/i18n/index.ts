@@ -9,6 +9,11 @@ import huAuth from './resources/hu/auth.json';
 import huDashboard from './resources/hu/dashboard.json';
 import huForms from './resources/hu/forms.json';
 import huErrors from './resources/hu/errors.json';
+import huCalendar from './resources/hu/calendar.json';
+import huLoading from './resources/hu/loading.json';
+import huAccessibility from './resources/hu/accessibility.json';
+import huSystem from './resources/hu/system.json';
+import huPlants from './resources/hu/plants.json';
 
 import enCommon from './resources/en/common.json';
 import enNavigation from './resources/en/navigation.json';
@@ -16,6 +21,11 @@ import enAuth from './resources/en/auth.json';
 import enDashboard from './resources/en/dashboard.json';
 import enForms from './resources/en/forms.json';
 import enErrors from './resources/en/errors.json';
+import enCalendar from './resources/en/calendar.json';
+import enLoading from './resources/en/loading.json';
+import enAccessibility from './resources/en/accessibility.json';
+import enSystem from './resources/en/system.json';
+import enPlants from './resources/en/plants.json';
 
 // Translation resources organized by language and namespace
 const resources = {
@@ -26,6 +36,11 @@ const resources = {
     dashboard: huDashboard,
     forms: huForms,
     errors: huErrors,
+    calendar: huCalendar,
+    loading: huLoading,
+    accessibility: huAccessibility,
+    system: huSystem,
+    plants: huPlants,
   },
   en: {
     common: enCommon,
@@ -34,6 +49,11 @@ const resources = {
     dashboard: enDashboard,
     forms: enForms,
     errors: enErrors,
+    calendar: enCalendar,
+    loading: enLoading,
+    accessibility: enAccessibility,
+    system: enSystem,
+    plants: enPlants,
   },
 };
 
@@ -145,7 +165,7 @@ i18n
     
     // Namespace configuration
     defaultNS: 'common',
-    ns: ['common', 'navigation', 'auth', 'dashboard', 'forms', 'errors'],
+    ns: ['common', 'navigation', 'auth', 'dashboard', 'forms', 'errors', 'calendar', 'loading', 'accessibility', 'system', 'plants'],
     
     // Interpolation configuration with error handling
     interpolation: {

@@ -48,5 +48,6 @@
   "appDescription": "Háztartás kezelő alkalmazás növények, projektek és feladatok nyomon követésére",
   "appKeywords": "háztartás, kezelés, növények, projektek, feladatok, otthon",
   "invalidDate": "Érvénytelen dátum",
-  "invalidTime": "Érvénytelen idő"
+  "invalidTime": "Érvénytelen idő",
+  "uploadPhoto": "Fotó Feltöltése"
 }

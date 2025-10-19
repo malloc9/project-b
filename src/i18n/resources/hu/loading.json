@@ -1,0 +1,14 @@
+{
+  "loading": "Betöltés...",
+  "loadingData": "Adatok betöltése...",
+  "pleaseWait": "Kérjük várjon",
+  "loadingCalendar": "Naptár betöltése...",
+  "loadingEvents": "Események betöltése...",
+  "loadingPlants": "Növények betöltése...",
+  "loadingProjects": "Projektek betöltése...",
+  "loadingTasks": "Feladatok betöltése...",
+  "initializing": "Inicializálás...",
+  "authenticating": "Hitelesítés...",
+  "synchronizing": "Szinkronizálás...",
+  "processing": "Feldolgozás..."
+}

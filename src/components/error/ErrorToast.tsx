@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AppError } from '../../types/errors';
 import { getErrorMessage } from '../../types/errors';
 
@@ -20,6 +21,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
   autoCloseDelay = 5000,
   position = 'top-right'
 }) => {
+  const { t } = useTranslation(['accessibility', 'errors']);
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
@@ -104,7 +106,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
           
           <div className="ml-3 w-0 flex-1">
             <p className="text-sm font-medium text-gray-900">
-              Error
+              {t('accessibility:error')}
             </p>
             <p className="mt-1 text-sm text-gray-700">
               {getErrorMessage(error)}
@@ -123,7 +125,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
               onClick={handleClose}
               className="inline-flex text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-600 transition-colors"
             >
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{t('accessibility:close')}</span>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>

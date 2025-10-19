@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 interface PhotoUploadModalProps {
   onUpload: (file: File, description?: string) => Promise<void>;
@@ -8,6 +9,7 @@ interface PhotoUploadModalProps {
 }
 
 export function PhotoUploadModal({ onUpload, onClose, isUploading }: PhotoUploadModalProps) {
+  const { t } = useTranslation(['loading', 'common']);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [description, setDescription] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -230,7 +232,7 @@ export function PhotoUploadModal({ onUpload, onClose, isUploading }: PhotoUpload
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isUploading && <LoadingSpinner size="sm" className="mr-2" />}
-                {isUploading ? 'Uploading...' : 'Upload Photo'}
+                {isUploading ? t('loading:processing', { defaultValue: 'Uploading...' }) : t('common:uploadPhoto', { defaultValue: 'Upload Photo' })}
               </button>
             </div>
           </form>

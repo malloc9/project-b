@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { CalendarEvent } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface VirtualEventListProps {
   events: CalendarEvent[];
@@ -27,6 +28,7 @@ export function VirtualEventList({
   className = '',
   overscan = 5
 }: VirtualEventListProps) {
+  const { language, t } = useTranslation();
   const [scrollTop, setScrollTop] = useState(0);
   const scrollElementRef = useRef<HTMLDivElement>(null);
 
@@ -82,7 +84,8 @@ export function VirtualEventList({
     };
 
     const formatDate = (date: Date) => {
-      return date.toLocaleDateString('en-US', {
+      const locale = language === 'hu' ? 'hu-HU' : 'en-US';
+      return date.toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric',
         hour: event.allDay ? undefined : 'numeric',
@@ -174,8 +177,8 @@ export function VirtualEventList({
           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No events</h3>
-          <p className="mt-1 text-sm text-gray-500">No events found for the selected criteria.</p>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('calendar:virtualEventList.noEvents')}</h3>
+          <p className="mt-1 text-sm text-gray-500">{t('calendar:virtualEventList.noEventsDescription')}</p>
         </div>
       </div>
     );
@@ -312,12 +315,14 @@ export function VirtualListPerformanceMonitor({
     return null;
   }
 
+  const { t } = useTranslation();
+
   return (
     <div className="text-xs text-gray-500 p-2 bg-gray-50 border-t">
-      <div>Total Events: {events.length}</div>
-      <div>Visible: {visibleCount}</div>
-      <div>Render Time: {renderTime.toFixed(2)}ms</div>
-      <div>Performance: {events.length > 1000 ? 'Virtual scrolling active' : 'Standard rendering'}</div>
+      <div>{t('calendar:virtualEventList.totalEvents')}: {events.length}</div>
+      <div>{t('calendar:virtualEventList.visible')}: {visibleCount}</div>
+      <div>{t('calendar:virtualEventList.renderTime')}: {renderTime.toFixed(2)}ms</div>
+      <div>{t('calendar:virtualEventList.performance')}: {events.length > 1000 ? t('calendar:virtualEventList.virtualScrollingActive') : t('calendar:virtualEventList.standardRendering')}</div>
     </div>
   );
 }

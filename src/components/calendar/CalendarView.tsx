@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import type { CalendarEvent } from '../../types';
 import { getEventsForDateRange } from '../../services/calendarService';
@@ -30,6 +31,7 @@ export function CalendarView({
   selectedDate,
   className = '' 
 }: CalendarViewProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -171,22 +173,28 @@ export function CalendarView({
   }, []);
 
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    t('calendar:monthNames.january'), t('calendar:monthNames.february'), t('calendar:monthNames.march'), 
+    t('calendar:monthNames.april'), t('calendar:monthNames.may'), t('calendar:monthNames.june'),
+    t('calendar:monthNames.july'), t('calendar:monthNames.august'), t('calendar:monthNames.september'), 
+    t('calendar:monthNames.october'), t('calendar:monthNames.november'), t('calendar:monthNames.december')
   ];
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayNames = [
+    t('calendar:dayNames.sunday'), t('calendar:dayNames.monday'), t('calendar:dayNames.tuesday'), 
+    t('calendar:dayNames.wednesday'), t('calendar:dayNames.thursday'), t('calendar:dayNames.friday'), 
+    t('calendar:dayNames.saturday')
+  ];
 
   if (error) {
     return (
       <div className={`bg-red-50 border border-red-200 rounded-md p-4 ${className}`}>
-        <div className="text-red-800 text-sm font-medium">Error loading calendar</div>
+        <div className="text-red-800 text-sm font-medium">{t('calendar:calendarView.errorLoading')}</div>
         <div className="text-red-700 text-sm mt-1">{error}</div>
         <button
           onClick={() => window.location.reload()}
           className="mt-2 bg-red-100 hover:bg-red-200 px-3 py-1 rounded text-sm text-red-800"
         >
-          Retry
+          {t('calendar:dayView.retry')}
         </button>
       </div>
     );
@@ -199,7 +207,7 @@ export function CalendarView({
         <button
           onClick={() => navigateMonth('prev')}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Previous month"
+          aria-label={t('calendar:calendarView.previousMonth')}
         >
           <svg className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -213,7 +221,7 @@ export function CalendarView({
         <button
           onClick={() => navigateMonth('next')}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Next month"
+          aria-label={t('calendar:calendarView.nextMonth')}
         >
           <ChevronRightIcon className="h-5 w-5 text-gray-600" />
         </button>
@@ -272,7 +280,7 @@ export function CalendarView({
               {/* Show "+N more" if there are more than 3 events */}
               {day.events.length > 3 && (
                 <div className="text-xs text-gray-500 px-2">
-                  +{day.events.length - 3} more
+                  {t('calendar:calendarView.moreEvents', { count: day.events.length - 3 })}
                 </div>
               )}
             </div>

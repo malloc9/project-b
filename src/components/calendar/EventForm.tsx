@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from '../../hooks/useTranslation';
 import type { CalendarEvent, CreateCalendarEventData, NotificationSettings } from '../../types';
 import { createEvent, updateEvent, validateEventData } from '../../services/calendarService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -30,6 +31,7 @@ export function EventForm({
   onEventSaved,
   initialDate 
 }: EventFormProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -208,7 +210,7 @@ export function EventForm({
       onClose();
     } catch (err) {
       console.error('Error saving event:', err);
-      setErrors({ form: ['Failed to save event. Please try again.'] });
+      setErrors({ form: [t('forms:messages.failedToSaveEvent')] });
     } finally {
       setIsSubmitting(false);
     }
@@ -222,12 +224,12 @@ export function EventForm({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-lg font-semibold text-gray-900">
-            {event ? 'Edit Event' : 'Create Event'}
+            {event ? t('forms:titles.editEvent') : t('forms:titles.createEvent')}
           </h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            aria-label="Close modal"
+            aria-label={t('accessibility:close')}
           >
             <XMarkIcon className="h-5 w-5 text-gray-500" />
           </button>
@@ -249,7 +251,7 @@ export function EventForm({
           {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              Title *
+              {t('forms:labels.title')} *
             </label>
             <input
               type="text"
@@ -260,7 +262,7 @@ export function EventForm({
                 w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                 ${errors.title ? 'border-red-300' : 'border-gray-300'}
               `}
-              placeholder="Enter event title"
+              placeholder={t('forms:placeholders.enterEventTitle')}
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-600">{errors.title[0]}</p>
@@ -270,7 +272,7 @@ export function EventForm({
           {/* Description */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Description
+              {t('forms:labels.description')}
             </label>
             <textarea
               id="description"
@@ -278,7 +280,7 @@ export function EventForm({
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter event description (optional)"
+              placeholder={t('forms:placeholders.enterEventDescription')}
             />
           </div>
 
@@ -292,7 +294,7 @@ export function EventForm({
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
             <label htmlFor="allDay" className="ml-2 block text-sm text-gray-700">
-              All day event
+              {t('forms:labels.allDayEvent')}
             </label>
           </div>
 
@@ -300,7 +302,7 @@ export function EventForm({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date *
+                {t('forms:labels.startDate')} *
               </label>
               <input
                 type="date"
@@ -320,7 +322,7 @@ export function EventForm({
             {!formData.allDay && (
               <div>
                 <label htmlFor="startTime" className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Time
+                  {t('forms:labels.startTime')}
                 </label>
                 <input
                   type="time"
@@ -337,7 +339,7 @@ export function EventForm({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
-                End Date *
+                {t('forms:labels.endDate')} *
               </label>
               <input
                 type="date"
@@ -357,7 +359,7 @@ export function EventForm({
             {!formData.allDay && (
               <div>
                 <label htmlFor="endTime" className="block text-sm font-medium text-gray-700 mb-1">
-                  End Time
+                  {t('forms:labels.endTime')}
                 </label>
                 <input
                   type="time"
@@ -374,7 +376,7 @@ export function EventForm({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700">
-                Notifications
+                {t('forms:labels.notifications')}
               </label>
               <button
                 type="button"
@@ -382,12 +384,12 @@ export function EventForm({
                 className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200"
               >
                 <PlusIcon className="h-3 w-3 mr-1" />
-                Add
+                {t('forms:buttons.add')}
               </button>
             </div>
             
             {formData.notifications.length === 0 ? (
-              <p className="text-sm text-gray-500">No notifications set</p>
+              <p className="text-sm text-gray-500">{t('forms:messages.noNotificationsSet')}</p>
             ) : (
               <div className="space-y-2">
                 {formData.notifications.map((notification, index) => (
@@ -397,8 +399,8 @@ export function EventForm({
                       onChange={(e) => updateNotification(index, 'type', e.target.value)}
                       className="text-sm border-gray-300 rounded"
                     >
-                      <option value="in_app">In-app</option>
-                      <option value="browser">Browser</option>
+                      <option value="in_app">{t('forms:notifications.inApp')}</option>
+                      <option value="browser">{t('forms:notifications.browser')}</option>
                     </select>
                     
                     <input
@@ -408,7 +410,7 @@ export function EventForm({
                       onChange={(e) => updateNotification(index, 'timing', parseInt(e.target.value))}
                       className="w-16 text-sm border-gray-300 rounded"
                     />
-                    <span className="text-sm text-gray-600">min before</span>
+                    <span className="text-sm text-gray-600">{t('forms:messages.minBefore')}</span>
                     
                     <input
                       type="checkbox"
@@ -441,7 +443,7 @@ export function EventForm({
               onClick={onClose}
               className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
-              Cancel
+              {t('forms:buttons.cancel')}
             </button>
             <button
               type="submit"
@@ -451,10 +453,10 @@ export function EventForm({
               {isSubmitting ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Saving...
+                  {t('forms:messages.saving')}
                 </div>
               ) : (
-                event ? 'Update Event' : 'Create Event'
+                event ? t('forms:titles.updateEvent') : t('forms:titles.createEvent')
               )}
             </button>
           </div>

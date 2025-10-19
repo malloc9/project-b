@@ -14,6 +14,7 @@ interface I18nContextType {
   error: string | null;
   supportedLanguages: LanguageConfig[];
   currentLanguageConfig: LanguageConfig | null;
+  recoverFromError: () => Promise<void>;
 }
 
 // Provider props interface
@@ -48,6 +49,44 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   // Get current language configuration
   const currentLanguageConfig = SUPPORTED_LANGUAGES.find(lang => lang.code === language) || null;
+
+  // Error recovery function
+  const recoverFromError = async () => {
+    try {
+      setError(null);
+      setIsLoading(true);
+
+      // Clear error handler log
+      i18nErrorHandler.clearErrorLog();
+
+      // Try to reinitialize i18n
+      if (!i18nInstance.isInitialized) {
+        await i18nInstance.init();
+      }
+
+      // Reload current language resources
+      await i18nInstance.reloadResources([language]);
+      
+      // Verify language is working
+      const testTranslation = i18nInstance.t('common:appTitle', { defaultValue: 'Test' });
+      if (testTranslation === 'Test') {
+        // If common namespace is not working, try to fallback to English
+        if (language !== 'en') {
+          console.warn('Current language resources not working, falling back to English');
+          await i18nInstance.changeLanguage('en');
+          setLanguage('en');
+          localStorage.setItem('i18nextLng', 'en');
+        }
+      }
+
+      setIsLoading(false);
+      console.log('Successfully recovered from i18n error');
+    } catch (recoveryErr) {
+      console.error('Failed to recover from i18n error:', recoveryErr);
+      setError(t('system:i18n.initializationFailed', { defaultValue: 'Failed to initialize internationalization' }));
+      setIsLoading(false);
+    }
+  };
 
   // Initialize i18n and handle loading states
   useEffect(() => {
@@ -122,7 +161,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         setIsLoading(false);
       } catch (err) {
         console.error('Failed to initialize i18n:', err);
-        setError('Failed to initialize internationalization');
+        setError(t('system:i18n.initializationFailed', { defaultValue: 'Failed to initialize internationalization' }));
         setIsLoading(false);
 
         // Fallback to Hungarian even if initialization fails
@@ -228,7 +267,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
       // Check if language is supported
       if (!SUPPORTED_LANGUAGES.some(lang => lang.code === normalizedLanguage)) {
-        throw new Error(`Unsupported language: ${normalizedLanguage}`);
+        throw new Error(t('system:i18n.unsupportedLanguage', { 
+          language: normalizedLanguage, 
+          defaultValue: `Unsupported language: ${normalizedLanguage}` 
+        }));
       }
 
       // Don't change if it's already the current language
@@ -263,7 +305,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       console.log(`Language changed from ${previousLanguage} to: ${normalizedLanguage}`);
     } catch (err) {
       console.error('Failed to change language:', err);
-      setError(`Failed to change language to ${newLanguage}`);
+      setError(t('system:i18n.languageChangeFailed', { 
+        language: newLanguage, 
+        defaultValue: `Failed to change language to ${newLanguage}` 
+      }));
 
       // Revert to previous language on error
       try {
@@ -303,35 +348,112 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     }
   };
 
-  // Enhanced translation function with error handling
+  // Enhanced translation function with error handling and better fallback mechanisms
   const translationFunction: TranslationFunction = (key: string, options = {}) => {
     try {
       // Check if i18n is ready before attempting translation
       if (!i18nInstance.isInitialized) {
         console.warn(`Translation attempted before i18n initialization: ${key}`);
+        // Log to error handler for tracking
+        i18nErrorHandler.logError(new Error(`Translation attempted before initialization: ${key}`), {
+          key,
+          language,
+          initialized: false
+        });
         return options.defaultValue || key;
+      }
+
+      // Check if the current language has the required namespace
+      const namespace = key.includes(':') ? key.split(':')[0] : 'common';
+      if (!i18nInstance.hasResourceBundle(language, namespace)) {
+        console.warn(`Missing resource bundle for ${language}:${namespace}`);
+        
+        // Try fallback language (English) if available
+        if (language !== 'en' && i18nInstance.hasResourceBundle('en', namespace)) {
+          const fallbackResult = i18nInstance.t(key, { ...options, lng: 'en' });
+          if (fallbackResult && fallbackResult !== key) {
+            console.info(`Using English fallback for key: ${key}`);
+            return typeof fallbackResult === 'string' ? fallbackResult : String(fallbackResult);
+          }
+        }
+        
+        // Log missing resource bundle
+        i18nErrorHandler.logError(new Error(`Missing resource bundle: ${language}:${namespace}`), {
+          key,
+          language,
+          namespace,
+          initialized: i18nInstance.isInitialized
+        });
+        
+        return options.defaultValue || (process.env.NODE_ENV === 'development' ? `[MISSING: ${key}]` : key);
       }
 
       const result = t(key, options);
 
       // Check if translation was successful
       if (result === key || !result) {
-        // Translation not found, return default or key
-        return options.defaultValue || (process.env.NODE_ENV === 'development' ? `[${key}]` : '');
+        // Translation key not found, try fallback strategies
+        console.warn(`Translation key not found: ${key}`);
+        
+        // Log missing translation key
+        i18nErrorHandler.logError(new Error(`Translation key not found: ${key}`), {
+          key,
+          language,
+          namespace,
+          initialized: i18nInstance.isInitialized
+        });
+
+        // Try fallback language (English) if current language is not English
+        if (language !== 'en') {
+          try {
+            const fallbackResult = i18nInstance.t(key, { ...options, lng: 'en' });
+            if (fallbackResult && fallbackResult !== key) {
+              console.info(`Using English fallback for missing key: ${key}`);
+              return typeof fallbackResult === 'string' ? fallbackResult : String(fallbackResult);
+            }
+          } catch (fallbackErr) {
+            console.warn(`Fallback translation also failed for key: ${key}`, fallbackErr);
+          }
+        }
+
+        // Return default value or formatted key for development
+        return options.defaultValue || (process.env.NODE_ENV === 'development' ? `[MISSING: ${key}]` : '');
       }
 
       // Ensure we always return a string
       return typeof result === 'string' ? result : String(result);
     } catch (err) {
-      console.warn(`Translation error for key "${key}":`, err);
+      console.error(`Translation error for key "${key}":`, err);
+      
+      // Log translation error
+      i18nErrorHandler.logError(err as Error, {
+        key,
+        language,
+        initialized: i18nInstance.isInitialized,
+        errorType: 'translation'
+      });
 
-      // Return the key itself as fallback in development
+      // Enhanced fallback strategy for errors
+      if (options.defaultValue) {
+        return options.defaultValue;
+      }
+
+      // Try to extract a meaningful fallback from the key
+      const keyParts = key.split(':');
+      const lastPart = keyParts[keyParts.length - 1];
+      const humanReadable = lastPart
+        .split('.')
+        .pop()
+        ?.replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase())
+        .trim();
+
+      // Return human-readable version in production, error indicator in development
       if (process.env.NODE_ENV === 'development') {
         return `[ERROR: ${key}]`;
       }
 
-      // Return default value or empty string in production
-      return options.defaultValue || '';
+      return humanReadable || '';
     }
   };
 
@@ -344,6 +466,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     error,
     supportedLanguages: SUPPORTED_LANGUAGES,
     currentLanguageConfig,
+    recoverFromError,
   };
 
   // Show loading state while initializing
@@ -352,7 +475,9 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">
+            {i18nInstance.isInitialized ? t('system:i18n.initializing', { defaultValue: 'Initializing language system...' }) : t('system:i18n.initializing', { defaultValue: 'Initializing language system...' })}
+          </p>
         </div>
       </div>
     );
@@ -363,13 +488,26 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center text-red-600">
-          <p className="mb-2">Failed to load language settings</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Retry
-          </button>
+          <p className="mb-4">{t('system:i18n.languageLoadFailed', { defaultValue: 'Failed to load language settings' })}</p>
+          <div className="space-y-2">
+            <button
+              onClick={recoverFromError}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 mr-2"
+            >
+              {t('system:i18n.retryLanguageLoad', { defaultValue: 'Retry Loading Languages' })}
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              {t('system:retry', { defaultValue: 'Reload Page' })}
+            </button>
+          </div>
+          {error && (
+            <p className="mt-2 text-sm text-gray-600">
+              {t('system:i18n.fallbackToDefault', { defaultValue: 'Falling back to default language' })}
+            </p>
+          )}
         </div>
       </div>
     );

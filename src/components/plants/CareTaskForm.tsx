@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { PlantCareTask, RecurrencePattern } from '../../types';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { format } from 'date-fns';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface CareTaskFormProps {
   task?: PlantCareTask | null;
@@ -27,6 +28,7 @@ interface FormErrors {
 }
 
 export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskFormProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FormData>({
     title: '',
     description: '',
@@ -78,23 +80,23 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
     const newErrors: FormErrors = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Task title is required';
+      newErrors.title = t('forms:validation.taskTitleRequired');
     } else if (formData.title.length > 100) {
-      newErrors.title = 'Title must be less than 100 characters';
+      newErrors.title = t('forms:validation.titleTooLong', { max: 100 });
     }
 
     if (!formData.dueDate) {
-      newErrors.dueDate = 'Due date is required';
+      newErrors.dueDate = t('forms:validation.dueDateRequired');
     } else {
       const dueDate = new Date(formData.dueDate);
       if (isNaN(dueDate.getTime())) {
-        newErrors.dueDate = 'Invalid due date';
+        newErrors.dueDate = t('forms:validation.invalidDueDate');
       }
     }
 
     if (hasRecurrence) {
       if (recurrenceData.interval < 1 || recurrenceData.interval > 365) {
-        newErrors.recurrence = 'Interval must be between 1 and 365';
+        newErrors.recurrence = t('forms:validation.intervalRange', { min: 1, max: 365 });
       }
     }
 
@@ -129,7 +131,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
 
   const handleCancel = () => {
     if (isDirty) {
-      if (window.confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+      if (window.confirm(t('forms:messages.unsavedChanges'))) {
         onCancel();
       }
     } else {
@@ -143,7 +145,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-semibold text-gray-900">
-              {isEditing ? 'Edit Care Task' : 'Add Care Task'}
+              {isEditing ? t('forms:titles.editCareTask') : t('forms:titles.addCareTask')}
             </h2>
             <button
               onClick={handleCancel}
@@ -160,14 +162,14 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
             {/* Task Title */}
             <div>
               <label htmlFor="task-title" className="block text-sm font-medium text-gray-700 mb-1">
-                Task Title *
+                {t('forms:labels.taskTitle')} *
               </label>
               <input
                 id="task-title"
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
-                placeholder="e.g., Water plant, Fertilize, Repot"
+                placeholder={t('forms:placeholders.careTaskExample')}
                 className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
                   errors.title
                     ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
@@ -183,14 +185,14 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
             {/* Description */}
             <div>
               <label htmlFor="task-description" className="block text-sm font-medium text-gray-700 mb-1">
-                Description
+                {t('forms:labels.description')}
               </label>
               <textarea
                 id="task-description"
                 rows={3}
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                placeholder="Optional: Add details about this care task..."
+                placeholder={t('forms:placeholders.careTaskDescription')}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                 disabled={isLoading}
               />
@@ -199,7 +201,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
             {/* Due Date */}
             <div>
               <label htmlFor="task-due-date" className="block text-sm font-medium text-gray-700 mb-1">
-                Due Date *
+                {t('forms:labels.dueDate')} *
               </label>
               <input
                 id="task-due-date"
@@ -229,7 +231,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
                     className="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
                     disabled={isLoading}
                   />
-                  <span className="ml-2 text-sm text-gray-700">Mark as completed</span>
+                  <span className="ml-2 text-sm text-gray-700">{t('forms:labels.markAsCompleted')}</span>
                 </label>
               </div>
             )}
@@ -244,7 +246,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
                   className="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50"
                   disabled={isLoading}
                 />
-                <span className="ml-2 text-sm font-medium text-gray-700">Repeat this task</span>
+                <span className="ml-2 text-sm font-medium text-gray-700">{t('forms:labels.repeatThisTask')}</span>
               </label>
 
               {hasRecurrence && (
@@ -252,7 +254,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="recurrence-interval" className="block text-sm font-medium text-gray-700 mb-1">
-                        Every
+                        {t('forms:labels.every')}
                       </label>
                       <input
                         id="recurrence-interval"
@@ -268,7 +270,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
 
                     <div>
                       <label htmlFor="recurrence-type" className="block text-sm font-medium text-gray-700 mb-1">
-                        Period
+                        {t('forms:labels.period')}
                       </label>
                       <select
                         id="recurrence-type"
@@ -277,17 +279,17 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
                         className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                         disabled={isLoading}
                       >
-                        <option value="daily">Day(s)</option>
-                        <option value="weekly">Week(s)</option>
-                        <option value="monthly">Month(s)</option>
-                        <option value="yearly">Year(s)</option>
+                        <option value="daily">{t('forms:recurrence.days')}</option>
+                        <option value="weekly">{t('forms:recurrence.weeks')}</option>
+                        <option value="monthly">{t('forms:recurrence.months')}</option>
+                        <option value="yearly">{t('forms:recurrence.years')}</option>
                       </select>
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="recurrence-end-date" className="block text-sm font-medium text-gray-700 mb-1">
-                      End Date (optional)
+                      {t('forms:labels.endDate')}
                     </label>
                     <input
                       id="recurrence-end-date"
@@ -298,7 +300,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
                       disabled={isLoading}
                     />
                     <p className="mt-1 text-xs text-gray-500">
-                      Leave empty to repeat indefinitely
+                      {t('forms:messages.leaveEmptyToRepeat')}
                     </p>
                   </div>
 
@@ -317,7 +319,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
                 disabled={isLoading}
                 className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Cancel
+                {t('forms:buttons.cancel')}
               </button>
               <button
                 type="submit"
@@ -326,8 +328,8 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
               >
                 {isLoading && <LoadingSpinner size="sm" className="mr-2" />}
                 {isLoading 
-                  ? (isEditing ? 'Updating...' : 'Creating...') 
-                  : (isEditing ? 'Update Task' : 'Create Task')
+                  ? (isEditing ? t('forms:messages.updating') : t('forms:messages.creating')) 
+                  : (isEditing ? t('forms:titles.updateTask') : t('forms:titles.createTask'))
                 }
               </button>
             </div>
