@@ -136,24 +136,69 @@ export const subtractDays = (date: Date, days: number): Date => {
 };
 
 /**
+
  * Get days between two dates
+
  */
+
 export const getDaysBetween = (startDate: Date, endDate: Date): number => {
+
   const diffInMs = endDate.getTime() - startDate.getTime();
+
   return Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
 };
 
+
+
 /**
- * Format date for display with relative context
+
+ * Check if a given date falls within the next N days (inclusive of today).
+
  */
+
+export const isWithinNextNDays = (date: Date, n: number): boolean => {
+
+  const now = new Date(); // Capture current time once
+
+  const nowStartOfDay = getStartOfDay(now);
+
+  const targetStartOfDay = getStartOfDay(date);
+
+  const endWindowStartOfDay = getStartOfDay(addDays(nowStartOfDay, n - 1));
+
+
+
+  return targetStartOfDay.getTime() >= nowStartOfDay.getTime() && targetStartOfDay.getTime() <= endWindowStartOfDay.getTime();
+
+};
+
+
+
+/**
+
+ * Format date for display with relative context
+
+ */
+
 export const formatDateWithContext = (date: Date): string => {
+
   if (isToday(date)) {
+
     return 'Today';
+
   } else if (isTomorrow(date)) {
+
     return 'Tomorrow';
+
   } else if (isYesterday(date)) {
+
     return 'Yesterday';
+
   } else {
+
     return formatDate(date);
+
   }
+
 };
