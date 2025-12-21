@@ -8,7 +8,7 @@ This plan outlines the steps to transform the dashboard into a dynamic and usefu
 
 ### Tasks
 
-- [ ] Task: Conductor - Write failing tests for "This Week" stat logic.
+- [x] Task: Conductor - Write failing tests for "This Week" stat logic. [700d6b0]
 - [ ] Task: Conductor - Implement logic to calculate and display the "This Week" stat.
 - [ ] Task: Conductor - User Manual Verification 'Implement "This Week" Stat' (Protocol in workflow.md)
 
