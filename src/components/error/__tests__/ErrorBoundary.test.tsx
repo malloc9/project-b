@@ -110,7 +110,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('uses custom fallback when provided', () => {
-    const customFallback = (error: any, retry: () => void) => (
+    const customFallback = (error: Error, retry: () => void) => (
       <div>
         <h1>Custom Error Display</h1>
         <p>{error.message}</p>

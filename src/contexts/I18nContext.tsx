@@ -26,6 +26,7 @@ interface I18nProviderProps {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 // Custom hook to use the I18n context
+// eslint-disable-next-line react-refresh/only-export-components
 export const useI18nContext = (): I18nContextType => {
   const context = useContext(I18nContext);
   if (context === undefined) {
