@@ -1,13 +1,16 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, MockedFunction } from 'vitest';
 import { EventForm } from '../EventForm';
 import { useAuth } from '../../../contexts/AuthContext';
 import * as calendarService from '../../../services/calendarService';
+import { User } from '../../../types';
 
 // Mock the auth context
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: vi.fn()
 }));
+
+const mockedUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 // Mock the calendar service
 vi.mock('../../../services/calendarService', () => ({
@@ -16,7 +19,7 @@ vi.mock('../../../services/calendarService', () => ({
   validateEventData: vi.fn(() => [])
 }));
 
-const mockUser = {
+const mockUser: User = {
   uid: 'test-user-id',
   email: 'test@example.com',
   displayName: 'Test User',
@@ -44,7 +47,7 @@ describe('EventForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAuth as any).mockReturnValue({ user: mockUser });
+    mockedUseAuth.mockReturnValue({ user: mockUser, loading: false, login: vi.fn(), logout: vi.fn(), resetPassword: vi.fn() });
   });
 
   it('renders create event form when no event is provided', () => {

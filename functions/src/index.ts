@@ -52,7 +52,6 @@ export const onUserCreate = onDocumentCreated("users/{userId}", async (event) =>
 export const onUserUpdate = onDocumentUpdated("users/{userId}", async (event) => {
   const beforeData = event.data?.before.data();
   const afterData = event.data?.after.data();
-  const userId = event.params.userId;
   
   // Update last active timestamp if user data changed
   if (beforeData && afterData && JSON.stringify(beforeData) !== JSON.stringify(afterData)) {

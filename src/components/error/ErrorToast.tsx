@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AppError } from '../../types/errors';
 import { getErrorMessage } from '../../types/errors';
@@ -31,6 +31,13 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
+  const handleClose = useCallback(() => {
+    setIsLeaving(true);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Match animation duration
+  }, [onClose]);
+
   useEffect(() => {
     if (autoClose && autoCloseDelay > 0) {
       const timer = setTimeout(() => {
@@ -39,14 +46,7 @@ export const ErrorToast: React.FC<ErrorToastProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [autoClose, autoCloseDelay]);
-
-  const handleClose = () => {
-    setIsLeaving(true);
-    setTimeout(() => {
-      onClose();
-    }, 300); // Match animation duration
-  };
+  }, [autoClose, autoCloseDelay, handleClose]);
 
   const positionClasses = {
     'top-right': 'top-4 right-4',

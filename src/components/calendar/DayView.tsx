@@ -41,7 +41,6 @@ export function DayView({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [newEventStart, setNewEventStart] = useState<Date | null>(null);
   const [newEventEnd, setNewEventEnd] = useState<Date | null>(null);
@@ -180,7 +179,7 @@ export function DayView({
     };
 
     loadEvents();
-  }, [user, selectedDate]);
+  }, [user, selectedDate, t]);
 
   const navigateDay = (direction: 'prev' | 'next') => {
     const newDate = new Date(selectedDate);
@@ -259,21 +258,12 @@ export function DayView({
     
     if (!timelineRef.current) return;
 
-    const rect = timelineRef.current.getBoundingClientRect();
     setDraggedEvent(event);
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = () => {
     if (!draggedEvent || !timelineRef.current) return;
 
-    const rect = timelineRef.current.getBoundingClientRect();
-    const y = e.clientY - rect.top - dragOffset.y;
-    const percentage = Math.max(0, Math.min(100, (y / rect.height) * 100));
-    
     // Update visual feedback here if needed
     // For now, we'll handle the actual update on mouse up
   };

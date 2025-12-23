@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { vi, MockedFunction } from 'vitest';
 import { CalendarSummary } from '../CalendarSummary';
 import { useAuth } from '../../../contexts/AuthContext';
 import { getEventsForDate, getUpcomingEvents, getOverdueEvents } from '../../../services/calendarService';
+import { CalendarEvent, User } from '../../../types';
 
 // Mock the auth context
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -16,15 +17,20 @@ vi.mock('../../../services/calendarService', () => ({
   getOverdueEvents: vi.fn()
 }));
 
+const mockedUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockedGetEventsForDate = getEventsForDate as MockedFunction<typeof getEventsForDate>;
+const mockedGetUpcomingEvents = getUpcomingEvents as MockedFunction<typeof getUpcomingEvents>;
+const mockedGetOverdueEvents = getOverdueEvents as MockedFunction<typeof getOverdueEvents>;
+
 describe('CalendarSummary', () => {
-  const mockUser = { uid: 'test-user-id', email: 'test@example.com' };
+  const mockUser: User = { uid: 'test-user-id', email: 'test@example.com', createdAt: new Date() };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAuth as any).mockReturnValue({ user: mockUser });
-    (getEventsForDate as any).mockResolvedValue([]);
-    (getUpcomingEvents as any).mockResolvedValue([]);
-    (getOverdueEvents as any).mockResolvedValue([]);
+    mockedUseAuth.mockReturnValue({ user: mockUser, loading: false, login: vi.fn(), logout: vi.fn(), resetPassword: vi.fn() });
+    mockedGetEventsForDate.mockResolvedValue([]);
+    mockedGetUpcomingEvents.mockResolvedValue([]);
+    mockedGetOverdueEvents.mockResolvedValue([]);
   });
 
   it('renders loading state initially', () => {
@@ -45,19 +51,23 @@ describe('CalendarSummary', () => {
   });
 
   it('renders today events', async () => {
-    const todayEvents = [
+    const todayEvents: CalendarEvent[] = [
       {
         id: '1',
+        userId: 'test-user-id',
         title: 'Morning Meeting',
         startDate: new Date(),
         endDate: new Date(),
         allDay: false,
         type: 'custom' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ];
 
-    (getEventsForDate as any).mockResolvedValue(todayEvents);
+    mockedGetEventsForDate.mockResolvedValue(todayEvents);
 
     render(<CalendarSummary />);
 
@@ -68,19 +78,23 @@ describe('CalendarSummary', () => {
   });
 
   it('renders upcoming events', async () => {
-    const upcomingEvents = [
+    const upcomingEvents: CalendarEvent[] = [
       {
         id: '2',
+        userId: 'test-user-id',
         title: 'Project Deadline',
         startDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
         endDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
         allDay: true,
         type: 'project' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ];
 
-    (getUpcomingEvents as any).mockResolvedValue(upcomingEvents);
+    mockedGetUpcomingEvents.mockResolvedValue(upcomingEvents);
 
     render(<CalendarSummary />);
 
@@ -91,19 +105,23 @@ describe('CalendarSummary', () => {
   });
 
   it('renders overdue events', async () => {
-    const overdueEvents = [
+    const overdueEvents: CalendarEvent[] = [
       {
         id: '3',
+        userId: 'test-user-id',
         title: 'Overdue Task',
         startDate: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
         endDate: new Date(Date.now() - 24 * 60 * 60 * 1000),
         allDay: false,
         type: 'task' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ];
 
-    (getOverdueEvents as any).mockResolvedValue(overdueEvents);
+    mockedGetOverdueEvents.mockResolvedValue(overdueEvents);
 
     render(<CalendarSummary />);
 
@@ -114,7 +132,7 @@ describe('CalendarSummary', () => {
   });
 
   it('renders error state when service fails', async () => {
-    (getEventsForDate as any).mockRejectedValue(new Error('Service error'));
+    mockedGetEventsForDate.mockRejectedValue(new Error('Service error'));
 
     render(<CalendarSummary />);
 
@@ -133,28 +151,36 @@ describe('CalendarSummary', () => {
   });
 
   it('displays correct event type colors and icons', async () => {
-    const events = [
+    const events: CalendarEvent[] = [
       {
         id: '1',
+        userId: 'test-user-id',
         title: 'Task Event',
         startDate: new Date(),
         endDate: new Date(),
         allDay: false,
         type: 'task' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: '2',
+        userId: 'test-user-id',
         title: 'Plant Care',
         startDate: new Date(),
         endDate: new Date(),
         allDay: false,
         type: 'plant_care' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ];
 
-    (getEventsForDate as any).mockResolvedValue(events);
+    mockedGetEventsForDate.mockResolvedValue(events);
 
     render(<CalendarSummary />);
 
@@ -167,28 +193,36 @@ describe('CalendarSummary', () => {
   });
 
   it('formats event times correctly', async () => {
-    const events = [
+    const events: CalendarEvent[] = [
       {
         id: '1',
+        userId: 'test-user-id',
         title: 'Timed Event',
         startDate: new Date('2024-01-15T09:30:00'),
         endDate: new Date('2024-01-15T10:30:00'),
         allDay: false,
         type: 'custom' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
       {
         id: '2',
+        userId: 'test-user-id',
         title: 'All Day Event',
         startDate: new Date('2024-01-15T00:00:00'),
         endDate: new Date('2024-01-15T23:59:59'),
         allDay: true,
         type: 'custom' as const,
-        status: 'pending' as const
+        status: 'pending' as const,
+        notifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
     ];
 
-    (getEventsForDate as any).mockResolvedValue(events);
+    mockedGetEventsForDate.mockResolvedValue(events);
 
     render(<CalendarSummary />);
 
@@ -200,7 +234,7 @@ describe('CalendarSummary', () => {
   });
 
   it('does not render when user is not authenticated', () => {
-    (useAuth as any).mockReturnValue({ user: null });
+    mockedUseAuth.mockReturnValue({ user: null, loading: false, login: vi.fn(), logout: vi.fn(), resetPassword: vi.fn() });
 
     render(<CalendarSummary />);
 

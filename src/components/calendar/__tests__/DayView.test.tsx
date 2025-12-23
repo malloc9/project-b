@@ -95,8 +95,7 @@ const renderDayView = (props = {}) => {
 describe('DayView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    const { getEventsForDate } = require('../../../services/calendarService');
-    getEventsForDate.mockResolvedValue(mockEvents);
+    mockedGetEventsForDate.mockResolvedValue(mockEvents);
   });
 
   it('renders day view with correct date header', async () => {
@@ -194,8 +193,7 @@ describe('DayView', () => {
   });
 
   it('handles loading state', () => {
-    const { getEventsForDate } = require('../../../services/calendarService');
-    getEventsForDate.mockImplementation(() => new Promise(() => {})); // Never resolves
+    mockedGetEventsForDate.mockImplementation(() => new Promise(() => {})); // Never resolves
     
     renderDayView();
     
@@ -204,8 +202,7 @@ describe('DayView', () => {
   });
 
   it('handles error state', async () => {
-    const { getEventsForDate } = require('../../../services/calendarService');
-    getEventsForDate.mockRejectedValue(new Error('Failed to load events'));
+    mockedGetEventsForDate.mockRejectedValue(new Error('Failed to load events'));
     
     renderDayView();
     
@@ -230,8 +227,8 @@ describe('DayView', () => {
   });
 
   it('creates quick event when Add Event button is clicked', async () => {
-    const { createEvent } = require('../../../services/calendarService');
-    createEvent.mockResolvedValue({
+    const { createEvent } = await import('../../../services/calendarService');
+    (createEvent as MockedFunction<typeof createEvent>).mockResolvedValue({
       id: 'new-event',
       ...mockEvents[0],
       title: 'New Event'
@@ -249,10 +246,9 @@ describe('DayView', () => {
   });
 
   it('loads events when selectedDate changes', async () => {
-    const { getEventsForDate } = require('../../../services/calendarService');
     const { rerender } = renderDayView();
     
-    expect(getEventsForDate).toHaveBeenCalledWith('test-user-id', new Date('2024-01-15'));
+    expect(mockedGetEventsForDate).toHaveBeenCalledWith('test-user-id', new Date('2024-01-15'));
     
     // Change the selected date
     rerender(
@@ -262,12 +258,11 @@ describe('DayView', () => {
     );
     
     await waitFor(() => {
-      expect(getEventsForDate).toHaveBeenCalledWith('test-user-id', new Date('2024-01-16'));
+      expect(mockedGetEventsForDate).toHaveBeenCalledWith('test-user-id', new Date('2024-01-16'));
     });
   });
 
   it('does not load events when user is not authenticated', () => {
-    const { getEventsForDate } = require('../../../services/calendarService');
     const unauthenticatedContext = { ...mockAuthContext, user: null };
     
     render(
@@ -276,6 +271,6 @@ describe('DayView', () => {
       </AuthContext.Provider>
     );
     
-    expect(getEventsForDate).not.toHaveBeenCalled();
+    expect(mockedGetEventsForDate).not.toHaveBeenCalled();
   });
 });

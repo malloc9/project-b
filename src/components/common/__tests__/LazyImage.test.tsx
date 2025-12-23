@@ -18,7 +18,12 @@ Object.defineProperty(window, 'IntersectionObserver', {
 });
 
 // Mock Image constructor
-let mockImage: any;
+interface MockImage {
+  onload: (() => void) | null;
+  onerror: (() => void) | null;
+  src: string;
+}
+let mockImage: MockImage;
 
 Object.defineProperty(global, 'Image', {
   writable: true,

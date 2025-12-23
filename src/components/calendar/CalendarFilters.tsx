@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import type { CalendarEvent, CalendarFilters as CalendarFiltersType } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
+import { TFunction } from 'i18next';
 
 interface CalendarFiltersProps {
   onFiltersChange: (filters: CalendarFiltersType) => void;
@@ -36,7 +37,7 @@ export function CalendarFilters({
     onFiltersChange(filters);
   }, [filters, onFiltersChange]);
 
-  const handleFilterChange = (key: keyof CalendarFiltersType, value: any) => {
+  const handleFilterChange = (key: keyof CalendarFiltersType, value: CalendarFiltersType[keyof CalendarFiltersType]) => {
     setFilters(prev => ({
       ...prev,
       [key]: value === '' ? undefined : value
@@ -183,7 +184,7 @@ export function CalendarFilters({
               </label>
               <select
                 value={filters.type || ''}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
+                onChange={(e) => handleFilterChange('type', e.target.value as CalendarEvent['type'])}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('calendar:filters.allTypes', 'All Types')}</option>
@@ -201,7 +202,7 @@ export function CalendarFilters({
               </label>
               <select
                 value={filters.status || ''}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
+                onChange={(e) => handleFilterChange('status', e.target.value as CalendarEvent['status'])}
                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('calendar:filters.allStatuses', 'All Statuses')}</option>
@@ -257,7 +258,7 @@ function getTypeColor(type: CalendarEvent['type']): string {
   }
 }
 
-function getTypeLabel(type: CalendarEvent['type'], t: any): string {
+function getTypeLabel(type: CalendarEvent['type'], t: TFunction): string {
   switch (type) {
     case 'task':
       return t('calendar:filters.tasks', 'Tasks');
@@ -285,7 +286,7 @@ function getStatusIcon(status: CalendarEvent['status']): React.ReactNode {
   }
 }
 
-function getStatusLabel(status: CalendarEvent['status'], t: any): string {
+function getStatusLabel(status: CalendarEvent['status'], t: TFunction): string {
   switch (status) {
     case 'pending':
       return t('calendar:filters.pending', 'Pending');

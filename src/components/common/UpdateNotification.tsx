@@ -111,7 +111,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
         setUpdateError('Service worker health check failed. Try recovery.');
         setShowAdvancedOptions(true);
       }
-    } catch (error) {
+    } catch {
       setUpdateError('Health check failed. Try recovery.');
       setShowAdvancedOptions(true);
     }

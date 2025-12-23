@@ -113,7 +113,7 @@ export function EventForm({
     }));
   };
 
-  const updateNotification = (index: number, field: keyof NotificationSettings, value: any) => {
+  const updateNotification = (index: number, field: keyof NotificationSettings, value: NotificationSettings[keyof NotificationSettings]) => {
     setFormData(prev => ({
       ...prev,
       notifications: prev.notifications.map((notification, i) => 

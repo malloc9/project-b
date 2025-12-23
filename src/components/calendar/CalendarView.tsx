@@ -2,11 +2,9 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import type { CalendarEvent } from '../../types';
-import { getEventsForDateRange } from '../../services/calendarService';
 import { 
   getEventsForCalendarViewOptimized, 
-  prefetchAdjacentMonths,
-  invalidateEventCache 
+  prefetchAdjacentMonths
 } from '../../services/optimizedCalendarService';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -260,7 +258,7 @@ export function CalendarView({
 
             {/* Event Indicators */}
             <div className="space-y-1">
-              {day.events.slice(0, 3).map((event, eventIndex) => (
+              {day.events.slice(0, 3).map((event) => (
                 <div
                   key={event.id}
                   className={`

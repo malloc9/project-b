@@ -30,7 +30,7 @@ export function EventDetailsModal({
   onEdit,
   onEventUpdated 
 }: EventDetailsModalProps) {
-  const { t, language, formatDate: formatDateTranslation, formatTime } = useTranslation();
+  const { t, language, formatTime } = useTranslation();
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);

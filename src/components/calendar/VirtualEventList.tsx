@@ -66,8 +66,8 @@ export function VirtualEventList({
     setScrollTop(e.currentTarget.scrollTop);
   }, []);
 
-  // Default event renderer
-  const defaultRenderEvent = useCallback((event: CalendarEvent, index: number) => {
+    // Default event renderer
+  const defaultRenderEvent = useCallback((event: CalendarEvent) => {
     const getEventTypeColor = (type: CalendarEvent['type']) => {
       switch (type) {
         case 'task':
@@ -144,7 +144,7 @@ export function VirtualEventList({
         </div>
       </div>
     );
-  }, [onEventClick]);
+  }, [onEventClick, language]);
 
   // Scroll to specific event
   const scrollToEvent = useCallback((eventId: string) => {
@@ -207,7 +207,7 @@ export function VirtualEventList({
               paddingBottom: '8px'
             }}
           >
-            {renderEvent ? renderEvent(item.event, item.index) : defaultRenderEvent(item.event, item.index)}
+            {renderEvent ? renderEvent(item.event, item.index) : defaultRenderEvent(item.event)}
           </div>
         ))}
       </div>
@@ -216,6 +216,7 @@ export function VirtualEventList({
 }
 
 // Hook for managing virtual list state
+// eslint-disable-next-line react-refresh/only-export-components
 export function useVirtualEventList(
   events: CalendarEvent[],
   options: {
@@ -299,6 +300,7 @@ export function VirtualListPerformanceMonitor({
   events: CalendarEvent[]; 
   visibleCount: number; 
 }) {
+  const { t } = useTranslation();
   const [renderTime, setRenderTime] = useState(0);
 
   useEffect(() => {
@@ -314,8 +316,6 @@ export function VirtualListPerformanceMonitor({
   if (process.env.NODE_ENV !== 'development') {
     return null;
   }
-
-  const { t } = useTranslation();
 
   return (
     <div className="text-xs text-gray-500 p-2 bg-gray-50 border-t">

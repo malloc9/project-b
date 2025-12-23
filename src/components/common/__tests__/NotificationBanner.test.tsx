@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import NotificationBanner from '../NotificationBanner';
-import { NotificationService } from '../../../services/notificationService';
+import { NotificationService, InAppNotification } from '../../../services/notificationService';
 
 // Mock the NotificationService
 vi.mock('../../../services/notificationService', () => ({
@@ -15,7 +15,7 @@ vi.mock('../../../services/notificationService', () => ({
   }
 }));
 
-const mockNotificationService = NotificationService as any;
+const mockNotificationService = vi.mocked(NotificationService, true);
 
 describe('NotificationBanner', () => {
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should render notifications when they exist', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
@@ -51,7 +51,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should display different notification types with correct styling', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Error message',
@@ -94,7 +94,7 @@ describe('NotificationBanner', () => {
 
   it('should show timestamp for notifications', () => {
     const timestamp = new Date('2023-01-01T12:00:00Z');
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
@@ -112,7 +112,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should handle dismiss button click', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
@@ -133,7 +133,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should handle mark as read button click', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
@@ -154,7 +154,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should not show mark as read button for read notifications', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
@@ -172,7 +172,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should apply opacity to read notifications', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Read notification',
@@ -191,7 +191,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should limit displayed notifications to 5', () => {
-    const mockNotifications = Array.from({ length: 10 }, (_, i) => ({
+    const mockNotifications: InAppNotification[] = Array.from({ length: 10 }, (_, i) => ({
       id: `${i + 1}`,
       message: `Notification ${i + 1}`,
       type: 'info' as const,
@@ -213,7 +213,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should handle clear all button click', () => {
-    const mockNotifications = Array.from({ length: 10 }, (_, i) => ({
+    const mockNotifications: InAppNotification[] = Array.from({ length: 10 }, (_, i) => ({
       id: `${i + 1}`,
       message: `Notification ${i + 1}`,
       type: 'info' as const,
@@ -233,7 +233,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should listen for new notifications', async () => {
-    let addedCallback: (notification: any) => void = () => {};
+    let addedCallback: (notification: InAppNotification) => void = () => {};
     
     mockNotificationService.onInAppNotificationAdded.mockImplementation((callback) => {
       addedCallback = callback;
@@ -242,10 +242,10 @@ describe('NotificationBanner', () => {
     
     mockNotificationService.getInAppNotifications.mockReturnValue([]);
     
-    const { rerender } = render(<NotificationBanner />);
+    render(<NotificationBanner />);
     
     // Simulate new notification added
-    const newNotification = {
+    const newNotification: InAppNotification = {
       id: '1',
       message: 'New notification',
       type: 'info' as const,
@@ -268,7 +268,7 @@ describe('NotificationBanner', () => {
       return () => {};
     });
     
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
@@ -293,7 +293,7 @@ describe('NotificationBanner', () => {
   });
 
   it('should apply custom className', () => {
-    const mockNotifications = [
+    const mockNotifications: InAppNotification[] = [
       {
         id: '1',
         message: 'Test notification',
