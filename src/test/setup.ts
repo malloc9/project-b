@@ -185,3 +185,53 @@ vi.mock('../types/errors', () => ({
   })),
   getErrorMessage: vi.fn((error) => error.message || 'An unexpected error occurred'),
 }));
+
+// Mock translation hooks and context
+vi.mock('../hooks/useTranslation', () => {
+  const t = (key: string) => key;
+  return {
+    useTranslation: () => ({
+      t,
+      tCommon: t,
+      tNavigation: t,
+      tAuth: t,
+      tDashboard: t,
+      tForms: t,
+      tErrors: t,
+      formatDate: (date: Date | string) => new Date(date).toLocaleDateString(),
+      formatTime: (date: Date | string) => new Date(date).toLocaleTimeString(),
+      language: 'en',
+      changeLanguage: vi.fn(),
+      isLoading: false,
+      error: null,
+      supportedLanguages: [],
+      currentLanguageConfig: { code: 'en', name: 'English', flag: '🇺🇸' },
+      isRTL: false,
+    }),
+    useCommonTranslation: () => t,
+    useNavigationTranslation: () => t,
+    useAuthTranslation: () => t,
+    useDashboardTranslation: () => t,
+    useFormsTranslation: () => t,
+    useErrorsTranslation: () => t,
+    default: () => ({
+      t,
+      formatDate: (date: Date | string) => new Date(date).toLocaleDateString(),
+      formatTime: (date: Date | string) => new Date(date).toLocaleTimeString(),
+    }),
+  };
+});
+
+vi.mock('../contexts/I18nContext', () => ({
+  useI18nContext: () => ({
+    language: 'en',
+    changeLanguage: vi.fn(),
+    t: (key: string) => key,
+    isLoading: false,
+    error: null,
+    supportedLanguages: [],
+    currentLanguageConfig: { code: 'en', name: 'English', flag: '🇺🇸' },
+    recoverFromError: vi.fn(),
+  }),
+  I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
