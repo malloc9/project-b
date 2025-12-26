@@ -52,7 +52,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setIsDirty(true);
-    
+
     // Clear field error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -82,7 +82,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       setErrors({ general: t('forms:messages.mustBeLoggedIn') });
       return;
@@ -130,8 +130,8 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
       setIsDirty(false);
     } catch (err) {
       console.error('Error saving plant:', err);
-      setErrors({ 
-        general: err instanceof Error ? err.message : t('forms:messages.failedToSavePlant') 
+      setErrors({
+        general: err instanceof Error ? err.message : t('forms:messages.failedToSavePlant')
       });
     } finally {
       setIsSubmitting(false);
@@ -155,7 +155,7 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
           {isEditing ? t('forms:titles.editPlant') : t('forms:titles.addNewPlant')}
         </h2>
         <p className="mt-1 text-sm text-gray-600">
-          {isEditing 
+          {isEditing
             ? t('forms:messages.updatePlantInfo')
             : t('forms:messages.addPlantInfo')
           }
@@ -168,7 +168,12 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6"
+        aria-label={isEditing ? t('forms:titles.editPlant') : t('forms:titles.addNewPlant')}
+        data-testid="plant-form"
+      >
         {/* Plant Name */}
         <div>
           <label htmlFor="plant-name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -180,11 +185,10 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             placeholder={t('forms:placeholders.enterPlantName')}
-            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
-              errors.name
+            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${errors.name
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-            }`}
+              }`}
             disabled={isSubmitting}
           />
           {errors.name && (
@@ -203,11 +207,10 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             value={formData.species}
             onChange={(e) => handleInputChange('species', e.target.value)}
             placeholder={t('forms:placeholders.enterSpecies') + ' (' + t('forms:placeholders.optional') + ')'}
-            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
-              errors.species
+            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${errors.species
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-            }`}
+              }`}
             disabled={isSubmitting}
           />
           {errors.species && (
@@ -229,11 +232,10 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
             placeholder={t('forms:placeholders.enterDescription')}
-            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${
-              errors.description
+            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 ${errors.description
                 ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-            }`}
+              }`}
             disabled={isSubmitting}
           />
           {errors.description && (
@@ -260,8 +262,8 @@ export function PlantForm({ plant, onSave, onCancel }: PlantFormProps) {
             disabled={isSubmitting}
           >
             {isSubmitting && <LoadingSpinner size="sm" className="mr-2" />}
-            {isSubmitting 
-              ? (isEditing ? t('forms:messages.updating') : t('forms:messages.creating')) 
+            {isSubmitting
+              ? (isEditing ? t('forms:messages.updating') : t('forms:messages.creating'))
               : (isEditing ? t('forms:titles.updatePlant') : t('forms:titles.createPlant'))
             }
           </button>

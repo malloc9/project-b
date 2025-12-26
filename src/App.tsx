@@ -12,12 +12,12 @@ import { FirebaseDebug } from './components/debug/FirebaseDebug';
 import './i18n';
 
 // Lazy load pages for code splitting
-const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
-const DashboardPage = lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
-const PlantsPage = lazy(() => import('./pages/PlantsPage').then(module => ({ default: module.PlantsPage })));
-const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then(module => ({ default: module.ProjectsPage })));
-const TasksPage = lazy(() => import('./pages/TasksPage').then(module => ({ default: module.TasksPage })));
-const CalendarPage = lazy(() => import('./pages/CalendarPage').then(module => ({ default: module.CalendarPage })));
+import { LoginPage } from './pages/LoginPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { PlantsPage } from './pages/PlantsPage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { TasksPage } from './pages/TasksPage';
+import { CalendarPage } from './pages/CalendarPage';
 
 // Lazy load task components
 const TaskForm = lazy(() => import('./components/tasks/TaskForm'));
@@ -40,157 +40,157 @@ function App() {
       <ErrorToastProvider>
         <I18nProvider>
           <AuthProvider>
-              <AuthLayout>
-                <Router>
-                    <Suspense fallback={<LoadingSpinner />}>
-                    <Routes>
-            {/* Public routes - redirect to dashboard if authenticated */}
-            <Route 
-              path="/login" 
-              element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              } 
-            />
-            
-            {/* Protected routes with app layout */}
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <DashboardPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/plants" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <PlantsPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/projects" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <ProjectsPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/projects/new" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <ProjectForm />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/projects/:projectId" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <ProjectDetail />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/projects/:projectId/edit" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <ProjectForm />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/tasks" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <TasksPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/tasks/new" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <TaskForm />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/tasks/:taskId" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <TaskDetail />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/tasks/:taskId/edit" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <TaskForm />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            <Route 
-              path="/calendar" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <CalendarPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Catch all route - redirect to dashboard */}
-            <Route 
-              path="*" 
-              element={
-                <ProtectedRoute>
-                  <AppLayout>
-                    <DashboardPage />
-                  </AppLayout>
-                </ProtectedRoute>
-              } 
-            />
-                    </Routes>
-                  </Suspense>
-                </Router>
-              </AuthLayout>
+            <AuthLayout>
+              <Router>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    {/* Public routes - redirect to dashboard if authenticated */}
+                    <Route
+                      path="/login"
+                      element={
+                        <PublicRoute>
+                          <LoginPage />
+                        </PublicRoute>
+                      }
+                    />
+
+                    {/* Protected routes with app layout */}
+                    <Route
+                      path="/"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <DashboardPage />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/plants"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <PlantsPage />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/projects"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <ProjectsPage />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/projects/new"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <ProjectForm />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/projects/:projectId"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <ProjectDetail />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/projects/:projectId/edit"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <ProjectForm />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/tasks"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <TasksPage />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/tasks/new"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <TaskForm />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/tasks/:taskId"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <TaskDetail />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/tasks/:taskId/edit"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <TaskForm />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    <Route
+                      path="/calendar"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <CalendarPage />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* Catch all route - redirect to dashboard */}
+                    <Route
+                      path="*"
+                      element={
+                        <ProtectedRoute>
+                          <AppLayout>
+                            <DashboardPage />
+                          </AppLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Routes>
+                </Suspense>
+              </Router>
+            </AuthLayout>
           </AuthProvider>
         </I18nProvider>
         <FirebaseDebug />

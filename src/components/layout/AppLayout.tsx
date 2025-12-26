@@ -14,7 +14,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [updateDismissed, setUpdateDismissed] = useState(false);
   const { t } = useTranslation();
-  
+
   // Service worker integration
   const { updateAvailable, forceUpdate } = useServiceWorker();
 
@@ -49,12 +49,12 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       <div className="flex h-screen lg:h-auto">
         {/* Desktop Sidebar - always visible on large screens */}
-        <div className="hidden lg:block">
-          <Sidebar isOpen={true} onClose={() => {}} />
+        <div className="hidden lg:block" data-testid="desktop-sidebar-container">
+          <Sidebar isOpen={true} onClose={() => { }} />
         </div>
 
         {/* Mobile Sidebar - overlay on small screens */}
-        <div className="lg:hidden">
+        <div className="lg:hidden" data-testid="mobile-sidebar-container">
           <Sidebar isOpen={isMobileSidebarOpen} onClose={closeMobileSidebar} />
         </div>
 
@@ -68,7 +68,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <LanguageSelector 
+              <LanguageSelector
                 className="z-10"
                 compact={false}
                 showFlag={true}
@@ -91,6 +91,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <button
         onClick={toggleMobileSidebar}
         className="lg:hidden fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+        data-testid="mobile-menu-button"
       >
         <span className="sr-only">{t('navigation:openNavigationMenu')}</span>
         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
