@@ -26,7 +26,16 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   isMobile,
   compact = false,
 }) => {
-  const { language, changeLanguage, currentLanguageConfig, t } = useTranslation();
+  const { language, changeLanguage, currentLanguageConfig, t, isLoading } = useTranslation();
+  
+  // Don't render if translations are still loading
+  if (isLoading) {
+    return (
+      <div className={`inline-flex items-center ${compact ? 'px-2 py-1' : 'px-3 py-2'}`}>
+        <div className={`animate-spin rounded-full border-b-2 border-gray-400 ${compact ? 'h-3 w-3' : 'h-4 w-4'}`} />
+      </div>
+    );
+  }
   const [isOpen, setIsOpen] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
   const [focusedOptionIndex, setFocusedOptionIndex] = useState(-1);
@@ -82,12 +91,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     }
   }, [isOpen, useMobileLayout]);
 
+  // Safe translation function that handles loading state
+  const safeT = useCallback((key: string, fallback: string, options?: any) => {
+    if (isLoading) return fallback;
+    return t(key, { defaultValue: fallback, ...options });
+  }, [isLoading, t]);
+
   // Announce language change to screen readers
   const announceLanguageChange = useCallback((newLanguage: string) => {
     const langConfig = SUPPORTED_LANGUAGES.find(lang => lang.code === newLanguage);
     if (langConfig) {
-      const announcement = t('common.languageChanged', { 
-        defaultValue: 'Language changed to {{language}}',
+      const announcement = safeT('common.languageChanged', 'Language changed to {{language}}', {
         language: langConfig.nativeName 
       });
       
@@ -105,7 +119,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         document.body.removeChild(announcement_element);
       }, 1000);
     }
-  }, [t]);
+  }, [safeT]);
 
   // Handle language change
   const handleLanguageChange = async (newLanguage: string) => {
@@ -341,9 +355,8 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         disabled={isChanging}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-label={t('common.selectLanguage', { defaultValue: 'Select language' })}
-        title={t('common.currentLanguage', { 
-          defaultValue: `Current language: ${currentDisplay.nativeName}`,
+        aria-label={safeT('common.selectLanguage', 'Select language')}
+        title={safeT('common.currentLanguage', `Current language: ${currentDisplay.nativeName}`, {
           language: currentDisplay.nativeName 
         })}
       >
@@ -365,7 +378,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           )}
           {showLabel && !showNativeName && (
             <span className="font-medium">
-              {compact ? t('common.lang', { defaultValue: 'Lang' }) : t('common.language', { defaultValue: 'Language' })}
+              {compact ? safeT('common.lang', 'Lang') : safeT('common.language', 'Language')}
             </span>
           )}
           {isChanging && (
@@ -391,7 +404,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <div
         className={dropdownClasses}
         role="listbox"
-        aria-label={t('common.availableLanguages', { defaultValue: 'Available languages' })}
+        aria-label={safeT('common.availableLanguages', 'Available languages')}
         aria-activedescendant={focusedOptionIndex >= 0 ? `language-option-${SUPPORTED_LANGUAGES[focusedOptionIndex]?.code}` : undefined}
       >
         {/* Mobile header */}
@@ -399,12 +412,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium text-gray-900">
-                {t('common.selectLanguage', { defaultValue: 'Select Language' })}
+                {safeT('common.selectLanguage', 'Select Language')}
               </h3>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 rounded-full hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={t('common.close', { defaultValue: 'Close' })}
+                aria-label={safeT('common.close', 'Close')}
               >
                 <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -437,8 +450,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
               onKeyDown={(e) => handleOptionKeyDown(e, lang.code, index)}
               onMouseEnter={() => setFocusedOptionIndex(index)}
               aria-selected={isSelected}
-              aria-label={t('common.selectLanguageOption', {
-                defaultValue: 'Select {{nativeName}} ({{name}})',
+              aria-label={safeT('common.selectLanguageOption', 'Select {{nativeName}} ({{name}})', {
                 nativeName: lang.nativeName,
                 name: lang.name
               })}
@@ -465,7 +477,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
                   className={`ml-auto text-blue-600 ${compact ? 'h-3 w-3' : useMobileLayout ? 'h-5 w-5' : 'h-4 w-4'}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
-                  aria-label={t('common.selectedLanguage', { defaultValue: 'Selected language' })}
+                  aria-label={safeT('common.selectedLanguage', 'Selected language')}
                 >
                   <path
                     fillRule="evenodd"

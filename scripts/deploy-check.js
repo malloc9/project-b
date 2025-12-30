@@ -14,7 +14,31 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 
-dotenv.config({ path: path.resolve(rootDir, '.env.local') });
+// Load environment variables from .env.local
+function loadEnvFile() {
+  const envPath = path.join(rootDir, '.env.local');
+  if (fs.existsSync(envPath)) {
+    // Try using dotenv first (more robust)
+    try {
+      dotenv.config({ path: envPath });
+    } catch (error) {
+      // Fallback to manual parsing
+      const envContent = fs.readFileSync(envPath, 'utf8');
+      const lines = envContent.split('\n');
+      
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (trimmedLine && !trimmedLine.startsWith('#')) {
+          const [key, ...valueParts] = trimmedLine.split('=');
+          if (key && valueParts.length > 0) {
+            const value = valueParts.join('=');
+            process.env[key] = value;
+          }
+        }
+      }
+    }
+  }
+}
 
 // Colors for console output
 const colors = {
@@ -64,6 +88,9 @@ function checkPackageScript(scriptName, description) {
 }
 
 async function main() {
+  // Load environment variables first
+  loadEnvFile();
+  
   log('🚀 Pre-deployment Verification', 'blue');
   log('================================', 'blue');
   console.log('VITE_FIREBASE_API_KEY:', process.env.VITE_FIREBASE_API_KEY);

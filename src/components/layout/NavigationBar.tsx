@@ -23,7 +23,13 @@ export function NavigationBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { t } = useTranslation();
+  const { t, isLoading } = useTranslation();
+
+  // Provide fallback text while translations are loading
+  const safeT = (key: string, fallback: string) => {
+    if (isLoading) return fallback;
+    return t(key, { defaultValue: fallback });
+  };
 
   const handleLogout = async () => {
     try {
@@ -45,7 +51,7 @@ export function NavigationBar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav aria-label="Main Navigation" className="bg-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and brand */}
@@ -53,10 +59,10 @@ export function NavigationBar() {
             <Link to="/" className="flex items-center space-x-2">
               <span className="text-2xl">🏡</span>
               <span className="text-xl font-bold text-gray-900 hidden sm:block">
-                {t('navigation:householdManagement')}
+                {safeT('navigation:householdManagement', 'Household Management')}
               </span>
               <span className="text-xl font-bold text-gray-900 sm:hidden">
-                {t('common:home')}
+                {safeT('common:home', 'Home')}
               </span>
             </Link>
           </div>
@@ -67,14 +73,13 @@ export function NavigationBar() {
               <Link
                 key={item.nameKey}
                 to={item.href}
-                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActiveRoute(item.href)
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActiveRoute(item.href)
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                <span>{t(item.nameKey)}</span>
+                <span>{safeT(item.nameKey, item.nameKey.split(':')[1] || item.nameKey)}</span>
               </Link>
             ))}
           </div>
@@ -83,17 +88,17 @@ export function NavigationBar() {
           <div className="flex items-center space-x-4">
             {/* Offline indicator */}
             <OfflineIndicator />
-            
-            {/* Language selector - desktop */}
-            <div className="hidden md:block">
-              <LanguageSelector 
+
+            {/* Language selector - tablet and mobile */}
+            <div className="hidden md:block lg:hidden">
+              <LanguageSelector
                 compact={true}
                 showFlag={true}
                 showNativeName={true}
                 isMobile={false}
               />
             </div>
-            
+
             {/* User info - hidden on mobile */}
             <div className="hidden md:flex items-center space-x-3">
               <span className="text-sm text-gray-700">
@@ -103,7 +108,7 @@ export function NavigationBar() {
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                {t('navigation:signOut')}
+                {safeT('navigation:signOut', 'Sign Out')}
               </button>
             </div>
 
@@ -112,8 +117,9 @@ export function NavigationBar() {
               onClick={toggleMobileMenu}
               className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               aria-expanded="false"
+              data-testid="nav-menu-button"
             >
-              <span className="sr-only">{t('navigation:openMainMenu')}</span>
+              <span className="sr-only">{safeT('navigation:openMainMenu', 'Open main menu')}</span>
               {isMobileMenuOpen ? (
                 <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -137,22 +143,21 @@ export function NavigationBar() {
                 key={item.nameKey}
                 to={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  isActiveRoute(item.href)
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium transition-colors ${isActiveRoute(item.href)
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
               >
                 <span className="text-xl">{item.icon}</span>
-                <span>{t(item.nameKey)}</span>
+                <span>{safeT(item.nameKey, item.nameKey.split(':')[1] || item.nameKey)}</span>
               </Link>
             ))}
-            
+
             {/* Mobile language selector */}
             <div className="px-3 py-2 border-t border-gray-200">
               <div className="flex items-center justify-between">
-                <span className="text-base font-medium text-gray-800">{t('common:language')}</span>
-                <LanguageSelector 
+                <span className="text-base font-medium text-gray-800">{safeT('common:language', 'Language')}</span>
+                <LanguageSelector
                   compact={false}
                   showFlag={true}
                   showNativeName={true}
@@ -160,12 +165,12 @@ export function NavigationBar() {
                 />
               </div>
             </div>
-            
+
             {/* Mobile user menu */}
             <div className="border-t border-gray-200 pt-4 pb-3">
               <div className="px-3 py-2">
                 <div className="text-base font-medium text-gray-800">
-                  {user?.displayName || t('navigation:user')}
+                  {user?.displayName || safeT('navigation:user', 'User')}
                 </div>
                 <div className="text-sm text-gray-500">
                   {user?.email}
@@ -176,13 +181,14 @@ export function NavigationBar() {
                   onClick={handleLogout}
                   className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
-                  {t('navigation:signOut')}
+                  {safeT('navigation:signOut', 'Sign Out')}
                 </button>
               </div>
             </div>
           </div>
         </div>
-      )}
-    </nav>
+      )
+      }
+    </nav >
   );
 }

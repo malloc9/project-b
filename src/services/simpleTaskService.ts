@@ -9,11 +9,146 @@ import {
   query,
   orderBy,
   Timestamp,
+  where,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
-import type { SimpleTask } from "../types";
+import type { SimpleTask, CreateCalendarEventData, CalendarEvent } from "../types";
 import { ErrorCode, createAppError } from "../types/errors";
 
+
+// ============================================================================
+// CALENDAR INTEGRATION HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get calendar events by source type and ID
+ */
+const getTaskCalendarEvents = async (
+  userId: string,
+  taskId: string
+): Promise<CalendarEvent[]> => {
+  try {
+    const q = query(
+      collection(db, "users", userId, "calendarEvents"),
+      where("type", "==", "task"),
+      where("sourceId", "==", taskId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const events: CalendarEvent[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      events.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+        startDate: data.startDate.toDate(),
+        endDate: data.endDate.toDate(),
+      } as CalendarEvent);
+    });
+
+    return events;
+  } catch (error) {
+    console.error("Error getting task calendar events:", error);
+    return [];
+  }
+};
+
+/**
+ * Create calendar event for a task
+ */
+const createTaskCalendarEvent = async (
+  userId: string,
+  task: SimpleTask
+): Promise<void> => {
+  if (!task.dueDate) return; // Skip tasks without due dates
+
+  try {
+    const { createEvent } = await import('./calendarService');
+    
+    const eventData: CreateCalendarEventData = {
+      userId,
+      title: task.title,
+      description: task.description,
+      startDate: task.dueDate,
+      endDate: task.dueDate,
+      allDay: true,
+      type: 'task',
+      sourceId: task.id,
+      status: task.completed ? 'completed' : 'pending',
+      notifications: []
+    };
+
+    await createEvent(userId, eventData);
+  } catch (error) {
+    console.error("Error creating task calendar event:", error);
+    // Don't throw - calendar event creation should not fail task creation
+  }
+};
+
+/**
+ * Update calendar event for a task
+ */
+const updateTaskCalendarEvent = async (
+  userId: string,
+  task: SimpleTask
+): Promise<void> => {
+  try {
+    const { updateEvent } = await import('./calendarService');
+    const events = await getTaskCalendarEvents(userId, task.id);
+    
+    if (events.length === 0) {
+      // Create event if it doesn't exist and task has due date
+      if (task.dueDate) {
+        await createTaskCalendarEvent(userId, task);
+      }
+      return;
+    }
+
+    // Update existing event
+    const event = events[0]; // Should only be one event per task
+    
+    if (!task.dueDate) {
+      // Remove event if task no longer has due date
+      const { deleteEvent } = await import('./calendarService');
+      await deleteEvent(userId, event.id);
+      return;
+    }
+
+    // Update event with task changes
+    await updateEvent(userId, event.id, {
+      title: task.title,
+      description: task.description,
+      startDate: task.dueDate,
+      endDate: task.dueDate,
+      status: task.completed ? 'completed' : 'pending'
+    });
+  } catch (error) {
+    console.error("Error updating task calendar event:", error);
+    // Don't throw - calendar event update should not fail task update
+  }
+};
+
+/**
+ * Delete calendar event for a task
+ */
+const deleteTaskCalendarEvent = async (
+  userId: string,
+  taskId: string
+): Promise<void> => {
+  try {
+    const { deleteEvent } = await import('./calendarService');
+    const events = await getTaskCalendarEvents(userId, taskId);
+    
+    // Delete all calendar events for this task
+    await Promise.all(events.map(event => deleteEvent(userId, event.id)));
+  } catch (error) {
+    console.error("Error deleting task calendar event:", error);
+    // Don't throw - calendar event deletion should not fail task deletion
+  }
+};
 
 // ============================================================================
 // SIMPLE TASK CRUD OPERATIONS
@@ -44,6 +179,21 @@ export const createSimpleTask = async (
       collection(db, "users", userId, "simpleTasks"),
       taskToSave
     );
+
+    // Create calendar event for the new task
+    const createdTask: SimpleTask = {
+      id: docRef.id,
+      userId,
+      title: taskData.title,
+      description: taskData.description,
+      dueDate: taskData.dueDate,
+      completed: taskData.completed,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    await createTaskCalendarEvent(userId, createdTask);
+
     return docRef.id;
   } catch (error) {
     console.error("Error creating simple task:", error);
@@ -153,6 +303,12 @@ export const updateSimpleTask = async (
     }
 
     await updateDoc(docRef, updateData);
+
+    // Update calendar event for the task
+    const updatedTask = await getSimpleTask(userId, taskId);
+    if (updatedTask) {
+      await updateTaskCalendarEvent(userId, updatedTask);
+    }
   } catch (error) {
     console.error("Error updating simple task:", error);
     throw createAppError(
@@ -173,6 +329,10 @@ export const deleteSimpleTask = async (
     );
   }
   try {
+    // Delete calendar event first
+    await deleteTaskCalendarEvent(userId, taskId);
+
+    // Then delete the task
     const docRef = doc(db, "users", userId, "simpleTasks", taskId);
     await deleteDoc(docRef);
   } catch (error) {

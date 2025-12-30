@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { Subtask, TaskStatus } from '../../types';
 import { updateSubtask, deleteSubtask } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface SubtaskListProps {
   subtasks: Subtask[];
@@ -11,6 +11,7 @@ interface SubtaskListProps {
 
 const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) => {
   const { user } = useAuth();
+  const { formatDate } = useTranslation();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 

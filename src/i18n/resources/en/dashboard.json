@@ -17,15 +17,5 @@
   "upcomingItems": "Upcoming Items",
   "upcomingItemsSubtitle": "Tasks and deadlines this week",
   "noUpcomingItemsScheduled": "No upcoming items scheduled",
-  "plantCareRemindersWillShow": "Your plant care reminders and project deadlines will show here",
-  "gettingStarted": "Getting Started",
-  "gettingStartedSubtitle": "Tips to make the most of your household management system",
-  "tips": {
-    "addFirstPlant": "Add Your First Plant",
-    "addFirstPlantDescription": "Start by adding plants to your codex and upload photos to track their growth",
-    "createProject": "Create a Project",
-    "createProjectDescription": "Organize complex household tasks into projects with subtasks and deadlines",
-    "syncCalendar": "Sync Your Calendar",
-    "syncCalendarDescription": "Connect with Google Calendar to get reminders for all your tasks and plant care"
-  }
+  "plantCareRemindersWillShow": "Your plant care reminders and project deadlines will show here"
 }

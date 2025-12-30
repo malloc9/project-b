@@ -1,34 +1,25 @@
-# Initial Concept
+# Product Guide: Household Management Application
 
-A comprehensive property and household management application.
-# Product Guide
+## 1. Vision
 
-## 1. Target Audience
+To create a comprehensive and user-friendly household management application that helps users organize and manage their properties, tasks, and other related activities efficiently.
 
-The primary users of this application are individuals looking to efficiently manage their personal home maintenance and related tasks. The focus is on providing a simple yet powerful tool for a single user to stay organized.
+## 2. Target Audience
 
-## 2. Core Objective
+Homeowners, renters, and property managers who need a centralized platform to manage household-related information.
 
-The main goal of the application is to help individuals organize and schedule home maintenance tasks. This includes everything from recurring chores to one-off home improvement projects.
+## 3. Core Features
 
-## 3. Key Features
+*   **Authentication:** Secure user login and registration.
+*   **Dashboard:** A central hub displaying an overview of tasks, projects, and other relevant information.
+*   **Task Management:** Create, track, and manage household tasks.
+*   **Project Management:** Organize larger projects with subtasks and progress tracking.
+*   **Plant Care:** A dedicated section for managing house plants, including watering schedules and care logs.
+*   **Calendar Integration:** Visualize tasks and events in a calendar view.
+*   **Internationalization:** Support for multiple languages.
 
-To achieve the core objective, the application will include the following key features:
+## 4. Technology Stack
 
-### 3.1. Task Management
-
-A simple and intuitive task list to track and manage day-to-day activities.
-
-### 3.2. Project Management
-
-For more complex undertakings, a project management module will be available, allowing users to:
-- Break down projects into sub-tasks.
-- Assign deadlines to projects and individual sub-tasks.
-- Track progress towards project completion.
-
-### 3.3. Plant Codex
-
-A specialized feature for plant enthusiasts, the Plant Codex will enable users to:
-- Catalog the plants they own.
-- Access a repository of useful information and care instructions for each plant.
-- Create a visual timeline of a plant's growth by uploading photos.
+*   **Frontend:** React, TypeScript, Vite, Tailwind CSS
+*   **Backend:** Firebase (Firestore, Functions, Authentication, Hosting)
+*   **Testing:** Vitest, React Testing Library

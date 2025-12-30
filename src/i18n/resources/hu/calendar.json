@@ -1,0 +1,140 @@
+{
+  "summary": "Naptár Összefoglaló",
+  "viewCalendar": "Naptár Megtekintése",
+  "allDay": "Egész nap",
+  "today": "Ma",
+  "tomorrow": "Holnap",
+  "overdue": "Lejárt",
+  "upcoming": "Közelgő",
+  "noUpcomingEvents": "Nincsenek közelgő események",
+  "calendarClearForNow": "A naptárad jelenleg üres",
+  "eventTypes": {
+    "task": "Feladat",
+    "project": "Projekt",
+    "plantCare": "Növénygondozás",
+    "custom": "Egyéni"
+  },
+  "filters": {
+    "allTypes": "Minden Típus",
+    "allStatuses": "Minden Állapot",
+    "filterBy": "Szűrés",
+    "eventType": "Esemény Típusa",
+    "status": "Állapot",
+    "advancedFilters": "Speciális Szűrők",
+    "searchPlaceholder": "Események keresése cím vagy leírás alapján...",
+    "filters": "Szűrők",
+    "clearAll": "Összes Törlése",
+    "startDate": "Kezdő Dátum",
+    "endDate": "Befejező Dátum",
+    "tasks": "Feladatok",
+    "projects": "Projektek",
+    "plantCare": "Növénygondozás",
+    "customEvents": "Egyéni Események",
+    "pending": "Függőben",
+    "completed": "Befejezett",
+    "cancelled": "Törölve",
+    "filtersActive": "szűrő",
+    "filtersActiveMultiple": "szűrő",
+    "active": "aktív",
+    "clearAllFilters": "Összes szűrő törlése"
+  },
+  "yesterday": "Tegnap",
+  "relativeTime": {
+    "justNow": "most",
+    "inMinutes": "{{count}} perc múlva",
+    "inMinutes_plural": "{{count}} perc múlva",
+    "minutesAgo": "{{count}} perce",
+    "minutesAgo_plural": "{{count}} perce",
+    "inHours": "{{count}} óra múlva",
+    "inHours_plural": "{{count}} óra múlva",
+    "hoursAgo": "{{count}} órája",
+    "hoursAgo_plural": "{{count}} órája",
+    "inDays": "{{count}} nap múlva",
+    "inDays_plural": "{{count}} nap múlva",
+    "daysAgo": "{{count}} napja",
+    "daysAgo_plural": "{{count}} napja"
+  },
+  "dateFormats": {
+    "shortDate": "MMM d",
+    "longDate": "yyyy. MMMM d.",
+    "timeFormat": "HH:mm"
+  },
+  "eventDetails": {
+    "title": "Esemény Részletei",
+    "description": "Leírás",
+    "recurrence": "Ismétlődés",
+    "notifications": "Értesítések",
+    "edit": "Szerkesztés",
+    "delete": "Törlés",
+    "markComplete": "Befejezettnek Jelölés",
+    "markPending": "Függőben Lévőnek Jelölés",
+    "confirmDelete": "Biztosan törölni szeretnéd ezt az eseményt?",
+    "deleteError": "Az esemény törlése sikertelen",
+    "updateError": "Az esemény állapotának frissítése sikertelen",
+    "viewSource": "{{type}} forrás megtekintése",
+    "repeats": "Ismétlődik {{type}}",
+    "every": "minden {{interval}}",
+    "until": "{{date}}-ig",
+    "browserNotification": "Böngésző értesítés",
+    "inAppNotification": "Alkalmazáson belüli értesítés",
+    "minutesBefore": "{{minutes}} perccel előtte",
+    "disabled": "(letiltva)"
+  },
+  "dayView": {
+    "errorLoading": "Hiba a napi nézet betöltésekor",
+    "retry": "Újrapróbálás",
+    "allDay": "Egész Nap",
+    "addEvent": "Esemény Hozzáadása",
+    "previousDay": "Előző nap",
+    "nextDay": "Következő nap"
+  },
+  "virtualEventList": {
+    "noEvents": "Nincsenek események",
+    "noEventsDescription": "Nem találhatók események a kiválasztott feltételeknek megfelelően.",
+    "totalEvents": "Összes Esemény",
+    "visible": "Látható",
+    "renderTime": "Renderelési Idő",
+    "performance": "Teljesítmény",
+    "virtualScrollingActive": "Virtuális görgetés aktív",
+    "standardRendering": "Szabványos renderelés"
+  },
+  "calendarView": {
+    "errorLoading": "Hiba a naptár betöltésekor",
+    "previousMonth": "Előző hónap",
+    "nextMonth": "Következő hónap",
+    "moreEvents": "+{{count}} további"
+  },
+  "monthNames": {
+    "january": "Január",
+    "february": "Február", 
+    "march": "Március",
+    "april": "Április",
+    "may": "Május",
+    "june": "Június",
+    "july": "Július",
+    "august": "Augusztus",
+    "september": "Szeptember",
+    "october": "Október",
+    "november": "November",
+    "december": "December"
+  },
+  "dayNames": {
+    "sunday": "Vas",
+    "monday": "Hét",
+    "tuesday": "Ked", 
+    "wednesday": "Sze",
+    "thursday": "Csü",
+    "friday": "Pén",
+    "saturday": "Szo"
+  },
+  "page": {
+    "title": "Naptár",
+    "subtitle": "Események és ütemezés kezelése",
+    "viewToggle": {
+      "month": "Hónap",
+      "day": "Nap"
+    },
+    "newEvent": "Új Esemény",
+    "loginRequired": "Kérjük, jelentkezzen be a naptár megtekintéséhez."
+  }
+}

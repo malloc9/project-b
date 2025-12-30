@@ -14,7 +14,14 @@
     "period": "Period",
     "endDate": "End Date (optional)",
     "careTasks": "Care Tasks",
-    "recurrence": "Recurrence"
+    "recurrence": "Recurrence",
+    "markAsCompleted": "Mark as completed",
+    "repeatThisTask": "Repeat this task",
+    "startDate": "Start Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "allDayEvent": "All day event",
+    "notifications": "Notifications"
   },
   "placeholders": {
     "enterTitle": "Enter title",
@@ -24,7 +31,11 @@
     "enterTaskTitle": "Enter task title",
     "selectDate": "Select date",
     "selectStatus": "Select status",
-    "optional": "Optional"
+    "optional": "Optional",
+    "careTaskExample": "e.g., Water plant, Fertilize, Repot",
+    "careTaskDescription": "Optional: Add details about this care task...",
+    "enterEventTitle": "Enter event title",
+    "enterEventDescription": "Enter event description (optional)"
   },
   "buttons": {
     "save": "Save",
@@ -50,7 +61,10 @@
     "invalidEmail": "Invalid email address",
     "fieldRequired": "{{field}} is required",
     "fieldTooLong": "{{field}} is too long (maximum {{max}} characters)",
-    "fieldTooShort": "{{field}} is too short (minimum {{min}} characters)"
+    "fieldTooShort": "{{field}} is too short (minimum {{min}} characters)",
+    "textExceedsMaxLength": "Text exceeds maximum length of {{max}} characters",
+    "invalidDueDate": "Invalid due date",
+    "intervalRange": "Interval must be between {{min}} and {{max}}"
   },
   "status": {
     "notStarted": "Not Started",
@@ -65,9 +79,42 @@
     "weekly": "Weekly",
     "monthly": "Monthly",
     "yearly": "Yearly",
-    "days": "days",
-    "weeks": "weeks",
-    "months": "months",
-    "years": "years"
+    "days": "Day(s)",
+    "weeks": "Week(s)",
+    "months": "Month(s)",
+    "years": "Year(s)"
+  },
+  "titles": {
+    "editCareTask": "Edit Care Task",
+    "addCareTask": "Add Care Task",
+    "createTask": "Create Task",
+    "updateTask": "Update Task",
+    "editPlant": "Edit Plant",
+    "addNewPlant": "Add New Plant",
+    "createPlant": "Create Plant",
+    "updatePlant": "Update Plant",
+    "editEvent": "Edit Event",
+    "createEvent": "Create Event",
+    "updateEvent": "Update Event"
+  },
+  "messages": {
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to cancel?",
+    "leaveEmptyToRepeat": "Leave empty to repeat indefinitely",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "updatePlantInfo": "Update your plant information below.",
+    "addPlantInfo": "Add a new plant to your collection. You can upload photos and add care tasks after creating the plant.",
+    "speciesOptional": "Optional: Scientific or common name of the plant species",
+    "describeYourPlant": "Describe your plant's location, care requirements, or any notes",
+    "mustBeLoggedIn": "You must be logged in to save plants",
+    "failedToSavePlant": "Failed to save plant",
+    "failedToSaveEvent": "Failed to save event. Please try again.",
+    "saving": "Saving...",
+    "noNotificationsSet": "No notifications set",
+    "minBefore": "min before"
+  },
+  "notifications": {
+    "inApp": "In-app",
+    "browser": "Browser"
   }
 }

@@ -1,9 +1,9 @@
-import type { Plant, Project, SimpleTask, PlantCareTask, Subtask } from '../types';
+import type { Plant, Project, SimpleTask, PlantCareTask, Subtask, CalendarEvent } from '../types';
 
 export interface OfflineOperation {
   id: string;
   type: 'create' | 'update' | 'delete';
-  collection: 'plants' | 'projects' | 'simpleTasks' | 'plantCareTasks' | 'subtasks';
+  collection: 'plants' | 'projects' | 'simpleTasks' | 'plantCareTasks' | 'subtasks' | 'calendarEvents';
   documentId: string;
   data?: any;
   timestamp: number;
@@ -16,6 +16,7 @@ export interface OfflineData {
   simpleTasks: Record<string, SimpleTask>;
   plantCareTasks: Record<string, PlantCareTask>;
   subtasks: Record<string, Subtask>;
+  calendarEvents: Record<string, CalendarEvent>;
   lastSync: number;
   pendingOperations: OfflineOperation[];
 }
@@ -59,6 +60,7 @@ class OfflineStorageManager {
       simpleTasks: {},
       plantCareTasks: {},
       subtasks: {},
+      calendarEvents: {},
       lastSync: 0,
       pendingOperations: []
     };
@@ -197,7 +199,7 @@ class OfflineStorageManager {
 
   // Check if a field name is a known date field
   private isDateField(fieldName: string): boolean {
-    const dateFields = ['createdAt', 'updatedAt', 'dueDate', 'uploadedAt'];
+    const dateFields = ['createdAt', 'updatedAt', 'dueDate', 'uploadedAt', 'startDate', 'endDate'];
     return dateFields.includes(fieldName);
   }
 
@@ -219,6 +221,97 @@ class OfflineStorageManager {
       used,
       available: estimated - used
     };
+  }
+
+  // Calendar-specific methods for caching events by date ranges
+  
+  // Cache calendar events for a specific date range
+  cacheCalendarEventsForRange(events: CalendarEvent[], startDate: Date, endDate: Date): void {
+    const offlineData = this.getOfflineData();
+    
+    // Cache each event individually
+    events.forEach(event => {
+      offlineData.calendarEvents[event.id] = event;
+    });
+    
+    // Store metadata about cached date ranges
+    const cacheKey = `calendar_range_${startDate.toISOString().split('T')[0]}_${endDate.toISOString().split('T')[0]}`;
+    localStorage.setItem(cacheKey, JSON.stringify({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      cachedAt: new Date().toISOString(),
+      eventIds: events.map(e => e.id)
+    }));
+    
+    this.saveOfflineData(offlineData);
+  }
+
+  // Get cached calendar events for a date range
+  getCachedCalendarEventsForRange(startDate: Date, endDate: Date): CalendarEvent[] {
+    const offlineData = this.getOfflineData();
+    const allEvents = Object.values(offlineData.calendarEvents);
+    
+    // Filter events that fall within the date range
+    return allEvents.filter(event => {
+      const eventStart = new Date(event.startDate);
+      const eventEnd = new Date(event.endDate);
+      
+      // Event overlaps with the requested range
+      return eventStart <= endDate && eventEnd >= startDate;
+    });
+  }
+
+  // Check if a date range is cached and still valid (within 1 hour)
+  isDateRangeCached(startDate: Date, endDate: Date): boolean {
+    const cacheKey = `calendar_range_${startDate.toISOString().split('T')[0]}_${endDate.toISOString().split('T')[0]}`;
+    const cached = localStorage.getItem(cacheKey);
+    
+    if (!cached) return false;
+    
+    try {
+      const cacheData = JSON.parse(cached);
+      const cachedAt = new Date(cacheData.cachedAt);
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      
+      return cachedAt > oneHourAgo;
+    } catch {
+      return false;
+    }
+  }
+
+  // Get cached events for current and adjacent months
+  getCachedEventsForCurrentAndAdjacentMonths(): CalendarEvent[] {
+    const now = new Date();
+    const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0); // Last day of next month
+    
+    return this.getCachedCalendarEventsForRange(previousMonth, nextMonth);
+  }
+
+  // Clean up old calendar cache entries
+  cleanupCalendarCache(): void {
+    const keys = Object.keys(localStorage);
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    
+    keys.forEach(key => {
+      if (key.startsWith('calendar_range_')) {
+        try {
+          const cached = localStorage.getItem(key);
+          if (cached) {
+            const cacheData = JSON.parse(cached);
+            const cachedAt = new Date(cacheData.cachedAt);
+            
+            if (cachedAt < oneWeekAgo) {
+              localStorage.removeItem(key);
+            }
+          }
+        } catch {
+          // Remove invalid cache entries
+          localStorage.removeItem(key);
+        }
+      }
+    });
   }
 }
 

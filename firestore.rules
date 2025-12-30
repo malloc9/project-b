@@ -30,6 +30,60 @@ service cloud.firestore {
       match /plantCareTasks/{taskId} {
         allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
       }
+      
+      // User's calendar events subcollection
+      match /calendarEvents/{eventId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // Top-level collections (alternative data structure)
+    // Users can read and write their own plants
+    match /plants/{plantId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own projects
+    match /projects/{projectId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own tasks
+    match /tasks/{taskId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own simple tasks
+    match /simpleTasks/{taskId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own calendar events
+    match /calendarEvents/{eventId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own care tasks (for plants)
+    match /careTasks/{taskId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own photos
+    match /photos/{photoId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Users can read and write their own subtasks
+    match /subtasks/{subtaskId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
   }
 }

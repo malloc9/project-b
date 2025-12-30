@@ -1,6 +1,7 @@
 import React, { useState, useCallback, forwardRef } from 'react';
 import { sanitizeInput } from '../../utils/inputSanitizer';
 import type { ValidationError } from '../../types/errors';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface ValidatedTextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
   value: string;
@@ -36,6 +37,7 @@ export const ValidatedTextarea = forwardRef<HTMLTextAreaElement, ValidatedTextar
   className = '',
   ...props
 }, ref) => {
+  const { t } = useTranslation();
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
 
@@ -169,7 +171,7 @@ export const ValidatedTextarea = forwardRef<HTMLTextAreaElement, ValidatedTextar
       
       {isOverLimit && !hasError && (
         <p className="mt-2 text-sm text-red-600">
-          Text exceeds maximum length of {maxLength} characters
+          {t('forms:validation.textExceedsMaxLength', { max: maxLength })}
         </p>
       )}
     </div>

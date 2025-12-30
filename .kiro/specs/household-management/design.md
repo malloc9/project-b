@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Household Management Application is a responsive web application built on Firebase that provides comprehensive management of plants, projects, and tasks with Google Calendar integration. The application uses a modern web stack with React for the frontend, Firebase for backend services, and Firestore for data persistence.
+The Household Management Application is a responsive web application built on Firebase that provides comprehensive management of plants, projects, and tasks with built-in calendar integration. The application uses a modern web stack with React for the frontend, Firebase for backend services, and Firestore for data persistence.
 
 ## Architecture
 
@@ -14,7 +14,6 @@ graph TB
     A --> C[Firestore Database]
     A --> D[Firebase Storage]
     A --> E[Firebase Functions]
-    E --> F[Google Calendar API]
     A --> G[Firebase Hosting]
     
     subgraph "Client Side"
@@ -37,7 +36,7 @@ graph TB
 - **Backend**: Firebase (Auth, Firestore, Functions, Storage, Hosting)
 - **Database**: Firestore (NoSQL, free tier available)
 - **File Storage**: Firebase Storage for plant photos
-- **Calendar Integration**: Google Calendar API via Firebase Functions
+- **Calendar Integration**: Built-in calendar display system
 - **State Management**: React Context API with useReducer
 - **Routing**: React Router v6
 - **Build Tool**: Vite

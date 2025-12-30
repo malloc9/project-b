@@ -2,12 +2,228 @@ import type {
   Plant, 
   PlantPhoto, 
   PlantCareTask, 
-  PlantFilters
+  PlantFilters,
+  CreateCalendarEventData,
+  CalendarEvent
 } from '../types';
 import { FirestoreService, QueryHelpers } from './firebase';
 import { UnifiedStorageService as StorageService } from './unifiedStorageService';
-import { where } from 'firebase/firestore';
+import { where, collection, query, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
+// ============================================================================
+// CALENDAR INTEGRATION HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get calendar events for plant care tasks
+ */
+const getPlantCareCalendarEvents = async (
+  userId: string,
+  plantId: string,
+  careTaskId: string
+): Promise<CalendarEvent[]> => {
+  try {
+    const sourceId = `${plantId}-${careTaskId}`;
+    const q = query(
+      collection(db, "users", userId, "calendarEvents"),
+      where("type", "==", "plant_care"),
+      where("sourceId", "==", sourceId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const events: CalendarEvent[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      events.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+        startDate: data.startDate.toDate(),
+        endDate: data.endDate.toDate(),
+      } as CalendarEvent);
+    });
+
+    return events;
+  } catch (error) {
+    console.error("Error getting plant care calendar events:", error);
+    return [];
+  }
+};
+
+/**
+ * Create calendar event for a plant care task
+ */
+const createPlantCareCalendarEvent = async (
+  userId: string,
+  plant: Plant,
+  careTask: PlantCareTask
+): Promise<void> => {
+  if (!careTask.dueDate) return; // Skip care tasks without due dates
+
+  try {
+    const { createEvent } = await import('./calendarService');
+    
+    const eventData: CreateCalendarEventData = {
+      userId,
+      title: `${plant.name}: ${careTask.title}`,
+      description: careTask.description,
+      startDate: careTask.dueDate,
+      endDate: careTask.dueDate,
+      allDay: true,
+      type: 'plant_care',
+      sourceId: `${plant.id}-${careTask.id}`,
+      status: careTask.completed ? 'completed' : 'pending',
+      notifications: []
+    };
+
+    await createEvent(userId, eventData);
+
+    // Handle recurring care tasks
+    if (careTask.recurrence && !careTask.completed) {
+      await generateRecurringPlantCareEvents(userId, plant, careTask, careTask.dueDate, 30);
+    }
+  } catch (error) {
+    console.error("Error creating plant care calendar event:", error);
+    // Don't throw - calendar event creation should not fail care task creation
+  }
+};
+
+/**
+ * Update calendar event for a plant care task
+ */
+const updatePlantCareCalendarEvent = async (
+  userId: string,
+  plant: Plant,
+  careTask: PlantCareTask
+): Promise<void> => {
+  try {
+    const { updateEvent, deleteEvent } = await import('./calendarService');
+    const events = await getPlantCareCalendarEvents(userId, plant.id, careTask.id);
+    
+    if (events.length === 0) {
+      // Create event if it doesn't exist and care task has due date
+      if (careTask.dueDate) {
+        await createPlantCareCalendarEvent(userId, plant, careTask);
+      }
+      return;
+    }
+
+    // Update existing event
+    const event = events[0]; // Should only be one event per care task
+    
+    if (!careTask.dueDate) {
+      // Remove event if care task no longer has due date
+      await deleteEvent(userId, event.id);
+      return;
+    }
+
+    // Update event with care task changes
+    await updateEvent(userId, event.id, {
+      title: `${plant.name}: ${careTask.title}`,
+      description: careTask.description,
+      startDate: careTask.dueDate,
+      endDate: careTask.dueDate,
+      status: careTask.completed ? 'completed' : 'pending'
+    });
+
+    // Handle recurring care tasks
+    if (careTask.recurrence && !careTask.completed) {
+      await generateRecurringPlantCareEvents(userId, plant, careTask, careTask.dueDate, 30);
+    }
+  } catch (error) {
+    console.error("Error updating plant care calendar event:", error);
+    // Don't throw - calendar event update should not fail care task update
+  }
+};
+
+/**
+ * Delete calendar event for a plant care task
+ */
+const deletePlantCareCalendarEvent = async (
+  userId: string,
+  plantId: string,
+  careTaskId: string
+): Promise<void> => {
+  try {
+    const { deleteEvent } = await import('./calendarService');
+    const events = await getPlantCareCalendarEvents(userId, plantId, careTaskId);
+    
+    // Delete all calendar events for this care task
+    await Promise.all(events.map(event => deleteEvent(userId, event.id)));
+  } catch (error) {
+    console.error("Error deleting plant care calendar event:", error);
+    // Don't throw - calendar event deletion should not fail care task deletion
+  }
+};
+
+/**
+ * Generate recurring care events
+ */
+const generateRecurringPlantCareEvents = async (
+  userId: string,
+  plant: Plant,
+  careTask: PlantCareTask,
+  startDate: Date,
+  daysAhead: number
+): Promise<void> => {
+  if (!careTask.recurrence) return;
+
+  try {
+    const { createEvent } = await import('./calendarService');
+    const { type, interval } = careTask.recurrence;
+    let currentDate = new Date(startDate);
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + daysAhead);
+
+    const events: CreateCalendarEventData[] = [];
+
+    while (currentDate <= endDate) {
+      // Calculate next occurrence
+      switch (type) {
+        case 'daily':
+          currentDate.setDate(currentDate.getDate() + interval);
+          break;
+        case 'weekly':
+          currentDate.setDate(currentDate.getDate() + (interval * 7));
+          break;
+        case 'monthly':
+          currentDate.setMonth(currentDate.getMonth() + interval);
+          break;
+        case 'yearly':
+          currentDate.setFullYear(currentDate.getFullYear() + interval);
+          break;
+        default:
+          return; // Invalid recurrence type
+      }
+
+      if (currentDate <= endDate) {
+        const eventData: CreateCalendarEventData = {
+          userId,
+          title: `${plant.name}: ${careTask.title}`,
+          description: careTask.description,
+          startDate: new Date(currentDate),
+          endDate: new Date(currentDate),
+          allDay: true,
+          type: 'plant_care',
+          sourceId: `${plant.id}-${careTask.id}-${currentDate.getTime()}`,
+          status: 'pending',
+          notifications: []
+        };
+
+        events.push(eventData);
+      }
+    }
+
+    // Create all recurring events
+    await Promise.all(events.map(eventData => createEvent(userId, eventData)));
+  } catch (error) {
+    console.error("Error generating recurring plant care events:", error);
+    // Don't throw - recurring event generation should not fail the main operation
+  }
+};
 
 /**
  * Service for managing plant data in Firestore
@@ -271,6 +487,9 @@ export class PlantService {
       const updatedCareTasks = [...plant.careTasks, newCareTask];
       await this.updatePlant(userId, plantId, { careTasks: updatedCareTasks });
 
+      // Create calendar event for the new care task
+      await createPlantCareCalendarEvent(userId, plant, newCareTask);
+
       return newCareTask;
     } catch (error) {
       console.error('Error adding care task to plant:', error);
@@ -306,6 +525,12 @@ export class PlantService {
       );
 
       await this.updatePlant(userId, plantId, { careTasks: updatedCareTasks });
+
+      // Update calendar event for the care task
+      const updatedTask = updatedCareTasks.find(task => task.id === taskId);
+      if (updatedTask) {
+        await updatePlantCareCalendarEvent(userId, plant, updatedTask);
+      }
     } catch (error) {
       console.error('Error updating plant care task:', error);
       throw new Error(`Failed to update care task: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -317,6 +542,9 @@ export class PlantService {
    */
   static async removeCareTaskFromPlant(userId: string, plantId: string, taskId: string): Promise<void> {
     try {
+      // Delete calendar event first
+      await deletePlantCareCalendarEvent(userId, plantId, taskId);
+
       // Get current plant
       const plant = await this.getPlant(userId, plantId);
       if (!plant) {

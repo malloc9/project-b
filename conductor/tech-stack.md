@@ -1,26 +1,32 @@
-# Technology Stack
+# Technology Stack: Household Management Application
 
-This document outlines the technology stack for the Household Management application.
+This document outlines the core technologies and frameworks used in the Household Management Application.
 
-## Frontend
+## 1. Frontend
 
--   **Programming Language:** TypeScript
--   **Framework:** React 19
--   **Build Tool:** Vite
--   **Styling:** Tailwind CSS
--   **Navigation:** React Router
+*   **Framework:** React
+*   **Language:** TypeScript
+*   **Build Tool:** Vite
+*   **Styling:** Tailwind CSS
+*   **Routing:** React Router
+*   **Internationalization:** i18next, react-i18next
+*   **UI Components:** Heroicons
 
-## Backend
+## 2. Backend and Cloud Services
 
--   **Backend-as-a-Service (BaaS):** Firebase
-    -   **Database:** Firestore
-    -   **Authentication:** Firebase Authentication
-    -   **Serverless Functions:** Firebase Cloud Functions
--   **Additional Services:**
-    -   **Supabase:** The Supabase client is integrated for potential use with its services.
+*   **Platform:** Firebase
+    *   **Database:** Firestore
+    *   **Serverless Functions:** Firebase Functions (Node.js/TypeScript)
+    *   **Hosting:** Firebase Hosting
+    *   **Authentication:** Firebase Authentication
 
-## Architecture
+## 3. Development and Testing
 
--   **Frontend:** Single-Page Application (SPA)
--   **Backend:** Serverless architecture leveraging Firebase services.
+*   **Testing Frameworks:** Vitest, React Testing Library (for React component testing)
+*   **Linting:** ESLint (with TypeScript and React specific plugins)
+*   **Dependency Management:** npm
 
+## 4. Other Libraries
+
+*   **Date Manipulation:** date-fns, moment
+*   **Cloud Storage:** Supabase JS (for potential alternative or additional storage needs)

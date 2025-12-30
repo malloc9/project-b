@@ -99,6 +99,7 @@ export const ErrorToastProvider: React.FC<ErrorToastProviderProps> = ({
 /**
  * Hook to access error toast functionality
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useErrorToast = (): ErrorToastContextType => {
   const context = useContext(ErrorToastContext);
   

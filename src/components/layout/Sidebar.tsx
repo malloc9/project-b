@@ -9,35 +9,35 @@ interface NavigationItem {
 }
 
 const navigationItems: NavigationItem[] = [
-  { 
-    nameKey: 'navigation:dashboard', 
-    href: '/', 
-    icon: '🏠', 
-    descriptionKey: 'navigation:overviewAndQuickAccess' 
+  {
+    nameKey: 'navigation:dashboard',
+    href: '/',
+    icon: '🏠',
+    descriptionKey: 'navigation:overviewAndQuickAccess'
   },
-  { 
-    nameKey: 'navigation:plantCodex', 
-    href: '/plants', 
-    icon: '🌱', 
-    descriptionKey: 'navigation:managePlantsAndPhotos' 
+  {
+    nameKey: 'navigation:plantCodex',
+    href: '/plants',
+    icon: '🌱',
+    descriptionKey: 'navigation:managePlantsAndPhotos'
   },
-  { 
-    nameKey: 'navigation:projects', 
-    href: '/projects', 
-    icon: '🔨', 
-    descriptionKey: 'navigation:householdProjectsAndSubtasks' 
+  {
+    nameKey: 'navigation:projects',
+    href: '/projects',
+    icon: '🔨',
+    descriptionKey: 'navigation:householdProjectsAndSubtasks'
   },
-  { 
-    nameKey: 'navigation:tasks', 
-    href: '/tasks', 
-    icon: '✅', 
-    descriptionKey: 'navigation:simpleTaskManagement' 
+  {
+    nameKey: 'navigation:tasks',
+    href: '/tasks',
+    icon: '✅',
+    descriptionKey: 'navigation:simpleTaskManagement'
   },
-  { 
-    nameKey: 'navigation:calendar', 
-    href: '/calendar', 
-    icon: '📅', 
-    descriptionKey: 'navigation:viewAllScheduledItems' 
+  {
+    nameKey: 'navigation:calendar',
+    href: '/calendar',
+    icon: '📅',
+    descriptionKey: 'navigation:viewAllScheduledItems'
   },
 ];
 
@@ -61,7 +61,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {/* Mobile overlay - only show on mobile when sidebar is open */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity lg:hidden z-20"
           onClick={onClose}
         />
@@ -95,25 +95,23 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav aria-label="Sidebar Navigation" className="flex-1 px-4 py-6 space-y-2">
             {navigationItems.map((item) => (
               <Link
                 key={item.nameKey}
                 to={item.href}
                 onClick={onClose}
-                className={`group flex flex-col p-3 rounded-lg text-sm font-medium transition-colors ${
-                  isActiveRoute(item.href)
+                className={`group flex flex-col p-3 rounded-lg text-sm font-medium transition-colors ${isActiveRoute(item.href)
                     ? 'bg-blue-100 text-blue-700 border-l-4 border-blue-500'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-3">
                   <span className="text-xl">{item.icon}</span>
                   <span className="font-medium">{t(item.nameKey)}</span>
                 </div>
-                <span className={`mt-1 text-xs ml-8 ${
-                  isActiveRoute(item.href) ? 'text-blue-600' : 'text-gray-500'
-                }`}>
+                <span className={`mt-1 text-xs ml-8 ${isActiveRoute(item.href) ? 'text-blue-600' : 'text-gray-500'
+                  }`}>
                   {t(item.descriptionKey)}
                 </span>
               </Link>

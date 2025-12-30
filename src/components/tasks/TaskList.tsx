@@ -10,13 +10,14 @@ import {
   deleteSimpleTask
 } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface TaskListProps {
   onTaskSelect?: (task: SimpleTask) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
+  const { t, formatDate } = useTranslation();
   const { user } = useAuth();
   const [tasks, setTasks] = useState<SimpleTask[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<SimpleTask[]>([]);
@@ -46,7 +47,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       setTasks(userTasks);
     } catch (err) {
       console.error('Error loading tasks:', err);
-      setError('Failed to load tasks');
+      setError(t('failedToLoad', { ns: 'tasks' }));
     } finally {
       setLoading(false);
     }
@@ -78,13 +79,13 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       await loadTasks(); // Reload to get updated data
     } catch (err) {
       console.error('Error toggling task completion:', err);
-      setError('Failed to update task');
+      setError(t('failedToUpdate', { ns: 'tasks' }));
     }
   };
 
   const handleDeleteTask = async (taskId: string) => {
     if (!user) return; // Add user null check
-    if (!window.confirm('Are you sure you want to delete this task?')) {
+    if (!window.confirm(t('confirmDelete', { ns: 'tasks' }))) {
       return;
     }
 
@@ -93,7 +94,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       await loadTasks(); // Reload to get updated data
     } catch (err) {
       console.error('Error deleting task:', err);
-      setError('Failed to delete task');
+      setError(t('failedToDelete', { ns: 'tasks' }));
     }
   };
 
@@ -115,7 +116,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error</h3>
+            <h3 className="text-sm font-medium text-red-800">{t('error', { ns: 'tasks' })}</h3>
             <div className="mt-2 text-sm text-red-700">
               <p>{error}</p>
             </div>
@@ -124,7 +125,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
                 onClick={loadTasks}
                 className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
               >
-                Try Again
+                {t('tryAgain', { ns: 'tasks' })}
               </button>
             </div>
           </div>
@@ -137,7 +138,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-2xl font-bold text-gray-900">Tasks</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('title', { ns: 'tasks' })}</h2>
         <Link
           to="/tasks/new"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -145,7 +146,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
           <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          New Task
+          {t('newTask', { ns: 'tasks' })}
         </Link>
       </div>
 
@@ -153,7 +154,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <label htmlFor="search" className="sr-only">
-            Search tasks
+            {t('searchTasks', { ns: 'tasks' })}
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -165,7 +166,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
               id="search"
               name="search"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Search tasks..."
+              placeholder={t('searchTasks', { ns: 'tasks' })}
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -174,7 +175,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
         </div>
         <div className="sm:w-48">
           <label htmlFor="completion-filter" className="sr-only">
-            Filter by completion
+            {t('filterByCompletion', { ns: 'tasks' })}
           </label>
           <select
             id="completion-filter"
@@ -183,14 +184,14 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
             value={completionFilter}
             onChange={(e) => setCompletionFilter(e.target.value as 'all' | 'completed' | 'pending')}
           >
-            <option value="all">All Tasks</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
+            <option value="all">{t('allTasks', { ns: 'tasks' })}</option>
+            <option value="pending">{t('pending', { ns: 'tasks' })}</option>
+            <option value="completed">{t('completed', { ns: 'tasks' })}</option>
           </select>
         </div>
         <div className="sm:w-48">
           <label htmlFor="sort-order" className="sr-only">
-            Sort order
+            {t('sortOrder', { ns: 'tasks' })}
           </label>
           <select
             id="sort-order"
@@ -199,8 +200,8 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
           >
-            <option value="asc">Due Date (Earliest)</option>
-            <option value="desc">Due Date (Latest)</option>
+            <option value="asc">{t('dueDateEarliest', { ns: 'tasks' })}</option>
+            <option value="desc">{t('dueDateLatest', { ns: 'tasks' })}</option>
           </select>
         </div>
       </div>
@@ -221,11 +222,11 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
               d="M9 5l7 7-7 7"
             />
           </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('noTasksFound', { ns: 'tasks' })}</h3>
           <p className="mt-1 text-sm text-gray-500">
             {tasks.length === 0
-              ? "Get started by creating your first task."
-              : "Try adjusting your search or filter criteria."}
+              ? t('getStartedMessage', { ns: 'tasks' })
+              : t('adjustFiltersMessage', { ns: 'tasks' })}
           </p>
           {tasks.length === 0 && (
             <div className="mt-6">
@@ -236,7 +237,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
                 <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                New Task
+                {t('newTask', { ns: 'tasks' })}
               </Link>
             </div>
           )}
@@ -327,7 +328,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <span>
-                          {overdue && !task.completed ? 'Overdue: ' : 'Due: '}
+                          {overdue && !task.completed ? `${t('overdue', { ns: 'tasks' })}: ` : `${t('due', { ns: 'tasks' })}: `}
                           {formatDate(task.dueDate)}
                         </span>
                       </div>
@@ -335,7 +336,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
 
                     {/* Created date */}
                     <div className="mt-1 text-xs text-gray-400">
-                      Created {formatDate(task.createdAt)}
+                      {t('created', { ns: 'tasks' })} {formatDate(task.createdAt)}
                     </div>
                   </div>
                 </div>

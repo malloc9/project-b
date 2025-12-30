@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { NavigationBar } from './NavigationBar';
 import { Sidebar } from './Sidebar';
 import { LanguageSelector } from '../i18n/LanguageSelector';
+import { UpdateNotification } from '../common/UpdateNotification';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useServiceWorker } from '../../hooks/useServiceWorker';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -10,7 +12,11 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [updateDismissed, setUpdateDismissed] = useState(false);
   const { t } = useTranslation();
+
+  // Service worker integration
+  const { updateAvailable, forceUpdate } = useServiceWorker();
 
   const toggleMobileSidebar = () => {
     setIsMobileSidebarOpen(!isMobileSidebarOpen);
@@ -18,6 +24,20 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const closeMobileSidebar = () => {
     setIsMobileSidebarOpen(false);
+  };
+
+  const handleUpdateApp = async () => {
+    try {
+      await forceUpdate();
+      // forceUpdate already handles page reload
+    } catch (error) {
+      console.error('Failed to update app:', error);
+      throw error; // Re-throw to let UpdateNotification handle the error display
+    }
+  };
+
+  const handleDismissUpdate = () => {
+    setUpdateDismissed(true);
   };
 
   return (
@@ -29,12 +49,12 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       <div className="flex h-screen lg:h-auto">
         {/* Desktop Sidebar - always visible on large screens */}
-        <div className="hidden lg:block">
-          <Sidebar isOpen={true} onClose={() => {}} />
+        <div className="hidden lg:block" data-testid="desktop-sidebar-container">
+          <Sidebar isOpen={true} onClose={() => { }} />
         </div>
 
         {/* Mobile Sidebar - overlay on small screens */}
-        <div className="lg:hidden">
+        <div className="lg:hidden" data-testid="mobile-sidebar-container">
           <Sidebar isOpen={isMobileSidebarOpen} onClose={closeMobileSidebar} />
         </div>
 
@@ -48,7 +68,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <LanguageSelector 
+              <LanguageSelector
                 className="z-10"
                 compact={false}
                 showFlag={true}
@@ -71,12 +91,20 @@ export function AppLayout({ children }: AppLayoutProps) {
       <button
         onClick={toggleMobileSidebar}
         className="lg:hidden fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+        data-testid="mobile-menu-button"
       >
         <span className="sr-only">{t('navigation:openNavigationMenu')}</span>
         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
+
+      {/* Update notification */}
+      <UpdateNotification
+        isVisible={updateAvailable && !updateDismissed}
+        onUpdate={handleUpdateApp}
+        onDismiss={handleDismissUpdate}
+      />
     </div>
   );
 }

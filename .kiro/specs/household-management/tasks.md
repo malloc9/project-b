@@ -178,17 +178,17 @@
   - Add task completion and deletion functionality
   - _Requirements: 3.1, 3.2, 3.4, 3.5_
 
-- [x] 9. Implement Google Calendar integration
+- [x] 9. Implement built-in calendar integration
 
 
 
 
 
-- [x] 9.1 Set up Firebase Functions for Calendar API
+- [x] 9.1 Set up calendar display system
 
 
-  - Create Firebase Functions for Google Calendar API integration
-  - Implement OAuth2 flow for Google Calendar access
+  - Create calendar event display components
+  - Implement calendar view functionality
   - Create calendar event CRUD operations
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 

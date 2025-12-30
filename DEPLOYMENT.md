@@ -17,8 +17,6 @@ This guide covers deploying the Household Management application to Firebase Hos
 
 5. **Photo Storage**: Configure photo storage (see FREE_STORAGE_SETUP.md for alternatives to Firebase Storage)
 
-6. **Google Calendar API**: Enable the Google Calendar API and create credentials (for calendar integration)
-
 ## Environment Setup
 
 ### 1. Configure Environment Variables
@@ -165,7 +163,7 @@ cd ..
 
 ### 2. Configure Function Environment Variables
 ```bash
-firebase functions:config:set calendar.api_key="your-google-calendar-api-key"
+# No additional configuration needed for basic functions
 ```
 
 ### 3. Deploy Functions

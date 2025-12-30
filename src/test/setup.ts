@@ -1,5 +1,55 @@
-import { vi } from 'vitest';
+import { vi, expect, afterEach } from 'vitest';
+import React from 'react';
 import '@testing-library/jest-dom';
+import { cleanup } from '@testing-library/react';
+import * as matchers from '@testing-library/jest-dom/matchers';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Set default timeout for all tests
+vi.setConfig({ testTimeout: 15000 });
+
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'dashboard:overview': 'Overview',
+        'dashboard:welcomeBack': 'Welcome back',
+        'navigation:householdManagement': 'Household Management',
+        'navigation:homeManager': 'Home Manager',
+        'navigation:dashboard': 'Dashboard',
+        'navigation:plantCodex': 'Plant Codex',
+        'navigation:projects': 'Projects',
+        'navigation:tasks': 'Tasks',
+        'navigation:calendar': 'Calendar',
+        'navigation:welcomeToDashboard': 'Welcome back',
+        'common:loading': 'Loading...',
+        'common:error': 'Error',
+      };
+
+      if (translations[key]) return translations[key];
+
+      const parts = key.split(':');
+      const actualKey = parts.length > 1 ? parts[1] : parts[0];
+      return actualKey
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (str) => str.toUpperCase())
+        .trim();
+    },
+    i18n: {
+      changeLanguage: vi.fn(),
+      language: 'en',
+    },
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+}));
 
 // Mock Firebase configuration
 const mockFirebaseConfig = {
@@ -48,29 +98,114 @@ vi.mock('firebase/app', () => ({
 vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(() => mockAuth),
   signInWithEmailAndPassword: vi.fn(),
+  createUserWithEmailAndPassword: vi.fn(),
   signOut: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
-  onAuthStateChanged: vi.fn(),
+  onAuthStateChanged: vi.fn((_auth, callback) => {
+    callback({
+      uid: 'test-user-123',
+      email: 'test@example.com',
+      displayName: 'Test User',
+      metadata: { creationTime: new Date().toISOString() }
+    });
+    return vi.fn();
+  }),
+  connectAuthEmulator: vi.fn(),
 }));
 
 vi.mock('firebase/firestore', () => ({
   getFirestore: vi.fn(() => mockDb),
   collection: vi.fn(),
-  doc: vi.fn(),
-  getDocs: vi.fn(),
-  getDoc: vi.fn(),
-  addDoc: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
+  doc: vi.fn((...args) => ({ id: args[args.length - 1], path: args.join('/') })),
+  getDocs: vi.fn(() => Promise.resolve({
+    forEach: () => { },
+    docs: [],
+    empty: true,
+    size: 0
+  })),
+  getDoc: vi.fn(() => Promise.resolve({
+    exists: () => false,
+    data: () => ({}),
+    id: 'mock-id'
+  })),
+  addDoc: vi.fn(() => Promise.resolve({ id: 'new-doc-id' })),
+  updateDoc: vi.fn(() => Promise.resolve()),
+  deleteDoc: vi.fn(() => Promise.resolve()),
   query: vi.fn(),
   where: vi.fn(),
   orderBy: vi.fn(),
   limit: vi.fn(),
+  connectFirestoreEmulator: vi.fn(),
+  Timestamp: {
+    fromDate: vi.fn((date) => ({
+      toDate: () => date,
+      toMillis: () => date.getTime(),
+      seconds: Math.floor(date.getTime() / 1000),
+      nanoseconds: (date.getTime() % 1000) * 1e6,
+    })),
+    now: vi.fn(() => ({
+      toDate: () => new Date(),
+      toMillis: () => Date.now(),
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: (Date.now() % 1000) * 1e6,
+    })),
+  },
 }));
 
 vi.mock('firebase/functions', () => ({
   getFunctions: vi.fn(() => mockFunctions),
-  httpsCallable: vi.fn(() => vi.fn()),
+  httpsCallable: vi.fn(() => vi.fn(() => Promise.resolve({ data: {} }))),
+  connectFunctionsEmulator: vi.fn(),
+}));
+
+vi.mock('firebase/storage', () => ({
+  getStorage: vi.fn(() => ({})),
+  ref: vi.fn(() => ({})),
+  uploadBytes: vi.fn(() => Promise.resolve({})),
+  getDownloadURL: vi.fn(() => Promise.resolve('https://example.com/photo.jpg')),
+  deleteObject: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock('firebase/analytics', () => ({
+  getAnalytics: vi.fn(() => ({})),
+  logEvent: vi.fn(),
+}));
+
+vi.mock('firebase/performance', () => ({
+  getPerformance: vi.fn(() => ({})),
+  trace: vi.fn(() => ({
+    start: vi.fn(),
+    stop: vi.fn(),
+    record: vi.fn(),
+  })),
+}));
+
+// Mock Firebase configuration module
+vi.mock('../config/firebase', () => ({
+  auth: {
+    currentUser: null,
+    onAuthStateChanged: vi.fn((callback) => {
+      callback({
+        uid: 'test-user-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+      });
+      return vi.fn();
+    }),
+    signOut: vi.fn(),
+    signInWithEmailAndPassword: vi.fn(),
+  },
+  db: {
+    collection: vi.fn(),
+    doc: vi.fn(),
+  },
+  functions: {
+    httpsCallable: vi.fn(),
+  },
+  default: {
+    name: '[DEFAULT]',
+    options: {},
+  },
 }));
 
 // Mock environment variables
@@ -185,3 +320,218 @@ vi.mock('../types/errors', () => ({
   })),
   getErrorMessage: vi.fn((error) => error.message || 'An unexpected error occurred'),
 }));
+
+// Mock translation hooks and context
+vi.mock('../hooks/useTranslation', () => {
+  const t = (key: string) => {
+    const parts = key.split(':');
+    const actualKey = parts.length > 1 ? parts[1] : parts[0];
+    return actualKey
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+  };
+  return {
+    useTranslation: () => ({
+      t,
+      tCommon: t,
+      tNavigation: t,
+      tAuth: t,
+      tDashboard: t,
+      tForms: t,
+      tErrors: t,
+      formatDate: (date: Date | string) => new Date(date).toLocaleDateString(),
+      formatTime: (date: Date | string) => new Date(date).toLocaleTimeString(),
+      language: 'en',
+      changeLanguage: vi.fn(),
+      isLoading: false,
+      error: null,
+      supportedLanguages: [
+        { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+        { code: 'hu', name: 'Hungarian', nativeName: 'Magyar', flag: '🇭🇺' },
+      ],
+      currentLanguageConfig: { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+      isRTL: false,
+    }),
+    useCommonTranslation: () => t,
+    useNavigationTranslation: () => t,
+    useAuthTranslation: () => t,
+    useDashboardTranslation: () => t,
+    useFormsTranslation: () => t,
+    useErrorsTranslation: () => t,
+    default: () => ({
+      t,
+      formatDate: (date: Date | string) => new Date(date).toLocaleDateString(),
+      formatTime: (date: Date | string) => new Date(date).toLocaleTimeString(),
+    }),
+  };
+});
+
+vi.mock('../services/authService', () => ({
+  AuthService: {
+    login: vi.fn(),
+    signup: vi.fn(),
+    logout: vi.fn(),
+    resetPassword: vi.fn(),
+    getCurrentUser: vi.fn(),
+    onAuthStateChanged: vi.fn((callback) => {
+      callback({
+        uid: 'test-user-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        createdAt: new Date(),
+      });
+      return vi.fn();
+    }),
+    validateEmail: vi.fn(() => true),
+    validatePassword: vi.fn(() => ({ isValid: true })),
+  },
+}));
+
+vi.mock('../contexts/I18nContext', () => ({
+  useI18nContext: () => ({
+    language: 'en',
+    changeLanguage: vi.fn(),
+    t: (key: string) => key,
+    isLoading: false,
+    error: null,
+    supportedLanguages: [
+      { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+      { code: 'hu', name: 'Hungarian', nativeName: 'Magyar', flag: '🇭🇺' },
+    ],
+    currentLanguageConfig: { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' },
+    recoverFromError: vi.fn(),
+  }),
+  I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+vi.mock('../services/firebaseInit', () => ({
+  FirebaseInitService: {
+    initialize: vi.fn().mockResolvedValue(undefined),
+    validateConfiguration: vi.fn(() => true),
+    isInitialized: vi.fn(() => true),
+    isEmulatorMode: vi.fn(() => false),
+  },
+  FirebaseErrorHandler: {
+    getErrorMessage: vi.fn((error) => error.message || 'An error occurred'),
+    logError: vi.fn(),
+  },
+}));
+
+vi.mock('../components/debug/FirebaseDebug', () => ({
+  FirebaseDebug: () => null,
+}));
+
+vi.mock('../utils/serviceWorkerManager', () => ({
+  serviceWorkerManager: {
+    isSupported: vi.fn(() => true),
+    register: vi.fn().mockResolvedValue({}),
+    unregister: vi.fn().mockResolvedValue(true),
+    update: vi.fn().mockResolvedValue(undefined),
+    isOnline: vi.fn(() => true),
+    onOnlineStatusChange: vi.fn(() => vi.fn()),
+    requestBackgroundSync: vi.fn().mockResolvedValue(undefined),
+    cacheUrls: vi.fn().mockResolvedValue(true),
+    clearCache: vi.fn().mockResolvedValue(true),
+    checkForUpdates: vi.fn().mockResolvedValue(false),
+    forceUpdate: vi.fn().mockResolvedValue(undefined),
+    getCurrentCacheVersion: vi.fn().mockResolvedValue('1.0.0'),
+    clearOldCaches: vi.fn().mockResolvedValue(true),
+    retryUpdate: vi.fn().mockResolvedValue(undefined),
+    recoverFromFailedUpdate: vi.fn().mockResolvedValue(true),
+    validateServiceWorkerHealth: vi.fn().mockResolvedValue(true),
+    getUpdateErrorHistory: vi.fn(() => []),
+    clearUpdateErrorHistory: vi.fn(),
+  },
+}));
+
+const mockPlant = {
+  id: 'mock-plant-1',
+  userId: 'test-user-123',
+  name: 'Mock Monstera',
+  species: 'Monstera Deliciosa',
+  description: 'A beautiful mock plant',
+  photos: [{ id: 'photo-1', url: 'https://example.com/photo.jpg', uploadedAt: new Date() }],
+  careTasks: [],
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+vi.mock('../services/plantService', () => {
+  const mockPlantService = {
+    getUserPlants: vi.fn().mockResolvedValue([mockPlant]),
+    getPlant: vi.fn().mockResolvedValue(mockPlant),
+    createPlant: vi.fn().mockResolvedValue('mock-plant-id'),
+    updatePlant: vi.fn().mockResolvedValue(undefined),
+    deletePlant: vi.fn().mockResolvedValue(undefined),
+    validatePlantData: vi.fn().mockReturnValue({ isValid: true, errors: [] }),
+    addCareTaskToPlant: vi.fn().mockResolvedValue('mock-task-id'),
+    addPhotoToPlant: vi.fn().mockResolvedValue({}),
+  };
+  return {
+    PlantService: mockPlantService,
+    default: mockPlantService,
+  };
+});
+
+vi.mock('../services/offlineAwarePlantService', () => {
+  const mockOfflineService = {
+    getUserPlants: vi.fn().mockResolvedValue([]),
+    getPlant: vi.fn().mockResolvedValue(null),
+    createPlant: vi.fn().mockResolvedValue('mock-plant-id'),
+    updatePlant: vi.fn().mockResolvedValue(undefined),
+    deletePlant: vi.fn().mockResolvedValue(undefined),
+    uploadPlantPhoto: vi.fn().mockResolvedValue({}),
+    addCareTask: vi.fn().mockResolvedValue({}),
+  };
+  return {
+    OfflineAwarePlantService: mockOfflineService,
+    default: mockOfflineService,
+  };
+});
+
+vi.mock('../services/projectService', () => ({
+  getUserProjects: vi.fn().mockResolvedValue([]),
+  getProject: vi.fn().mockResolvedValue(null),
+  createProject: vi.fn().mockResolvedValue('mock-project-id'),
+  updateProject: vi.fn().mockResolvedValue(undefined),
+  deleteProject: vi.fn().mockResolvedValue(undefined),
+  createSubtask: vi.fn().mockResolvedValue('mock-subtask-id'),
+  updateSubtask: vi.fn().mockResolvedValue(undefined),
+  deleteSubtask: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../services/simpleTaskService', () => {
+  const mockTasks = {
+    getUserSimpleTasks: vi.fn().mockResolvedValue([]),
+    getSimpleTask: vi.fn().mockResolvedValue(null),
+    createSimpleTask: vi.fn().mockResolvedValue('mock-task-id'),
+    updateSimpleTask: vi.fn().mockResolvedValue(undefined),
+    deleteSimpleTask: vi.fn().mockResolvedValue(undefined),
+    sortTasksByDueDate: vi.fn((tasks) => tasks),
+    filterTasksByCompletion: vi.fn((tasks) => tasks),
+    searchTasks: vi.fn((tasks) => tasks),
+    toggleTaskCompletion: vi.fn().mockResolvedValue(undefined),
+    completeTask: vi.fn().mockResolvedValue(undefined),
+    uncompleteTask: vi.fn().mockResolvedValue(undefined),
+  };
+  return {
+    ...mockTasks,
+    SimpleTaskService: mockTasks,
+    default: mockTasks,
+  };
+});
+
+vi.mock('../services/calendarService', () => ({
+  getUpcomingEvents: vi.fn().mockResolvedValue([]),
+  getEventsForDateRange: vi.fn().mockResolvedValue([]),
+  getEventsForDate: vi.fn().mockResolvedValue([]),
+  getOverdueEvents: vi.fn().mockResolvedValue([]),
+  getTodaysEvents: vi.fn().mockResolvedValue([]),
+  getThisWeeksEvents: vi.fn().mockResolvedValue([]),
+  getThisMonthsEvents: vi.fn().mockResolvedValue([]),
+  createEvent: vi.fn().mockResolvedValue({}),
+  updateEvent: vi.fn().mockResolvedValue(undefined),
+  deleteEvent: vi.fn().mockResolvedValue(undefined),
+  syncAllToCalendar: vi.fn().mockResolvedValue(undefined),
+}));
+

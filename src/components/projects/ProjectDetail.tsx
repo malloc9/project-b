@@ -10,7 +10,7 @@ import {
   updateProjectStatusFromSubtasks
 } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 import SubtaskList from './SubtaskList';
 import SubtaskForm from './SubtaskForm';
 
@@ -18,6 +18,7 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t, formatDate } = useTranslation();
   
   const [project, setProject] = useState<Project | null>(null);
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
@@ -46,12 +47,12 @@ const ProjectDetail: React.FC = () => {
       ]);
 
       if (!projectData) {
-        setError('Project not found');
+        setError(t('errors:notFound', { defaultValue: 'Project not found' }));
         return;
       }
 
       if (projectData.userId !== user.uid) {
-        setError('You do not have permission to view this project');
+        setError(t('errors:noPermission', { defaultValue: 'You do not have permission to view this project' }));
         return;
       }
 
@@ -59,7 +60,7 @@ const ProjectDetail: React.FC = () => {
       setSubtasks(subtasksData);
     } catch (err) {
       console.error('Error loading project:', err);
-      setError('Failed to load project');
+      setError(t('errors:failedToLoadData', { defaultValue: 'Failed to load project' }));
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ const ProjectDetail: React.FC = () => {
       setProject({ ...project, status: newStatus });
     } catch (err) {
       console.error('Error updating project status:', err);
-      setError('Failed to update project status');
+      setError(t('errors:failedToUpdate', { defaultValue: 'Failed to update project status' }));
     }
   };
 
@@ -85,7 +86,7 @@ const ProjectDetail: React.FC = () => {
       navigate('/projects');
     } catch (err) {
       console.error('Error deleting project:', err);
-      setError('Failed to delete project');
+      setError(t('errors:failedToDelete', { defaultValue: 'Failed to delete project' }));
     }
   };
 
@@ -126,11 +127,11 @@ const ProjectDetail: React.FC = () => {
   const getStatusLabel = (status: TaskStatus): string => {
     switch (status) {
       case 'todo':
-        return 'To Do';
+        return t('projects:statusLabels.todo');
       case 'in_progress':
-        return 'In Progress';
+        return t('projects:statusLabels.in_progress');
       case 'finished':
-        return 'Finished';
+        return t('projects:statusLabels.finished');
       default:
         return status;
     }
@@ -154,7 +155,7 @@ const ProjectDetail: React.FC = () => {
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">Error</h3>
+            <h3 className="text-sm font-medium text-red-800">{t('errors:error')}</h3>
             <div className="mt-2 text-sm text-red-700">
               <p>{error}</p>
             </div>
@@ -163,7 +164,7 @@ const ProjectDetail: React.FC = () => {
                 onClick={() => navigate('/projects')}
                 className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
               >
-                Back to Projects
+                {t('projects:backToProjects')}
               </button>
             </div>
           </div>
@@ -204,13 +205,13 @@ const ProjectDetail: React.FC = () => {
                 to={`/projects/${project.id}/edit`}
                 className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Edit
+                {t('projects:edit')}
               </Link>
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                Delete
+                {t('projects:delete')}
               </button>
             </div>
           </div>
@@ -220,18 +221,18 @@ const ProjectDetail: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Project Info */}
             <div className="md:col-span-2">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Description</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('projects:description')}</h3>
               <p className="text-gray-600 whitespace-pre-wrap">{project.description}</p>
               
               {project.dueDate && (
                 <div className="mt-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-1">Due Date</h4>
+                  <h4 className="text-sm font-medium text-gray-900 mb-1">{t('projects:dueDate')}</h4>
                   <div className={`flex items-center text-sm ${overdue ? 'text-red-600' : 'text-gray-600'}`}>
                     <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span>
-                      {overdue ? 'Overdue: ' : ''}
+                      {overdue ? `${t('projects:overdue')}: ` : ''}
                       {formatDate(project.dueDate)}
                     </span>
                   </div>
@@ -242,9 +243,9 @@ const ProjectDetail: React.FC = () => {
             {/* Progress & Stats */}
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Progress</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-2">{t('projects:progress')}</h4>
                 <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
-                  <span>Completion</span>
+                  <span>{t('projects:completion')}</span>
                   <span>{progress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -256,22 +257,22 @@ const ProjectDetail: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-2">Status</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-2">{t('projects:status')}</h4>
                 <select
                   value={project.status}
                   onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
                   className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
                 >
-                  <option value="todo">To Do</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="finished">Finished</option>
+                  <option value="todo">{t('projects:statusLabels.todo')}</option>
+                  <option value="in_progress">{t('projects:statusLabels.in_progress')}</option>
+                  <option value="finished">{t('projects:statusLabels.finished')}</option>
                 </select>
               </div>
 
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-1">Subtasks</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-1">{t('projects:subtasks')}</h4>
                 <p className="text-sm text-gray-600">
-                  {subtasks.filter(s => s.status === 'finished').length} of {subtasks.length} completed
+                  {subtasks.filter(s => s.status === 'finished').length} of {subtasks.length} {t('projects:complete')}
                 </p>
               </div>
             </div>
@@ -283,7 +284,7 @@ const ProjectDetail: React.FC = () => {
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-900">Subtasks</h2>
+            <h2 className="text-lg font-medium text-gray-900">{t('projects:subtasks')}</h2>
             <button
               onClick={() => setShowSubtaskForm(true)}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -291,7 +292,7 @@ const ProjectDetail: React.FC = () => {
               <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              Add Subtask
+              {t('projects:addSubtask')}
             </button>
           </div>
         </div>
@@ -326,10 +327,10 @@ const ProjectDetail: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mt-2">Delete Project</h3>
+              <h3 className="text-lg font-medium text-gray-900 mt-2">{t('projects:deleteProject')}</h3>
               <div className="mt-2 px-7 py-3">
                 <p className="text-sm text-gray-500">
-                  Are you sure you want to delete this project? This action cannot be undone and will also delete all subtasks.
+                  {t('projects:deleteConfirmation')}
                 </p>
               </div>
               <div className="items-center px-4 py-3">
@@ -337,13 +338,13 @@ const ProjectDetail: React.FC = () => {
                   onClick={handleDeleteProject}
                   className="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300"
                 >
-                  Delete
+                  {t('projects:delete')}
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   className="mt-3 px-4 py-2 bg-white text-gray-500 text-base font-medium rounded-md w-full shadow-sm border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
                 >
-                  Cancel
+                  {t('projects:cancel')}
                 </button>
               </div>
             </div>

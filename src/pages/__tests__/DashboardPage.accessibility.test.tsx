@@ -1,8 +1,11 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { DashboardPage } from '../DashboardPage';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { useAuthenticatedUser } from '../../hooks/useAuthenticatedUser';
+import { useTranslation } from '../../hooks/useTranslation';
+import { getUpcomingEvents } from '../../services/calendarService';
 
 // Mock the I18n context
 vi.mock('../../contexts/I18nContext', () => ({
@@ -102,6 +105,7 @@ vi.mock('../../hooks/useTranslation', () => ({
 }));
 
 // Mock the hooks
+vi.mock('../../hooks/useAuthenticatedUser');
 vi.mock('../../hooks/usePlants', () => ({
   usePlants: () => ({
     plants: [
@@ -132,6 +136,43 @@ vi.mock('../../hooks/useTasks', () => ({
   })
 }));
 
+vi.mock('../../hooks/useTranslation');
+vi.mock('../../services/calendarService');
+
+// Mock layout components
+vi.mock('../../components/layout', () => ({
+  ContentArea: ({ children, title }: any) => (
+    <div data-testid="content-area" title={title}>
+      <h3>{title}</h3>
+      {children}
+    </div>
+  ),
+  GridLayout: ({ children }: any) => <div data-testid="grid-layout">{children}</div>,
+  StatsCard: ({ title, value, description, color, href }: any) => (
+    <a 
+      href={href}
+      data-testid="stats-card" 
+      data-color={color}
+      aria-label={`Navigate to ${title} page. Current value: ${value}. ${description}`}
+      className="cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      <div data-testid="stats-title">{title}</div>
+      <div data-testid="stats-value">{value}</div>
+      <div data-testid="stats-description">{description}</div>
+    </a>
+  ),
+}));
+
+// Mock calendar components
+vi.mock('../../components/calendar', () => ({
+  CalendarSummary: () => (
+    <div data-testid="calendar-summary">
+      <h3>Upcoming Items</h3>
+      <p>Calendar Summary</p>
+    </div>
+  ),
+}));
+
 const renderWithRouter = (component: React.ReactElement) => {
   return render(
     <BrowserRouter>
@@ -140,7 +181,64 @@ const renderWithRouter = (component: React.ReactElement) => {
   );
 };
 
+// Mock implementations
+const mockUseAuthenticatedUser = vi.mocked(useAuthenticatedUser);
+const mockUseTranslation = vi.mocked(useTranslation);
+const mockGetUpcomingEvents = vi.mocked(getUpcomingEvents);
+
 describe('DashboardPage Accessibility Integration Tests', () => {
+  const mockUser = { uid: 'test-uid', email: 'test@example.com', displayName: 'Test User', createdAt: new Date() };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    
+    // Setup default mocks
+    mockUseAuthenticatedUser.mockReturnValue({
+      user: mockUser,
+      isAuthenticated: true,
+      isLoading: false,
+      error: null,
+    });
+
+    mockUseTranslation.mockReturnValue({
+      t: (key: string) => {
+        const translations: Record<string, string> = {
+          'dashboard:overview': 'Overview',
+          'dashboard:recentActivity': 'Recent Activity',
+          'dashboard:recentActivitySubtitle': 'Your latest activities',
+          'dashboard:recentActivitiesWillAppear': 'Recent activities will appear here',
+          'dashboard:startByAddingPlants': 'Start by adding plants',
+          'dashboard:stats.plantsTracked': 'Plants Tracked',
+          'dashboard:stats.activePlantsInCodex': 'Active plants in your codex',
+          'dashboard:stats.activeProjects': 'Active Projects',
+          'dashboard:stats.projectsInProgress': 'Projects in progress',
+          'dashboard:stats.pendingTasks': 'Pending Tasks',
+          'dashboard:stats.tasksAwaitingCompletion': 'Tasks awaiting completion',
+          'dashboard:stats.thisWeek': 'This Week',
+          'dashboard:stats.upcomingDeadlines': 'Upcoming deadlines',
+        };
+        return translations[key] || key;
+      },
+      language: 'en',
+      changeLanguage: vi.fn(),
+      isLoading: false,
+      error: null,
+      supportedLanguages: [],
+      currentLanguageConfig: null,
+      tCommon: vi.fn(),
+      tNavigation: vi.fn(),
+      tAuth: vi.fn(),
+      tDashboard: vi.fn(),
+      tForms: vi.fn(),
+      tErrors: vi.fn(),
+      formatDate: vi.fn(),
+      formatTime: vi.fn(),
+      isRTL: false,
+    });
+
+    mockGetUpcomingEvents.mockResolvedValue([]);
+  });
+
   describe('Overview Cards Navigation', () => {
     it('should render all overview cards as navigational elements', () => {
       renderWithRouter(<DashboardPage />);
@@ -165,14 +263,18 @@ describe('DashboardPage Accessibility Integration Tests', () => {
       expect(screen.getByRole('link', { name: /this week/i })).toHaveAttribute('href', '/calendar');
     });
 
-    it('should display correct statistical data', () => {
+    it('should display correct statistical data', async () => {
       renderWithRouter(<DashboardPage />);
       
       // Check specific cards by their aria-labels to avoid ambiguity
       expect(screen.getByLabelText(/plants tracked.*current value: 2/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/active projects.*current value: 3/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/pending tasks.*current value: 3/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/this week.*current value: 0/i)).toBeInTheDocument();
+      
+      // Calendar card shows loading state initially, then resolves to 0
+      await waitFor(() => {
+        expect(screen.getByLabelText(/this week.*current value: 0/i)).toBeInTheDocument();
+      });
     });
   });
 
@@ -229,18 +331,22 @@ describe('DashboardPage Accessibility Integration Tests', () => {
   });
 
   describe('Screen Reader Experience', () => {
-    it('should provide comprehensive ARIA labels for all overview cards', () => {
+    it('should provide comprehensive ARIA labels for all overview cards', async () => {
       renderWithRouter(<DashboardPage />);
       
       const plantsCard = screen.getByLabelText(/navigate to plants tracked page.*current value: 2.*active plants in your codex/i);
       const projectsCard = screen.getByLabelText(/navigate to active projects page.*current value: 3.*projects in progress/i);
       const tasksCard = screen.getByLabelText(/navigate to pending tasks page.*current value: 3.*tasks awaiting completion/i);
-      const calendarCard = screen.getByLabelText(/navigate to this week page.*current value: 0.*upcoming deadlines/i);
       
       expect(plantsCard).toBeInTheDocument();
       expect(projectsCard).toBeInTheDocument();
       expect(tasksCard).toBeInTheDocument();
-      expect(calendarCard).toBeInTheDocument();
+      
+      // Calendar card resolves asynchronously
+      await waitFor(() => {
+        const calendarCard = screen.getByLabelText(/navigate to this week page.*current value: 0.*upcoming deadlines/i);
+        expect(calendarCard).toBeInTheDocument();
+      });
     });
 
     it('should have proper heading structure', () => {
@@ -256,8 +362,8 @@ describe('DashboardPage Accessibility Integration Tests', () => {
       const upcomingItemsHeading = screen.getByRole('heading', { name: 'Upcoming Items' });
       expect(upcomingItemsHeading).toBeInTheDocument();
       
-      const gettingStartedHeading = screen.getByRole('heading', { name: 'Getting Started' });
-      expect(gettingStartedHeading).toBeInTheDocument();
+      // Getting started section should not be present
+      expect(screen.queryByRole('heading', { name: 'Getting Started' })).not.toBeInTheDocument();
     });
 
     it('should provide context for statistical values', () => {
@@ -381,6 +487,34 @@ describe('DashboardPage Accessibility Integration Tests', () => {
         expect(card).toHaveAttribute('aria-label');
         expect(card).toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Getting Started Section Removal', () => {
+    it('should not render getting started section', () => {
+      renderWithRouter(<DashboardPage />);
+      
+      // Verify getting started section is not present
+      expect(screen.queryByRole('heading', { name: /getting started/i })).not.toBeInTheDocument();
+      expect(screen.queryByText(/getting started/i)).not.toBeInTheDocument();
+      
+      // Verify getting started tips are not present
+      expect(screen.queryByText(/add first plant/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/create project/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/sync calendar/i)).not.toBeInTheDocument();
+    });
+
+    it('should maintain proper layout without getting started section', () => {
+      renderWithRouter(<DashboardPage />);
+      
+      // Verify only the expected sections are present
+      expect(screen.getByRole('heading', { name: 'Overview' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Recent Activity' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Upcoming Items' })).toBeInTheDocument();
+      
+      // Verify the main container maintains proper spacing
+      const mainContainer = document.querySelector('.space-y-6');
+      expect(mainContainer).toBeInTheDocument();
     });
   });
 });

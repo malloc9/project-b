@@ -17,7 +17,7 @@ This document outlines the requirements for a comprehensive property and househo
 3. WHEN a user uploads photos to a plant THEN the system SHALL create a chronological timeline showing plant growth
 4. WHEN a user adds a plant description THEN the system SHALL store and display the description with the plant entry
 5. WHEN a user creates a scheduled task for a plant THEN the system SHALL store the task with due date and recurrence options
-6. WHEN a plant care task is due THEN the system SHALL export it to Google Calendar with appropriate notifications
+6. WHEN a plant care task is due THEN the system SHALL display it in the built-in calendar with appropriate notifications
 
 ### Requirement 2: Project Management
 
@@ -28,7 +28,7 @@ This document outlines the requirements for a comprehensive property and househo
 1. WHEN a user creates a new project THEN the system SHALL allow setting a project title, description, and due date
 2. WHEN a user adds subtasks to a project THEN the system SHALL allow creating multiple subtasks with individual due dates
 3. WHEN a user updates task status THEN the system SHALL support "todo", "in progress", and "finished" states
-4. WHEN a project or subtask has a due date THEN the system SHALL export it to Google Calendar
+4. WHEN a project or subtask has a due date THEN the system SHALL display it in the built-in calendar
 5. WHEN a project due date approaches THEN the system SHALL send notifications via calendar integration
 6. WHEN all subtasks are completed THEN the system SHALL automatically mark the parent project as eligible for completion
 
@@ -39,22 +39,22 @@ This document outlines the requirements for a comprehensive property and househo
 #### Acceptance Criteria
 
 1. WHEN a user creates a simple task THEN the system SHALL allow setting title, description, and due date
-2. WHEN a user sets a task due date THEN the system SHALL export it to Google Calendar
+2. WHEN a user sets a task due date THEN the system SHALL display it in the built-in calendar
 3. WHEN a simple task is due THEN the system SHALL provide calendar notifications
 4. WHEN a user completes a simple task THEN the system SHALL mark it as finished and remove it from active task lists
 5. WHEN a user views task lists THEN the system SHALL display tasks sorted by due date and priority
 
-### Requirement 4: Google Calendar Integration
+### Requirement 4: Built-in Calendar Integration
 
-**User Story:** As a user, I want all my plant care tasks, project deadlines, and simple tasks automatically synchronized with my Google Calendar, so that I receive timely notifications and can see everything in one place.
+**User Story:** As a user, I want all my plant care tasks, project deadlines, and simple tasks automatically displayed in a built-in calendar, so that I receive timely notifications and can see everything in one place.
 
 #### Acceptance Criteria
 
-1. WHEN any task or project deadline is created THEN the system SHALL automatically create a corresponding Google Calendar event
+1. WHEN any task or project deadline is created THEN the system SHALL automatically display a corresponding calendar event
 2. WHEN a task due date is modified THEN the system SHALL update the corresponding calendar event
-3. WHEN a task is completed THEN the system SHALL remove or mark the calendar event as completed
-4. WHEN a due date approaches THEN the system SHALL ensure Google Calendar sends appropriate notifications
-5. IF calendar integration fails THEN the system SHALL provide error feedback and retry mechanisms
+3. WHEN a task is completed THEN the system SHALL update the calendar event status
+4. WHEN a due date approaches THEN the system SHALL provide in-app notifications
+5. IF calendar display fails THEN the system SHALL provide error feedback and retry mechanisms
 
 ### Requirement 5: User Authentication
 

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import type { TaskStatus } from '../../types';
 import { createProject, getProject, updateProject } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface ProjectFormData {
   title: string;
@@ -15,6 +16,7 @@ const ProjectForm: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isEditing = Boolean(projectId);
 
   const [formData, setFormData] = useState<ProjectFormData>({
@@ -68,19 +70,19 @@ const ProjectForm: React.FC = () => {
     const newErrors: Partial<ProjectFormData> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
+      newErrors.title = t('projects:projectTitleRequired');
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = t('projects:descriptionRequired');
     }
 
     if (formData.dueDate) {
       const dueDate = new Date(formData.dueDate);
       if (isNaN(dueDate.getTime())) {
-        newErrors.dueDate = 'Invalid date format';
+        newErrors.dueDate = t('projects:invalidDateFormat');
       } else if (dueDate < new Date()) {
-        newErrors.dueDate = 'Due date cannot be in the past';
+        newErrors.dueDate = t('projects:dueDateCannotBePast');
       }
     }
 
@@ -122,7 +124,7 @@ const ProjectForm: React.FC = () => {
       }
     } catch (err) {
       console.error('Error saving project:', err);
-      setErrors({ title: 'Failed to save project. Please try again.' });
+      setErrors({ title: t('projects:failedToSaveProject') });
     } finally {
       setLoading(false);
     }
@@ -150,7 +152,7 @@ const ProjectForm: React.FC = () => {
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900">
-            {isEditing ? 'Edit Project' : 'Create New Project'}
+            {isEditing ? t('projects:editProject') : t('projects:createNewProject')}
           </h1>
         </div>
 
@@ -158,7 +160,7 @@ const ProjectForm: React.FC = () => {
           {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-              Project Title *
+              {t('projects:projectTitle')} *
             </label>
             <input
               type="text"
@@ -168,7 +170,7 @@ const ProjectForm: React.FC = () => {
               className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                 errors.title ? 'border-red-300' : ''
               }`}
-              placeholder="Enter project title"
+              placeholder={t('projects:enterProjectTitle')}
               disabled={loading}
             />
             {errors.title && (
@@ -179,7 +181,7 @@ const ProjectForm: React.FC = () => {
           {/* Description */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              Description *
+              {t('projects:description')} *
             </label>
             <textarea
               id="description"
@@ -189,7 +191,7 @@ const ProjectForm: React.FC = () => {
               className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
                 errors.description ? 'border-red-300' : ''
               }`}
-              placeholder="Describe your project..."
+              placeholder={t('projects:describeProject')}
               disabled={loading}
             />
             {errors.description && (
@@ -200,7 +202,7 @@ const ProjectForm: React.FC = () => {
           {/* Status */}
           <div>
             <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-              Status
+              {t('projects:status')}
             </label>
             <select
               id="status"
@@ -209,16 +211,16 @@ const ProjectForm: React.FC = () => {
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               disabled={loading}
             >
-              <option value="todo">To Do</option>
-              <option value="in_progress">In Progress</option>
-              <option value="finished">Finished</option>
+              <option value="todo">{t('projects:statusLabels.todo')}</option>
+              <option value="in_progress">{t('projects:statusLabels.in_progress')}</option>
+              <option value="finished">{t('projects:statusLabels.finished')}</option>
             </select>
           </div>
 
           {/* Due Date */}
           <div>
             <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">
-              Due Date
+              {t('projects:dueDate')}
             </label>
             <input
               type="date"
@@ -234,7 +236,7 @@ const ProjectForm: React.FC = () => {
               <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>
             )}
             <p className="mt-1 text-sm text-gray-500">
-              Optional: Set a deadline for this project
+              {t('projects:optionalDeadline')}
             </p>
           </div>
 
@@ -246,7 +248,7 @@ const ProjectForm: React.FC = () => {
               disabled={loading}
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              Cancel
+              {t('projects:cancel')}
             </button>
             <button
               type="submit"
@@ -256,10 +258,10 @@ const ProjectForm: React.FC = () => {
               {loading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {isEditing ? 'Updating...' : 'Creating...'}
+                  {isEditing ? t('projects:updating') : t('projects:creating')}
                 </div>
               ) : (
-                isEditing ? 'Update Project' : 'Create Project'
+                isEditing ? t('projects:updateProject') : t('projects:createProject')
               )}
             </button>
           </div>

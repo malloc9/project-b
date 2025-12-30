@@ -39,12 +39,12 @@ export const FormField: React.FC<FormFieldProps> = ({
       </label>
       
       <div className="relative">
-        {React.cloneElement(children as React.ReactElement<any>, {
+        {React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, {
           id: fieldId,
           name,
           'aria-invalid': hasErrors,
           'aria-describedby': hasErrors ? `${fieldId}-error` : helpText ? `${fieldId}-help` : undefined,
-          className: `${((children as React.ReactElement).props as any).className || ''} ${
+          className: `${((children as React.ReactElement<React.HTMLAttributes<HTMLElement>>).props.className || '')} ${
             hasErrors 
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500' 
               : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'

@@ -3,12 +3,13 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import type { SimpleTask } from '../../types';
 import { getSimpleTask, toggleTaskCompletion, deleteSimpleTask } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatDate } from '../../utils/dateUtils';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const TaskDetail: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t, formatDate } = useTranslation();
   const [task, setTask] = useState<SimpleTask | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,19 +30,19 @@ const TaskDetail: React.FC = () => {
       const taskData = await getSimpleTask(user.uid, taskId);
       
       if (!taskData) {
-        setError('Task not found');
+        setError(t('taskNotFound', { ns: 'tasks' }));
         return;
       }
 
       if (taskData.userId !== user.uid) {
-        setError('You do not have permission to view this task');
+        setError(t('noPermission', { ns: 'tasks' }));
         return;
       }
 
       setTask(taskData);
     } catch (err) {
       console.error('Error loading task:', err);
-      setError('Failed to load task');
+      setError(t('failedToLoad', { ns: 'tasks' }));
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ const TaskDetail: React.FC = () => {
       await loadTask(); // Reload to get updated data
     } catch (err) {
       console.error('Error toggling task completion:', err);
-      setError('Failed to update task');
+      setError(t('failedToUpdate', { ns: 'tasks' }));
     } finally {
       setActionLoading(false);
     }
@@ -65,7 +66,7 @@ const TaskDetail: React.FC = () => {
   const handleDeleteTask = async () => {
     if (!task || !taskId || !user) return; // Add user null check
 
-    if (!window.confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+    if (!window.confirm(t('confirmDeleteDetail', { ns: 'tasks' }))) {
       return;
     }
 
@@ -75,7 +76,7 @@ const TaskDetail: React.FC = () => {
       navigate('/tasks');
     } catch (err) {
       console.error('Error deleting task:', err);
-      setError('Failed to delete task');
+      setError(t('failedToDelete', { ns: 'tasks' }));
       setActionLoading(false);
     }
   };
@@ -99,16 +100,16 @@ const TaskDetail: React.FC = () => {
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <h3 className="text-sm font-medium text-red-800">{t('error', { ns: 'tasks' })}</h3>
               <div className="mt-2 text-sm text-red-700">
-                <p>{error || 'Task not found'}</p>
+                <p>{error || t('taskNotFound', { ns: 'tasks' })}</p>
               </div>
               <div className="mt-4">
                 <Link
                   to="/tasks"
                   className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
                 >
-                  Back to Tasks
+                  {t('backToTasks', { ns: 'tasks' })}
                 </Link>
               </div>
             </div>
@@ -135,7 +136,7 @@ const TaskDetail: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Task Details</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('taskDetails', { ns: 'tasks' })}</h1>
             </div>
             <div className="flex items-center space-x-3">
               <Link
@@ -145,7 +146,7 @@ const TaskDetail: React.FC = () => {
                 <svg className="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                Edit
+                {t('edit', { ns: 'tasks' })}
               </Link>
               <button
                 onClick={handleDeleteTask}
@@ -155,7 +156,7 @@ const TaskDetail: React.FC = () => {
                 <svg className="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                Delete
+                {t('delete', { ns: 'tasks' })}
               </button>
             </div>
           </div>
@@ -201,11 +202,11 @@ const TaskDetail: React.FC = () => {
                         : 'bg-yellow-100 text-yellow-800'
                     }`}
                   >
-                    {task.completed ? 'Completed' : 'Pending'}
+                    {task.completed ? t('completed', { ns: 'tasks' }) : t('pending', { ns: 'tasks' })}
                   </span>
                   {overdue && !task.completed && (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      Overdue
+                      {t('overdue', { ns: 'tasks' })}
                     </span>
                   )}
                 </div>
@@ -215,7 +216,7 @@ const TaskDetail: React.FC = () => {
             {/* Description */}
             {task.description && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Description</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('description', { ns: 'tasks' })}</h3>
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-gray-700 whitespace-pre-wrap">{task.description}</p>
                 </div>
@@ -226,7 +227,7 @@ const TaskDetail: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {task.dueDate && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Due Date</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{t('dueDate', { ns: 'tasks' })}</h3>
                   <div className={`flex items-center text-sm ${
                     overdue && !task.completed ? 'text-red-600' : 'text-gray-600'
                   }`}>
@@ -235,14 +236,14 @@ const TaskDetail: React.FC = () => {
                     </svg>
                     <span className="font-medium">
                       {formatDate(task.dueDate)}
-                      {overdue && !task.completed && ' (Overdue)'}
+                      {overdue && !task.completed && ` (${t('overdue', { ns: 'tasks' })})`}
                     </span>
                   </div>
                 </div>
               )}
 
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Created</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('created', { ns: 'tasks' })}</h3>
                 <div className="flex items-center text-sm text-gray-600">
                   <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -255,7 +256,7 @@ const TaskDetail: React.FC = () => {
             {/* Last Updated */}
             {task.updatedAt.getTime() !== task.createdAt.getTime() && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Last Updated</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('lastUpdated', { ns: 'tasks' })}</h3>
                 <div className="flex items-center text-sm text-gray-600">
                   <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

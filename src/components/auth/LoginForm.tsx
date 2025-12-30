@@ -21,7 +21,13 @@ interface FormErrors {
 
 export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
   const { login } = useAuth();
-  const { t } = useTranslation();
+  const { t, isLoading } = useTranslation();
+
+  // Safe translation function that handles loading state
+  const safeT = (key: string, fallback: string) => {
+    if (isLoading) return fallback;
+    return t(key, { defaultValue: fallback });
+  };
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -34,14 +40,14 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = t('auth:validation.emailRequired');
+      newErrors.email = safeT('auth:validation.emailRequired', 'Email is required');
     } else if (!AuthService.validateEmail(formData.email)) {
-      newErrors.email = t('auth:validation.validEmailRequired');
+      newErrors.email = safeT('auth:validation.validEmailRequired', 'Please enter a valid email address');
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = t('auth:validation.passwordRequired');
+      newErrors.password = safeT('auth:validation.passwordRequired', 'Password is required');
     }
 
     setErrors(newErrors);
@@ -78,7 +84,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       await login(formData.email, formData.password);
       onSuccess?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t('auth:validation.loginFailed');
+      const errorMessage = error instanceof Error ? error.message : safeT('auth:validation.loginFailed', 'Login failed');
       setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
@@ -98,7 +104,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       await login(formData.email, formData.password);
       onSuccess?.();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : t('auth:validation.signupFailed');
+      const errorMessage = error instanceof Error ? error.message : safeT('auth:validation.signupFailed', 'Signup failed');
       setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
@@ -110,7 +116,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
-            {t('auth:signIn')}
+            {safeT('auth:signIn', 'Sign In')}
           </h2>
         </div>
 
@@ -122,7 +128,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
 
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            {t('auth:emailAddress')}
+            {safeT('auth:emailAddress', 'Email Address')}
           </label>
           <input
             id="email"
@@ -135,7 +141,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.email ? 'border-red-300' : 'border-gray-300'
             }`}
-            placeholder={t('auth:enterEmail')}
+            placeholder={safeT('auth:enterEmail', 'Enter your email')}
             disabled={isSubmitting}
           />
           {errors.email && (
@@ -145,7 +151,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            {t('auth:password')}
+            {safeT('auth:password', 'Password')}
           </label>
           <input
             id="password"
@@ -158,7 +164,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.password ? 'border-red-300' : 'border-gray-300'
             }`}
-            placeholder={t('auth:enterPassword')}
+            placeholder={safeT('auth:enterPassword', 'Enter your password')}
             disabled={isSubmitting}
           />
           {errors.password && (
@@ -175,10 +181,10 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             {isSubmitting ? (
               <div className="flex items-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                {t('auth:signingIn')}
+                {safeT('auth:signingIn', 'Signing in...')}
               </div>
             ) : (
-              t('auth:signIn')
+              safeT('auth:signIn', 'Sign In')
             )}
           </button>
         </div>
@@ -192,7 +198,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
               disabled={isSubmitting}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? t('auth:creatingAccount') : t('auth:createTestAccount')}
+              {isSubmitting ? safeT('auth:creatingAccount', 'Creating Account...') : safeT('auth:createTestAccount', 'Create Test Account')}
             </button>
           </div>
         )}
@@ -204,7 +210,7 @@ export function LoginForm({ onSuccess, onForgotPassword }: LoginFormProps) {
             className="text-sm text-blue-600 hover:text-blue-500 focus:outline-none focus:underline"
             disabled={isSubmitting}
           >
-            {t('auth:forgotPassword')}
+            {safeT('auth:forgotPassword', 'Forgot your password?')}
           </button>
         </div>
       </form>

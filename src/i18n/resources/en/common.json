@@ -48,5 +48,6 @@
   "appDescription": "Household management application for tracking plants, projects and tasks",
   "appKeywords": "household, management, plants, projects, tasks, home",
   "invalidDate": "Invalid date",
-  "invalidTime": "Invalid time"
+  "invalidTime": "Invalid time",
+  "uploadPhoto": "Upload Photo"
 }

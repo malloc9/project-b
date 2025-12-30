@@ -7,6 +7,7 @@ import { PhotoViewer } from './PhotoViewer';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
 import { format, formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface PhotoTimelineProps {
   plantId: string;
@@ -16,6 +17,7 @@ interface PhotoTimelineProps {
 
 export function PhotoTimeline({ plantId, photos, onPhotosChange }: PhotoTimelineProps) {
   const { user } = useAuth();
+  const { t } = useTranslation(['loading', 'common', 'accessibility']);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<PlantPhoto | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -109,7 +111,7 @@ export function PhotoTimeline({ plantId, photos, onPhotosChange }: PhotoTimeline
             {isUploading ? (
               <>
                 <LoadingSpinner size="sm" className="mr-2" />
-                Uploading...
+                {t('loading:processing', { defaultValue: 'Uploading...' })}
               </>
             ) : (
               'Quick Upload'
@@ -233,7 +235,7 @@ export function PhotoTimeline({ plantId, photos, onPhotosChange }: PhotoTimeline
                       <button
                         onClick={() => handlePhotoDelete(photo.id)}
                         className="text-gray-400 hover:text-red-600 transition-colors p-1"
-                        title="Delete photo"
+                        title={t('deletePhoto')}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

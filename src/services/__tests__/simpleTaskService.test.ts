@@ -9,18 +9,37 @@ vi.mock('../../config/firebase', () => ({
 // Mock Firestore functions
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn(),
-  doc: vi.fn(),
-  addDoc: vi.fn(),
-  getDoc: vi.fn(),
-  getDocs: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
+  doc: vi.fn((...args) => ({ id: args[args.length - 1], path: args.join('/') })),
+  addDoc: vi.fn(() => Promise.resolve({ id: 'mock-id' })),
+  getDoc: vi.fn(() => Promise.resolve({
+    exists: () => true,
+    data: () => ({}),
+    id: 'mock-id'
+  })),
+  getDocs: vi.fn(() => Promise.resolve({
+    forEach: (callback: any) => [],
+    docs: [],
+    empty: true,
+    size: 0
+  })),
+  updateDoc: vi.fn(() => Promise.resolve()),
+  deleteDoc: vi.fn(() => Promise.resolve()),
   query: vi.fn(),
   where: vi.fn(),
   orderBy: vi.fn(),
   Timestamp: {
-    fromDate: vi.fn((date: Date) => ({ toDate: () => date })),
-    now: vi.fn(() => ({ toDate: () => new Date() }))
+    fromDate: vi.fn((date: Date) => ({
+      toDate: () => date,
+      toMillis: () => date.getTime(),
+      seconds: Math.floor(date.getTime() / 1000),
+      nanoseconds: (date.getTime() % 1000) * 1e6,
+    })),
+    now: vi.fn(() => ({
+      toDate: () => new Date(),
+      toMillis: () => Date.now(),
+      seconds: Math.floor(Date.now() / 1000),
+      nanoseconds: (Date.now() % 1000) * 1e6,
+    }))
   }
 }));
 

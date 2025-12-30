@@ -1,0 +1,76 @@
+{
+  "pageTitle": "Növény Kódex",
+  "pageSubtitle": "Kezelje növénygyűjteményét, kövesse nyomon a növekedést fotókkal, és ütemezze a gondozási feladatokat",
+  "addPlant": "Növény Hozzáadása",
+  "backToPlants": "← Vissza a Növényekhez",
+  "stats": {
+    "totalPlants": "Összes Növény",
+    "photosUploaded": "Feltöltött Fotók",
+    "careTasks": "Gondozási Feladatok",
+    "plantsInCollection": "Növények a gyűjteményében",
+    "growthPhotosCaptured": "Rögzített növekedési fotók",
+    "scheduledCareReminders": "Ütemezett gondozási emlékeztetők"
+  },
+  "tasks": {
+    "overdue": "lejárt feladat",
+    "overduePlural": "lejárt feladat",
+    "next": "Következő:",
+    "noCareTasks": "Nincsenek ütemezett gondozási feladatok",
+    "updated": "Frissítve"
+  },
+  "search": {
+    "placeholder": "Keresés növények között név, faj vagy leírás alapján...",
+    "filters": "Szűrők",
+    "clearAll": "Összes törlése",
+    "species": "Faj",
+    "speciesPlaceholder": "Szűrés faj szerint...",
+    "careTasks": "Gondozási Feladatok",
+    "allPlants": "Minden növény",
+    "withTasks": "Gondozási feladatokkal",
+    "withoutTasks": "Gondozási feladatok nélkül"
+  },
+  "results": {
+    "plant": "növény",
+    "plants": "növény",
+    "found": "találat",
+    "noPlants": "Nem találhatók növények",
+    "noResultsWithFilters": "Próbálja meg módosítani a szűrőket, vagy adja hozzá az első növényét a kezdéshez.",
+    "noResultsEmpty": "Adja hozzá az első növényét a gyűjtemény elkezdéséhez."
+  },
+  "detail": {
+    "tabs": {
+      "overview": "Áttekintés",
+      "photos": "Fotók",
+      "careTasks": "Gondozási Feladatok"
+    },
+    "plantInformation": "Növény Információk",
+    "quickStats": "Gyors Statisztikák",
+    "fields": {
+      "name": "Név",
+      "species": "Faj",
+      "description": "Leírás",
+      "added": "Hozzáadva",
+      "lastUpdated": "Utoljára Frissítve"
+    },
+    "stats": {
+      "photosUploaded": "Feltöltött fotók",
+      "careTasks": "Gondozási feladatok",
+      "completedTasks": "Befejezett feladatok"
+    },
+    "actions": {
+      "edit": "Szerkesztés",
+      "delete": "Törlés",
+      "backToPlants": "← Vissza a növényekhez"
+    },
+    "alerts": {
+      "overdueTasks": "lejárt gondozási feladat",
+      "overdueTasksPlural": "lejárt gondozási feladat",
+      "nextTask": "Következő gondozási feladat:"
+    },
+    "notFound": {
+      "title": "Növény nem található",
+      "message": "A keresett növény nem létezik vagy törölve lett."
+    },
+    "deleteConfirm": "Biztosan törölni szeretné a(z) \"{name}\" növényt? Ez a művelet nem vonható vissza."
+  }
+}
