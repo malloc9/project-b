@@ -77,57 +77,69 @@ class PerformanceMonitor {
   monitorWebVitals(): void {
     // Monitor Largest Contentful Paint (LCP)
     if ('PerformanceObserver' in window) {
-      const lcpObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        const lastEntry = entries[entries.length - 1];
-        
-        console.log('LCP:', lastEntry.startTime);
-        this.logMetric('LCP', lastEntry.startTime);
-      });
-
       try {
-        lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
-        this.observers.push(lcpObserver);
+        const lcpObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          const lastEntry = entries[entries.length - 1];
+          
+          console.log('LCP:', lastEntry.startTime);
+          this.logMetric('LCP', lastEntry.startTime);
+        });
+
+        try {
+          lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
+          this.observers.push(lcpObserver);
+        } catch (e) {
+          console.warn('LCP observer not supported');
+        }
       } catch (e) {
-        console.warn('LCP observer not supported');
+        console.warn('PerformanceObserver not supported for LCP');
       }
 
       // Monitor First Input Delay (FID)
-      const fidObserver = new PerformanceObserver((list) => {
-        const entries = list.getEntries();
-        entries.forEach((entry: any) => {
-          console.log('FID:', entry.processingStart - entry.startTime);
-          this.logMetric('FID', entry.processingStart - entry.startTime);
-        });
-      });
-
       try {
-        fidObserver.observe({ entryTypes: ['first-input'] });
-        this.observers.push(fidObserver);
+        const fidObserver = new PerformanceObserver((list) => {
+          const entries = list.getEntries();
+          entries.forEach((entry: any) => {
+            console.log('FID:', entry.processingStart - entry.startTime);
+            this.logMetric('FID', entry.processingStart - entry.startTime);
+          });
+        });
+
+        try {
+          fidObserver.observe({ entryTypes: ['first-input'] });
+          this.observers.push(fidObserver);
+        } catch (e) {
+          console.warn('FID observer not supported');
+        }
       } catch (e) {
-        console.warn('FID observer not supported');
+        console.warn('PerformanceObserver not supported for FID');
       }
 
       // Monitor Cumulative Layout Shift (CLS)
-      const clsObserver = new PerformanceObserver((list) => {
-        let clsValue = 0;
-        const entries = list.getEntries();
-        
-        entries.forEach((entry: any) => {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
-          }
+      try {
+        const clsObserver = new PerformanceObserver((list) => {
+          let clsValue = 0;
+          const entries = list.getEntries();
+          
+          entries.forEach((entry: any) => {
+            if (!entry.hadRecentInput) {
+              clsValue += entry.value;
+            }
+          });
+
+          console.log('CLS:', clsValue);
+          this.logMetric('CLS', clsValue);
         });
 
-        console.log('CLS:', clsValue);
-        this.logMetric('CLS', clsValue);
-      });
-
-      try {
-        clsObserver.observe({ entryTypes: ['layout-shift'] });
-        this.observers.push(clsObserver);
+        try {
+          clsObserver.observe({ entryTypes: ['layout-shift'] });
+          this.observers.push(clsObserver);
+        } catch (e) {
+          console.warn('CLS observer not supported');
+        }
       } catch (e) {
-        console.warn('CLS observer not supported');
+        console.warn('PerformanceObserver not supported for CLS');
       }
     }
   }

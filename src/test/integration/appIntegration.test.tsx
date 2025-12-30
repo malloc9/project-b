@@ -25,20 +25,34 @@ vi.mock('../../config/firebase', () => ({
 
 // Mock all service modules
 vi.mock('../../services/authService', () => ({
-  getCurrentUser: vi.fn().mockResolvedValue({
-    uid: 'test-user-123',
-    email: 'test@example.com',
-    displayName: 'Test User',
-    createdAt: new Date(),
-  }),
-  login: vi.fn().mockResolvedValue({
-    uid: 'test-user-123',
-    email: 'test@example.com',
-    displayName: 'Test User',
-    createdAt: new Date(),
-  }),
-  logout: vi.fn().mockResolvedValue(undefined),
-  resetPassword: vi.fn().mockResolvedValue(undefined),
+  AuthService: {
+    getCurrentUser: vi.fn().mockReturnValue({
+      uid: 'test-user-123',
+      email: 'test@example.com',
+      displayName: 'Test User',
+      createdAt: new Date(),
+    }),
+    login: vi.fn().mockResolvedValue({
+      uid: 'test-user-123',
+      email: 'test@example.com',
+      displayName: 'Test User',
+      createdAt: new Date(),
+    }),
+    logout: vi.fn().mockResolvedValue(undefined),
+    resetPassword: vi.fn().mockResolvedValue(undefined),
+    onAuthStateChanged: vi.fn((callback) => {
+      // Simulate authenticated user
+      callback({
+        uid: 'test-user-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+        createdAt: new Date(),
+      });
+      return vi.fn(); // unsubscribe function
+    }),
+    validateEmail: vi.fn().mockReturnValue(true),
+    validatePassword: vi.fn().mockReturnValue({ isValid: true }),
+  },
 }));
 
 vi.mock('../../services/plantService', () => ({

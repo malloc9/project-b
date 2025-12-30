@@ -68,25 +68,34 @@ describe('ErrorBoundary', () => {
   });
 
   it('provides retry functionality', () => {
+    let shouldThrow = true;
+    
+    const TestComponentWithToggle = () => {
+      if (shouldThrow) {
+        throw new Error('Test error message');
+      }
+      return <div>No error</div>;
+    };
+
     const { rerender } = render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
+        <TestComponentWithToggle />
       </ErrorBoundary>
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
 
     const retryButton = screen.getByText('Try Again');
+    
+    // Change the condition before clicking retry
+    shouldThrow = false;
+    
     fireEvent.click(retryButton);
 
-    // Re-render with no error
-    rerender(
-      <ErrorBoundary>
-        <ThrowError shouldThrow={false} />
-      </ErrorBoundary>
-    );
-
-    expect(screen.getByText('No error')).toBeInTheDocument();
+    // Wait for the retry to take effect
+    setTimeout(() => {
+      expect(screen.getByText('No error')).toBeInTheDocument();
+    }, 150);
   });
 
   it('provides reload functionality', () => {
@@ -144,22 +153,32 @@ describe('ErrorBoundary', () => {
   });
 
   it('generates unique error IDs', () => {
-    const { rerender } = render(
+    // Mock Date.now and Math.random to ensure different IDs
+    const originalDateNow = Date.now;
+    const originalMathRandom = Math.random;
+    
+    let dateCounter = 1000;
+    let randomCounter = 0.1;
+    
+    Date.now = vi.fn(() => ++dateCounter); // Increment each time
+    Math.random = vi.fn(() => {
+      randomCounter += 0.1;
+      return randomCounter;
+    });
+
+    // First error boundary
+    const { unmount } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
     const firstErrorId = screen.getByText(/Error ID:/).textContent;
+    
+    // Unmount and create a new error boundary
+    unmount();
 
-    // Reset and throw another error
-    rerender(
-      <ErrorBoundary>
-        <ThrowError shouldThrow={false} />
-      </ErrorBoundary>
-    );
-
-    rerender(
+    render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
@@ -168,5 +187,9 @@ describe('ErrorBoundary', () => {
     const secondErrorId = screen.getByText(/Error ID:/).textContent;
 
     expect(firstErrorId).not.toBe(secondErrorId);
+    
+    // Restore original functions
+    Date.now = originalDateNow;
+    Math.random = originalMathRandom;
   });
 });

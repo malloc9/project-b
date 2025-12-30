@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): State {
     // Convert React error to our AppError format
     const appError = createAppError(
-      ErrorCode.UNKNOWN_ERROR,
+      'unknown-error' as ErrorCode,
       error.message || 'An unexpected error occurred in the application',
       {
         stack: error.stack,

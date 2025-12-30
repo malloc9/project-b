@@ -4,6 +4,103 @@ import { DashboardPage } from '../DashboardPage';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Mock the I18n context
+vi.mock('../../contexts/I18nContext', () => ({
+  useI18nContext: () => ({
+    language: 'en',
+    changeLanguage: vi.fn(),
+    t: (key: string, options?: any) => {
+      // Simple mock translation function
+      const translations: Record<string, string> = {
+        'dashboard:overview': 'Overview',
+        'dashboard:recentActivity': 'Recent Activity',
+        'dashboard:upcomingItems': 'Upcoming Items',
+        'dashboard:gettingStarted': 'Getting Started',
+        'dashboard:stats.plantsTracked': 'Plants Tracked',
+        'dashboard:stats.activeProjects': 'Active Projects',
+        'dashboard:stats.pendingTasks': 'Pending Tasks',
+        'dashboard:stats.thisWeek': 'This Week',
+        'dashboard:stats.activePlantsInCodex': 'Active plants in your codex',
+        'dashboard:stats.projectsInProgress': 'Projects in progress',
+        'dashboard:stats.tasksAwaitingCompletion': 'Tasks awaiting completion',
+        'dashboard:stats.upcomingDeadlines': 'Upcoming deadlines',
+        'dashboard:recentActivitySubtitle': 'Recent activity subtitle',
+        'dashboard:upcomingItemsSubtitle': 'Upcoming items subtitle',
+        'dashboard:recentActivitiesWillAppear': 'Recent activities will appear here',
+        'dashboard:startByAddingPlants': 'Start by adding some plants',
+        'dashboard:noUpcomingItemsScheduled': 'No upcoming items scheduled',
+        'dashboard:plantCareRemindersWillShow': 'Plant care reminders will show here',
+        'aria.navigateTo': 'Navigate to {{page}} page',
+        'aria.currentValue': 'current value: {{value}}',
+      };
+      
+      let result = translations[key] || key;
+      
+      // Handle interpolation
+      if (options && typeof options === 'object') {
+        Object.keys(options).forEach(optionKey => {
+          if (optionKey !== 'defaultValue') {
+            result = result.replace(`{{${optionKey}}}`, options[optionKey]);
+          }
+        });
+      }
+      
+      return result;
+    },
+    isLoading: false,
+    error: null,
+    supportedLanguages: [],
+    currentLanguageConfig: null,
+  }),
+  I18nProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock the useTranslation hook
+vi.mock('../../hooks/useTranslation', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: any) => {
+      // Simple mock translation function
+      const translations: Record<string, string> = {
+        'dashboard:overview': 'Overview',
+        'dashboard:recentActivity': 'Recent Activity',
+        'dashboard:upcomingItems': 'Upcoming Items',
+        'dashboard:gettingStarted': 'Getting Started',
+        'dashboard:stats.plantsTracked': 'Plants Tracked',
+        'dashboard:stats.activeProjects': 'Active Projects',
+        'dashboard:stats.pendingTasks': 'Pending Tasks',
+        'dashboard:stats.thisWeek': 'This Week',
+        'dashboard:stats.activePlantsInCodex': 'Active plants in your codex',
+        'dashboard:stats.projectsInProgress': 'Projects in progress',
+        'dashboard:stats.tasksAwaitingCompletion': 'Tasks awaiting completion',
+        'dashboard:stats.upcomingDeadlines': 'Upcoming deadlines',
+        'dashboard:recentActivitySubtitle': 'Recent activity subtitle',
+        'dashboard:upcomingItemsSubtitle': 'Upcoming items subtitle',
+        'dashboard:recentActivitiesWillAppear': 'Recent activities will appear here',
+        'dashboard:startByAddingPlants': 'Start by adding some plants',
+        'dashboard:noUpcomingItemsScheduled': 'No upcoming items scheduled',
+        'dashboard:plantCareRemindersWillShow': 'Plant care reminders will show here',
+        'aria.navigateTo': 'Navigate to {{page}} page',
+        'aria.currentValue': 'current value: {{value}}',
+      };
+      
+      let result = translations[key] || key;
+      
+      // Handle interpolation
+      if (options && typeof options === 'object') {
+        Object.keys(options).forEach(optionKey => {
+          if (optionKey !== 'defaultValue') {
+            result = result.replace(`{{${optionKey}}}`, options[optionKey]);
+          }
+        });
+      }
+      
+      return result;
+    },
+    language: 'en',
+    changeLanguage: vi.fn(),
+  }),
+}));
+
 // Mock the hooks
 vi.mock('../../hooks/usePlants', () => ({
   usePlants: () => ({

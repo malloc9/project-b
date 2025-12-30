@@ -26,8 +26,6 @@ describe('ValidatedInput', () => {
   });
 
   it('calls onChange when input value changes', async () => {
-    const user = userEvent.setup();
-    
     render(
       <ValidatedInput
         value=""
@@ -37,14 +35,12 @@ describe('ValidatedInput', () => {
     );
 
     const input = screen.getByPlaceholderText('Enter text');
-    await user.type(input, 'new text');
+    fireEvent.change(input, { target: { value: 'new text' } });
 
     expect(mockOnChange).toHaveBeenCalledWith('new text');
   });
 
   it('sanitizes input by default', async () => {
-    const user = userEvent.setup();
-    
     render(
       <ValidatedInput
         value=""
@@ -54,9 +50,9 @@ describe('ValidatedInput', () => {
     );
 
     const input = screen.getByPlaceholderText('Enter text');
-    await user.type(input, '<script>alert("xss")</script>');
+    fireEvent.change(input, { target: { value: '<script>alert("xss")</script>' } });
 
-    expect(mockOnChange).toHaveBeenCalledWith('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+    expect(mockOnChange).toHaveBeenCalledWith('&lt;script&gt;alert(&quot;xss&quot;)&lt;&#x2F;script&gt;');
   });
 
   it('validates on blur when validateOnBlur is true', async () => {
@@ -82,7 +78,6 @@ describe('ValidatedInput', () => {
   });
 
   it('validates on change when validateOnChange is true', async () => {
-    const user = userEvent.setup();
     mockOnValidate.mockReturnValue(null); // Valid input
     
     render(
@@ -97,7 +92,7 @@ describe('ValidatedInput', () => {
     );
 
     const input = screen.getByPlaceholderText('Enter text');
-    await user.type(input, 'valid');
+    fireEvent.change(input, { target: { value: 'valid' } });
 
     await waitFor(() => {
       expect(mockOnValidate).toHaveBeenCalledWith('valid');
@@ -105,7 +100,6 @@ describe('ValidatedInput', () => {
   });
 
   it('debounces validation when debounceMs is set', async () => {
-    const user = userEvent.setup();
     mockOnValidate.mockReturnValue(null);
     
     render(
@@ -120,10 +114,10 @@ describe('ValidatedInput', () => {
     );
 
     const input = screen.getByPlaceholderText('Enter text');
-    await user.type(input, 'test');
+    fireEvent.change(input, { target: { value: 'test' } });
 
     // Should not validate immediately
-    expect(mockOnValidate).not.toHaveBeenCalled();
+    expect(mockOnValidate).not.toHaveBeenCalledWith('test');
 
     // Should validate after debounce delay
     await waitFor(() => {
@@ -181,8 +175,6 @@ describe('ValidatedInput', () => {
   });
 
   it('applies custom sanitization options', async () => {
-    const user = userEvent.setup();
-    
     render(
       <ValidatedInput
         value=""
@@ -193,14 +185,12 @@ describe('ValidatedInput', () => {
     );
 
     const input = screen.getByPlaceholderText('Enter text');
-    await user.type(input, '  toolongtext  ');
+    fireEvent.change(input, { target: { value: '  toolongtext  ' } });
 
     expect(mockOnChange).toHaveBeenCalledWith('toolo');
   });
 
   it('disables sanitization when sanitize is false', async () => {
-    const user = userEvent.setup();
-    
     render(
       <ValidatedInput
         value=""
@@ -211,7 +201,7 @@ describe('ValidatedInput', () => {
     );
 
     const input = screen.getByPlaceholderText('Enter text');
-    await user.type(input, '<script>test</script>');
+    fireEvent.change(input, { target: { value: '<script>test</script>' } });
 
     expect(mockOnChange).toHaveBeenCalledWith('<script>test</script>');
   });

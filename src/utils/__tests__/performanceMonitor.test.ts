@@ -72,8 +72,11 @@ describe('PerformanceMonitor', () => {
 
   describe('metric management', () => {
     it('retrieves metrics correctly', () => {
+      // Set up the timing sequence
+      vi.mocked(performance.now).mockReturnValueOnce(1000); // start time
       performanceMonitor.startTiming('test-metric');
-      vi.mocked(performance.now).mockReturnValue(1100);
+      
+      vi.mocked(performance.now).mockReturnValueOnce(1100); // end time
       performanceMonitor.endTiming('test-metric');
       
       const metric = performanceMonitor.getMetric('test-metric');
@@ -185,9 +188,11 @@ describe('usePerformanceTimer', () => {
   it('starts and ends timing when called', () => {
     const { result } = renderHook(() => usePerformanceTimer('hook-timing'));
     
+    // Set up timing sequence
+    vi.mocked(performance.now).mockReturnValueOnce(1000); // start time
     result.current.startTimer();
     
-    vi.mocked(performance.now).mockReturnValue(1300);
+    vi.mocked(performance.now).mockReturnValueOnce(1300); // end time
     const metric = result.current.endTimer();
     
     expect(metric?.name).toBe('hook-timing');

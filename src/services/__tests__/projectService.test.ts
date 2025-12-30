@@ -8,8 +8,8 @@ vi.mock('../../config/firebase', () => ({
 
 // Mock Firestore functions
 vi.mock('firebase/firestore', () => ({
-  collection: vi.fn(),
-  doc: vi.fn(),
+  collection: vi.fn(() => ({ _type: 'collection' })),
+  doc: vi.fn(() => ({ _type: 'doc' })),
   addDoc: vi.fn(),
   getDoc: vi.fn(),
   getDocs: vi.fn(),
@@ -51,6 +51,11 @@ import {
   getDocs,
   updateDoc,
   deleteDoc,
+  collection,
+  doc,
+  query,
+  where,
+  orderBy,
   writeBatch,
   Timestamp
 } from 'firebase/firestore';
@@ -89,6 +94,10 @@ describe('Project Service', () => {
     (Timestamp.fromDate as any).mockImplementation((date: Date) => ({
       toDate: () => date
     }));
+    
+    // Setup mock return values
+    (collection as any).mockReturnValue({ _type: 'collection' });
+    (doc as any).mockReturnValue({ _type: 'doc' });
   });
 
   afterEach(() => {
@@ -113,7 +122,7 @@ describe('Project Service', () => {
 
         expect(result).toBe(mockProjectId);
         expect(addDoc).toHaveBeenCalledWith(
-          expect.anything(),
+          expect.objectContaining({ _type: 'collection' }),
           expect.objectContaining({
             ...projectData,
             createdAt: expect.anything(),

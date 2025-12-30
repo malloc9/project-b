@@ -67,17 +67,11 @@ describe('ServiceWorkerManager', () => {
       const callback = vi.fn();
       const unsubscribe = serviceWorkerManager.onOnlineStatusChange(callback);
 
-      // Simulate going offline
-      Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
-      
-      // Find the offline event listener and call it
-      const offlineListener = mockAddEventListener.mock.calls.find(
-        call => call[0] === 'offline'
-      )?.[1];
-      
-      if (offlineListener) {
-        offlineListener();
-      }
+      // Simulate going offline by directly calling the event handler
+      // Since the service worker manager sets up event listeners in constructor,
+      // we need to trigger them through the window events
+      const offlineEvent = new Event('offline');
+      window.dispatchEvent(offlineEvent);
 
       expect(callback).toHaveBeenCalledWith(false);
 
@@ -86,14 +80,8 @@ describe('ServiceWorkerManager', () => {
       callback.mockClear();
 
       // Simulate going online
-      Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
-      const onlineListener = mockAddEventListener.mock.calls.find(
-        call => call[0] === 'online'
-      )?.[1];
-      
-      if (onlineListener) {
-        onlineListener();
-      }
+      const onlineEvent = new Event('online');
+      window.dispatchEvent(onlineEvent);
 
       expect(callback).not.toHaveBeenCalled();
     });

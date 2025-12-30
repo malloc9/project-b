@@ -116,9 +116,9 @@ export class ConflictResolutionManager {
       };
     }
     
-    // Since PlantCareTask doesn't have updatedAt, use dueDate as fallback
-    const localTime = new Date(local.dueDate).getTime();
-    const remoteTime = new Date(remote.dueDate).getTime();
+    // Use updatedAt for timestamp comparison
+    const localTime = new Date(local.updatedAt).getTime();
+    const remoteTime = new Date(remote.updatedAt).getTime();
     
     return {
       resolved: localTime > remoteTime ? local : remote,

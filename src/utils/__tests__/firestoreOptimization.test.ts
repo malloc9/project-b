@@ -8,17 +8,26 @@ import {
   createQueryCacheKey 
 } from '../firestoreOptimization';
 
-// Mock Firestore functions
+// Mock Firebase Firestore functions
+vi.mock('firebase/firestore', () => ({
+  query: vi.fn((...args) => ({ 
+    _query: true, 
+    _args: args,
+    withConverter: vi.fn().mockReturnThis(),
+  })),
+  limit: vi.fn((n) => ({ type: 'limit', value: n })),
+  orderBy: vi.fn((field, direction) => ({ type: 'orderBy', field, direction })),
+  where: vi.fn((field, op, value) => ({ type: 'where', field, op, value })),
+  startAfter: vi.fn((doc) => ({ type: 'startAfter', doc })),
+}));
+
+import { query, limit, orderBy, where, startAfter } from 'firebase/firestore';
+
 const mockQuery = {
   withConverter: vi.fn().mockReturnThis(),
   startAfter: vi.fn().mockReturnThis(),
   limit: vi.fn().mockReturnThis(),
 };
-
-const mockConstraints = [
-  { type: 'where' },
-  { type: 'orderBy' },
-];
 
 describe('Firestore Optimization Utils', () => {
   beforeEach(() => {
@@ -29,27 +38,33 @@ describe('Firestore Optimization Utils', () => {
     it('creates query with pagination', () => {
       const options = { pageSize: 10 };
       
-      createPaginatedQuery(mockQuery as any, options);
+      const result = createPaginatedQuery(mockQuery as any, options);
       
-      expect(mockQuery.limit).toHaveBeenCalledWith(10);
+      expect(limit).toHaveBeenCalledWith(10);
+      expect(result).toBeDefined();
     });
 
     it('adds startAfter when lastDoc provided', () => {
       const mockDoc = { id: 'last-doc' } as any;
       const options = { pageSize: 10, lastDoc: mockDoc };
       
-      createPaginatedQuery(mockQuery as any, options);
+      const result = createPaginatedQuery(mockQuery as any, options);
       
-      expect(mockQuery.startAfter).toHaveBeenCalledWith(mockDoc);
-      expect(mockQuery.limit).toHaveBeenCalledWith(10);
+      expect(startAfter).toHaveBeenCalledWith(mockDoc);
+      expect(limit).toHaveBeenCalledWith(10);
+      expect(result).toBeDefined();
     });
 
     it('applies additional constraints', () => {
       const options = { pageSize: 10 };
+      const constraints = [
+        { type: 'where', field: 'userId', op: '==', value: 'user123' }
+      ];
       
-      createPaginatedQuery(mockQuery as any, options, mockConstraints as any);
+      const result = createPaginatedQuery(mockQuery as any, options, constraints as any);
       
-      expect(mockQuery.limit).toHaveBeenCalledWith(10);
+      expect(limit).toHaveBeenCalledWith(10);
+      expect(result).toBeDefined();
     });
   });
 
@@ -59,21 +74,22 @@ describe('Firestore Optimization Utils', () => {
         const constraints = QueryPatterns.plantsWithFilters('user123', {});
         
         expect(constraints).toHaveLength(2); // userId and orderBy
-        expect(constraints[0]).toEqual(expect.objectContaining({
-          type: 'where',
-        }));
+        expect(where).toHaveBeenCalledWith('userId', '==', 'user123');
+        expect(orderBy).toHaveBeenCalledWith('updatedAt', 'desc');
       });
 
       it('adds photo filter when specified', () => {
         const constraints = QueryPatterns.plantsWithFilters('user123', { hasPhotos: true });
         
         expect(constraints).toHaveLength(3); // userId, orderBy, photoCount
+        expect(where).toHaveBeenCalledWith('photoCount', '>', 0);
       });
 
       it('adds task filter when specified', () => {
         const constraints = QueryPatterns.plantsWithFilters('user123', { hasTasks: true });
         
         expect(constraints).toHaveLength(3); // userId, orderBy, activeTaskCount
+        expect(where).toHaveBeenCalledWith('activeTaskCount', '>', 0);
       });
 
       it('adds both filters when specified', () => {

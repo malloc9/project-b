@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-## [ ] Track: Implement a Dynamic and Actionable Dashboard
+## [~] Track: Implement a Dynamic and Actionable Dashboard
 *Link: [./conductor/tracks/dynamic_dashboard_20251221/](./conductor/tracks/dynamic_dashboard_20251221/)*

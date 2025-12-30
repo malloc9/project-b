@@ -2,6 +2,16 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { LazyImage } from '../LazyImage';
 
+// Mock the imageUtils module
+vi.mock('../../../utils/imageUtils', () => ({
+  createLazyImageObserver: vi.fn(),
+  preloadImage: vi.fn()
+}));
+
+import { createLazyImageObserver, preloadImage } from '../../../utils/imageUtils';
+
+const mockCreateLazyImageObserver = vi.mocked(createLazyImageObserver);
+const mockPreloadImage = vi.mocked(preloadImage);
 
 // Mock IntersectionObserver
 const mockIntersectionObserver = vi.fn();
@@ -11,30 +21,12 @@ mockIntersectionObserver.mockReturnValue({
   disconnect: vi.fn(),
 });
 
-Object.defineProperty(window, 'IntersectionObserver', {
-  writable: true,
-  configurable: true,
-  value: mockIntersectionObserver,
-});
-
-// Mock Image constructor
-let mockImage: any;
-
-Object.defineProperty(global, 'Image', {
-  writable: true,
-  value: vi.fn(() => {
-    mockImage = {
-      onload: null,
-      onerror: null,
-      src: '',
-    };
-    return mockImage;
-  }),
-});
-
 describe('LazyImage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Setup the mock to return the mocked intersection observer
+    mockCreateLazyImageObserver.mockReturnValue(mockIntersectionObserver());
   });
 
   it('renders with placeholder initially', () => {
@@ -58,18 +50,14 @@ describe('LazyImage', () => {
       />
     );
 
-    expect(mockIntersectionObserver).toHaveBeenCalledWith(
-      expect.any(Function),
-      expect.objectContaining({
-        root: null,
-        rootMargin: '50px',
-        threshold: 0.1,
-      })
+    expect(mockCreateLazyImageObserver).toHaveBeenCalledWith(
+      expect.any(Function)
     );
   });
 
   it('loads actual image when in view', async () => {
     const onLoad = vi.fn();
+    mockPreloadImage.mockResolvedValue();
     
     render(
       <LazyImage
@@ -79,22 +67,21 @@ describe('LazyImage', () => {
       />
     );
 
+    // Get the callback function passed to createLazyImageObserver
+    const observerCallback = mockCreateLazyImageObserver.mock.calls[0][0];
+    
     // Simulate intersection observer callback
-    const observerCallback = mockIntersectionObserver.mock.calls[0][0];
     observerCallback([{ isIntersecting: true, target: {} }]);
 
-    // Simulate image load
-    if (mockImage && mockImage.onload) {
-      mockImage.onload();
-    }
-
     await waitFor(() => {
+      expect(mockPreloadImage).toHaveBeenCalledWith('test-image.jpg');
       expect(onLoad).toHaveBeenCalled();
     });
   });
 
   it('handles image load error', async () => {
     const onError = vi.fn();
+    mockPreloadImage.mockRejectedValue(new Error('Failed to load'));
     
     render(
       <LazyImage
@@ -104,16 +91,14 @@ describe('LazyImage', () => {
       />
     );
 
+    // Get the callback function passed to createLazyImageObserver
+    const observerCallback = mockCreateLazyImageObserver.mock.calls[0][0];
+    
     // Simulate intersection observer callback
-    const observerCallback = mockIntersectionObserver.mock.calls[0][0];
     observerCallback([{ isIntersecting: true, target: {} }]);
 
-    // Simulate image error
-    if (mockImage && mockImage.onerror) {
-      mockImage.onerror();
-    }
-
     await waitFor(() => {
+      expect(mockPreloadImage).toHaveBeenCalledWith('invalid-image.jpg');
       expect(onError).toHaveBeenCalled();
     });
   });

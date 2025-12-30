@@ -104,35 +104,7 @@ export function DashboardPage() {
         </ContentArea>
       </GridLayout>
 
-      {/* Tips and getting started */}
-      <ContentArea
-        title={t('dashboard:gettingStarted')}
-        subtitle={t('dashboard:gettingStartedSubtitle')}
-      >
-        <GridLayout columns={3} gap="md">
-          <div className="text-center p-4">
-            <div className="text-3xl mb-3">🌱</div>
-            <h3 className="font-medium text-gray-900 mb-2">{t('dashboard:tips.addFirstPlant')}</h3>
-            <p className="text-sm text-gray-600">
-              {t('dashboard:tips.addFirstPlantDescription')}
-            </p>
-          </div>
-          <div className="text-center p-4">
-            <div className="text-3xl mb-3">🔨</div>
-            <h3 className="font-medium text-gray-900 mb-2">{t('dashboard:tips.createProject')}</h3>
-            <p className="text-sm text-gray-600">
-              {t('dashboard:tips.createProjectDescription')}
-            </p>
-          </div>
-          <div className="text-center p-4">
-            <div className="text-3xl mb-3">📅</div>
-            <h3 className="font-medium text-gray-900 mb-2">{t('dashboard:tips.syncCalendar')}</h3>
-            <p className="text-sm text-gray-600">
-              {t('dashboard:tips.syncCalendarDescription')}
-            </p>
-          </div>
-        </GridLayout>
-      </ContentArea>
+
     </div>
   );
 }

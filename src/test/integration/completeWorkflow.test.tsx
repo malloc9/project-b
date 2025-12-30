@@ -40,10 +40,15 @@ vi.mock("../../types", () => ({
 
 // Mock application services
 vi.mock("../../services/authService", () => ({
-  getCurrentUser: vi.fn(),
-  login: vi.fn(),
-  logout: vi.fn(),
-  resetPassword: vi.fn(),
+  AuthService: {
+    getCurrentUser: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    resetPassword: vi.fn(),
+    onAuthStateChanged: vi.fn(),
+    validateEmail: vi.fn(),
+    validatePassword: vi.fn(),
+  },
 }));
 
 vi.mock("../../services/plantService", () => ({
