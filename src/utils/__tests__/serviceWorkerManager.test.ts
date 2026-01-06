@@ -1061,8 +1061,8 @@ describe('ServiceWorkerManager', () => {
         expect(result2).toBe(false);
       });
 
-      it('should clear old caches through service worker manager', async () => {
-      // Capture the MessageChannel instance created by serviceWorkerManager.getCurrentCacheVersion
+it('should clear old caches through service worker manager', async () => {
+      // Capture MessageChannel instance created by serviceWorkerManager.getCurrentCacheVersion
       let capturedPort1: MessagePort;
       global.MessageChannel = vi.fn(() => {
         const { port1, port2 } = createMockMessageChannel();
@@ -1072,21 +1072,24 @@ describe('ServiceWorkerManager', () => {
 
       const result = serviceWorkerManager.clearOldCaches();
 
-      // Simulate successful cleanup response
-      setTimeout(() => {
-        if (capturedPort1.onmessage) {
-          capturedPort1.onmessage({ 
-            data: { 
-              success: true, 
-              deletedCount: 3,
-              currentVersion: 'abc123'
-            } 
-          } as MessageEvent);
-        }
-      }, 0);
+      // Simulate successful cleanup response immediately
+      if (capturedPort1.onmessage) {
+        capturedPort1.onmessage({ 
+          data: { 
+            success: true, 
+            deletedCount: 3,
+            currentVersion: 'abc123'
+          } 
+        } as MessageEvent);
+      }
 
-        const success = await result;
-        expect(success).toBe(true);
+      const success = await result;
+      expect(success).toBe(true);
+      });
+
+      await messagePromise;
+      const success = await result;
+      expect(success).toBe(true);
       });
     });
 

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { DashboardPage } from '../DashboardPage';
 import '@testing-library/jest-dom';
@@ -175,10 +175,10 @@ vi.mock('../../components/calendar', () => ({
 
 const renderWithRouter = (component: React.ReactElement) => {
   return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
-  );
+      <BrowserRouter>
+        {component}
+      </BrowserRouter>
+    );
 };
 
 // Mock implementations
@@ -240,8 +240,10 @@ describe('DashboardPage Accessibility Integration Tests', () => {
   });
 
   describe('Overview Cards Navigation', () => {
-    it('should render all overview cards as navigational elements', () => {
-      renderWithRouter(<DashboardPage />);
+it('should render all overview cards as navigational elements', () => {
+      act(() => {
+        renderWithRouter(<DashboardPage />);
+      });
       
       const plantsCard = screen.getByRole('link', { name: /navigate to plants tracked page/i });
       const projectsCard = screen.getByRole('link', { name: /navigate to active projects page/i });
@@ -254,8 +256,8 @@ describe('DashboardPage Accessibility Integration Tests', () => {
       expect(calendarCard).toBeInTheDocument();
     });
 
-    it('should have correct navigation targets', () => {
-      renderWithRouter(<DashboardPage />);
+it('should have correct navigation targets', async () => {
+      await await renderWithRouter(<DashboardPage />);
       
       expect(screen.getByRole('link', { name: /plants tracked/i })).toHaveAttribute('href', '/plants');
       expect(screen.getByRole('link', { name: /active projects/i })).toHaveAttribute('href', '/projects');
@@ -264,7 +266,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should display correct statistical data', async () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       // Check specific cards by their aria-labels to avoid ambiguity
       expect(screen.getByLabelText(/plants tracked.*current value: 2/i)).toBeInTheDocument();
@@ -280,7 +282,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
 
   describe('Keyboard Navigation Flow', () => {
     it('should allow tab navigation through all overview cards', async () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const cards = screen.getAllByRole('link').filter(link => 
         link.getAttribute('aria-label')?.includes('Navigate to')
@@ -302,7 +304,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should activate navigation on Enter key press', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const plantsCard = screen.getByRole('link', { name: /plants tracked/i });
       plantsCard.focus();
@@ -315,7 +317,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should maintain logical tab order', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const interactiveElements = screen.getAllByRole('link');
       const overviewCards = interactiveElements.filter(link => 
@@ -332,7 +334,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
 
   describe('Screen Reader Experience', () => {
     it('should provide comprehensive ARIA labels for all overview cards', async () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const plantsCard = screen.getByLabelText(/navigate to plants tracked page.*current value: 2.*active plants in your codex/i);
       const projectsCard = screen.getByLabelText(/navigate to active projects page.*current value: 3.*projects in progress/i);
@@ -350,7 +352,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should have proper heading structure', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const overviewHeading = screen.getByRole('heading', { name: 'Overview' });
       expect(overviewHeading).toBeInTheDocument();
@@ -367,7 +369,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should provide context for statistical values', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       // Verify that each statistic has descriptive context
       expect(screen.getByText('Active plants in your codex')).toBeInTheDocument();
@@ -379,7 +381,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
 
   describe('Visual Feedback and Hover States', () => {
     it('should apply hover styles to all overview cards', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const cards = screen.getAllByRole('link').filter(link => 
         link.getAttribute('aria-label')?.includes('Navigate to')
@@ -395,7 +397,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should respond to mouse interactions', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const plantsCard = screen.getByRole('link', { name: /plants tracked/i });
       
@@ -409,7 +411,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
 
   describe('Focus Management', () => {
     it('should have visible focus indicators on all interactive elements', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const cards = screen.getAllByRole('link').filter(link => 
         link.getAttribute('aria-label')?.includes('Navigate to')
@@ -424,7 +426,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should maintain focus when navigating with keyboard', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const plantsCard = screen.getByRole('link', { name: /plants tracked/i });
       plantsCard.focus();
@@ -446,7 +448,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
         value: 375,
       });
       
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       const cards = screen.getAllByRole('link').filter(link => 
         link.getAttribute('aria-label')?.includes('Navigate to')
@@ -475,7 +477,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     it('should handle zero values gracefully', () => {
       // The mocked data already provides non-zero values
       // This test verifies the cards are still accessible
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       // Should still be accessible even with zero values
       const cards = screen.getAllByRole('link').filter(link => 
@@ -492,7 +494,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
 
   describe('Getting Started Section Removal', () => {
     it('should not render getting started section', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       // Verify getting started section is not present
       expect(screen.queryByRole('heading', { name: /getting started/i })).not.toBeInTheDocument();
@@ -505,7 +507,7 @@ describe('DashboardPage Accessibility Integration Tests', () => {
     });
 
     it('should maintain proper layout without getting started section', () => {
-      renderWithRouter(<DashboardPage />);
+      await renderWithRouter(<DashboardPage />);
       
       // Verify only the expected sections are present
       expect(screen.getByRole('heading', { name: 'Overview' })).toBeInTheDocument();
