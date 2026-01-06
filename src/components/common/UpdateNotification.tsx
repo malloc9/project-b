@@ -9,13 +9,14 @@ interface UpdateNotificationProps {
   onUpdate: () => Promise<void>;
   onDismiss?: () => void;
   className?: string;
+  onUpdateLaterClick?: () => void;
 }
 
 export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
   isVisible,
   onUpdate,
   onDismiss,
-  className = ''
+  className = '', onUpdateLaterClick
 }) => {
   const { t } = useTranslation(['system', 'loading', 'common', 'accessibility']);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -170,7 +171,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
             {/* Dismiss button */}
             {!isUpdating && onDismiss && (
               <button
-                onClick={handleDismiss}
+                onClick={onUpdateLaterClick ?? handleDismiss}
                 className="text-blue-200 hover:text-white transition-colors p-1 -mt-1 -mr-1"
                 aria-label={t('accessibility:dismissNotification')}
               >
@@ -251,7 +252,7 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
               
               {!isUpdating && (
                 <button
-                  onClick={handleDismiss}
+onClick={onUpdateLaterClick ?? handleDismiss}
                   className="mobile:flex-shrink-0 bg-blue-500 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-400 transition-colors text-sm mobile:text-base mobile:hidden"
                 >
                   {t('system:later', { defaultValue: 'Later' })}
