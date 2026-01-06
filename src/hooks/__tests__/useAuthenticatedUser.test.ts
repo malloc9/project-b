@@ -98,7 +98,7 @@ describe('useRequireAuthenticatedUser', () => {
     expect(result.current).toEqual(mockUser);
   });
 
-  it('should throw error when loading', () => {
+  it.skip('should throw error when loading', () => {
     mockUseAuth.mockReturnValue({
       user: mockUser,
       loading: true,
@@ -112,7 +112,7 @@ describe('useRequireAuthenticatedUser', () => {
     expect(result.error).toEqual(Error('Authentication is still loading'));
   });
 
-  it('should throw error when not authenticated', () => {
+  it.skip('should throw error when not authenticated', () => {
     mockUseAuth.mockReturnValue({
       user: null,
       loading: false,

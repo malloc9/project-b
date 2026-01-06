@@ -1,6 +1,5 @@
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { AuthProvider, useAuth, useRequireAuth } from '../AuthContext';
 import { AuthService } from '../../services/authService';
 import type { User } from '../../types';
@@ -115,9 +114,11 @@ describe('AuthContext', () => {
         expect(screen.getByTestId('loading')).toHaveTextContent('not-loading');
       });
 
-      // Click login button
+// Click login button
       const loginButton = screen.getByText('Login');
-      loginButton.click();
+      await act(async () => {
+        loginButton.click();
+      });
 
       await waitFor(() => {
         expect(mockAuthService.login).toHaveBeenCalledWith(
@@ -146,11 +147,12 @@ describe('AuthContext', () => {
         expect(screen.getByTestId('loading')).toHaveTextContent('not-loading');
       });
 
-      // Click login button
+// Click login button
       const loginButton = screen.getByText('Login');
-      loginButton.click();
-      
-      // Wait for login to be called and verify it was called
+      await act(async () => {
+        loginButton.click();
+      });
+
       await waitFor(() => {
         expect(mockAuthService.login).toHaveBeenCalledWith('test@example.com', 'password');
       });
@@ -174,9 +176,11 @@ describe('AuthContext', () => {
         expect(screen.getByTestId('loading')).toHaveTextContent('not-loading');
       });
 
-      // Click logout button
+// Click logout button
       const logoutButton = screen.getByText('Logout');
-      logoutButton.click();
+      await act(async () => {
+        logoutButton.click();
+      });
 
       await waitFor(() => {
         expect(mockAuthService.logout).toHaveBeenCalled();
@@ -201,9 +205,11 @@ describe('AuthContext', () => {
         expect(screen.getByTestId('loading')).toHaveTextContent('not-loading');
       });
 
-      // Click reset password button
+// Click reset password button
       const resetButton = screen.getByText('Reset Password');
-      resetButton.click();
+      await act(async () => {
+        resetButton.click();
+      });
 
       await waitFor(() => {
         expect(mockAuthService.resetPassword).toHaveBeenCalledWith(

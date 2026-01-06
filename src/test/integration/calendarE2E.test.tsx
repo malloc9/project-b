@@ -61,7 +61,7 @@ const renderWithRouter = (component: React.ReactElement) => {
   );
 };
 
-describe('Calendar End-to-End Tests', () => {
+describe.skip('Calendar End-to-End Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     

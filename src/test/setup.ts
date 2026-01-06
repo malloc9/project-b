@@ -1,55 +1,14 @@
-import { vi, expect, afterEach } from 'vitest';
+import { vi } from 'vitest';
 import React from 'react';
 import '@testing-library/jest-dom';
-import { cleanup } from '@testing-library/react';
-import * as matchers from '@testing-library/jest-dom/matchers';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Initialize i18n for tests
+import '../i18n';
 
 // Set default timeout for all tests
 vi.setConfig({ testTimeout: 15000 });
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'dashboard:overview': 'Overview',
-        'dashboard:welcomeBack': 'Welcome back',
-        'navigation:householdManagement': 'Household Management',
-        'navigation:homeManager': 'Home Manager',
-        'navigation:dashboard': 'Dashboard',
-        'navigation:plantCodex': 'Plant Codex',
-        'navigation:projects': 'Projects',
-        'navigation:tasks': 'Tasks',
-        'navigation:calendar': 'Calendar',
-        'navigation:welcomeToDashboard': 'Welcome back',
-        'common:loading': 'Loading...',
-        'common:error': 'Error',
-      };
 
-      if (translations[key]) return translations[key];
-
-      const parts = key.split(':');
-      const actualKey = parts.length > 1 ? parts[1] : parts[0];
-      return actualKey
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase())
-        .trim();
-    },
-    i18n: {
-      changeLanguage: vi.fn(),
-      language: 'en',
-    },
-  }),
-  initReactI18next: {
-    type: '3rdParty',
-    init: vi.fn(),
-  },
-}));
 
 // Mock Firebase configuration
 const mockFirebaseConfig = {
@@ -319,6 +278,30 @@ vi.mock('../types/errors', () => ({
     timestamp: new Date(),
   })),
   getErrorMessage: vi.fn((error) => error.message || 'An unexpected error occurred'),
+}));
+
+// Mock react-i18next to prevent NO_I18NEXT_INSTANCE errors
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const parts = key.split(':');
+      const actualKey = parts.length > 1 ? parts[1] : parts[0];
+      return actualKey
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (str) => str.toUpperCase())
+        .trim();
+    },
+    i18n: {
+      language: 'en',
+      changeLanguage: vi.fn(),
+      isInitialized: true,
+    },
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: vi.fn(),
+  },
+  I18nextProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // Mock translation hooks and context

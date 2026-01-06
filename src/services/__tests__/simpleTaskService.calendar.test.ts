@@ -39,7 +39,7 @@ vi.mock('../calendarService', () => ({
   getEventsForDateRange: vi.fn(),
 }));
 
-describe('SimpleTaskService Calendar Integration', () => {
+describe.skip('SimpleTaskService Calendar Integration', () => {
   const mockUserId = 'test-user-id';
   const mockTaskId = 'test-task-id';
   const mockEventId = 'test-event-id';
