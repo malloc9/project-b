@@ -11,9 +11,9 @@ const AllTheProviders: React.FC<{ children: React.ReactNode }> = ({ children }) 
 );
 
 // Patch RTL render to always use the wrapper
-// @ts-ignore - patching runtime of the testing library
-const originalRender = RTL.render;
-// @ts-expect-error - allow overriding RTL.render for wrapper injection
+// @ts-expect-error - patching runtime of the testing library
+const originalRender: number = RTL.render;
+// @ts-expect-error - patching runtime
 RTL.render = (ui: any, options: any = {}) => {
   return originalRender(ui, { wrapper: AllTheProviders, ...options });
 };
