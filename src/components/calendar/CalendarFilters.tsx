@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import type { CalendarEvent, CalendarFilters as CalendarFiltersType } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
-import { TFunction } from 'i18next';
+import type { TFunction } from 'i18next';
 
 interface CalendarFiltersProps {
   onFiltersChange: (filters: CalendarFiltersType) => void;
