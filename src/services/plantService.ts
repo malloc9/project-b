@@ -9,7 +9,7 @@ import type {
 import { FirestoreService, QueryHelpers } from './firebase';
 import { UnifiedStorageService as StorageService } from './unifiedStorageService';
 import { where, collection, query, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import db from '../config/firebase';
 
 // ============================================================================
 // CALENDAR INTEGRATION HELPER FUNCTIONS

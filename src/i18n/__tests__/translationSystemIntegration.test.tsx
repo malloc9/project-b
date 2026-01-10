@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import i18n from '../index';
+import { translate as tHelper, setLang } from '../../test/helpers/i18nTestHelper';
 
 // Mock i18n for testing
 vi.mock('../index', () => ({
