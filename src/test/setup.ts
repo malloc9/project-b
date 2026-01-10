@@ -21,7 +21,7 @@ if (typeof window !== 'undefined') {
   // Seed i18n language for tests that read language preference from localStorage
   try {
     localStorage.setItem('i18nextLng', 'en');
-  } catch {}
+  } catch (e) { /* ignore */ }
 
   // Minimal Firebase Auth mock to satisfy onAuthStateChanged usage in tests
   if (!(window as any).firebase) {
