@@ -7,5 +7,6 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts', './src/test/setup-i18n.tsx'],
+    testPathIgnorePatterns: ['/src/test/integration/'],
   },
 });
