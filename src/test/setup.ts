@@ -146,18 +146,34 @@ vi.mock('firebase/performance', () => ({
 }));
 
 // Mock Firebase configuration module
-vi.mock("../config/firebase", () => ({\n  __esModule: true,\n  default: {\n    name: '[DEFAULT]',\n    options: {},\n  },\n  auth: {\n    currentUser: null,\n    onAuthStateChanged: vi.fn((callback) => {\n      callback({\n        uid: 'test-user-123',\n        email: 'test@example.com',\n        displayName: 'Test User',\n      });\n      return vi.fn();\n    }),\n    signOut: vi.fn(),\n    signInWithEmailAndPassword: vi.fn(),\n  },\n  db: {\n    collection: vi.fn(),\n    doc: vi.fn(),\n  },\n  functions: {\n    httpsCallable: vi.fn(),\n  },\n})) ;
-
-// Mock environment variables
-vi.mock('import.meta', () => ({
-  env: {
-    VITE_FIREBASE_API_KEY: 'test-api-key',
-    VITE_FIREBASE_AUTH_DOMAIN: 'test-project.firebaseapp.com',
-    VITE_FIREBASE_PROJECT_ID: 'test-project',
-    VITE_FIREBASE_MESSAGING_SENDER_ID: '123456789',
-    VITE_FIREBASE_APP_ID: '1:123456789:web:abcdef123456',
+vi.mock('../config/firebase', () => ({
+  __esModule: true,
+  default: {
+    name: '[DEFAULT]',
+    options: {},
+  },
+  auth: {
+    currentUser: null,
+    onAuthStateChanged: vi.fn((callback) => {
+      callback({
+        uid: 'test-user-123',
+        email: 'test@example.com',
+        displayName: 'Test User',
+      });
+      return vi.fn();
+    }),
+    signOut: vi.fn(),
+    signInWithEmailAndPassword: vi.fn(),
+  },
+  db: {
+    collection: vi.fn(),
+    doc: vi.fn(),
+  },
+  functions: {
+    httpsCallable: vi.fn(),
   },
 }));
+
 
 // Mock ResizeObserver for responsive design tests
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
