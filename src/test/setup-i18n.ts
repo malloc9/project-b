@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import React from "react";
 
 type Lang = "en" | "hu";
 let currentLang: Lang = "en";
@@ -49,7 +50,8 @@ export const I18nextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  return <>{children}</>;\n};
+  return React.createElement(React.Fragment, null, children);
+};
 export const initReactI18next = { type: "3rdParty", init: vi.fn() };
 export const setLanguage = (lang: Lang) => {
   currentLang = lang;
