@@ -3,7 +3,12 @@ import React from 'react';
 import '@testing-library/jest-dom';
 
 // Initialize i18n for tests
+import { applyI18nTestMocks } from './i18n.test.mock';
+import { firebaseUnifiedModule } from './utils/firebaseUnifiedMock';
 import '../i18n';
+applyI18nTestMocks();
+vi.mock('../config/firebase', () => firebaseUnifiedModule());
+vi.mock('../../config/firebase', () => firebaseUnifiedModule());
 
 // Set default timeout for all tests
 vi.setConfig({ testTimeout: 15000 });
