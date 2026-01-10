@@ -8,6 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts', './src/test/setup-i18n.tsx'],
     exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.idea/**',
       'src/i18n/__tests__/translationSystemIntegration.test.tsx',
       'src/pages/__tests__/**/*',
       'src/contexts/__tests__/**/*'
