@@ -170,11 +170,11 @@ export const UpdateNotification: React.FC<UpdateNotificationProps> = ({
             
             {/* Dismiss button */}
             {!isUpdating && onDismiss && (
-              <button
-                onClick={onUpdateLaterClick ?? handleDismiss}
-                className="text-blue-200 hover:text-white transition-colors p-1 -mt-1 -mr-1"
-                aria-label={t('accessibility:dismissNotification')}
-              >
+<button
+            onClick={onUpdateLaterClick ?? handleDismiss}
+            className="text-blue-200 hover:text-white transition-colors p-1 -mt-1 -mr-1"
+            aria-label={t('accessibility:dismissNotification')}
+          >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>

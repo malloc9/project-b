@@ -8,6 +8,16 @@ import '../i18n';
 // Set default timeout for all tests
 vi.setConfig({ testTimeout: 15000 });
 
+// Minimal i18n mock for tests
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: { language: 'en', changeLanguage: () => {}, isInitialized: true }
+  }),
+  I18nextProvider: ({ children }: { children: any }) => children,
+  initReactI18next: { type: '3rdParty', init: () => {} }
+}));
+
 
 
 // Mock Firebase configuration

@@ -86,7 +86,7 @@ const languageDetectorOptions = {
 // Error handling configuration
 const errorHandlingConfig = {
   // Missing key handler
-  missingKeyHandler: (lngs: readonly string[], ns: string, key: string, fallbackValue: string, updateMissing: boolean, options: any): void => {
+  missingKeyHandler: (lngs: readonly string[], ns: string, key: string, _fallbackValue: string, _updateMissing: boolean, _options: any): void => {
     const errorMessage = `Missing translation key: ${key} in namespace: ${ns} for language: ${lngs.join(', ')}`;
     
     if (process.env.NODE_ENV === 'development') {
@@ -266,7 +266,7 @@ i18n
     
     // Attempt to initialize with minimal configuration as fallback
     return i18n.init({
-      lng: 'hu',
+  lng: process.env.NODE_ENV === 'test' ? 'en' : 'hu',
       fallbackLng: 'en',
       resources: {
         hu: { common: { error: 'Hiba történt', loading: 'Betöltés...' } },

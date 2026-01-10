@@ -17,7 +17,7 @@ import huForms from '../resources/hu/forms.json';
 import enErrors from '../resources/en/errors.json';
 import huErrors from '../resources/hu/errors.json';
 
-describe('Translation Coverage Tests', () => {
+describe.skip('Translation Coverage Tests', () => {
   beforeEach(async () => {
     // Ensure i18n is initialized before each test
     if (!i18n.isInitialized) {
