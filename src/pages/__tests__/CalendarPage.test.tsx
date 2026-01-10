@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { setLanguage } from '../../test/setup-i18n';
 import { vi } from 'vitest';
 import { CalendarPage } from '../CalendarPage';
 import { useAuth } from '../../contexts/AuthContext';
@@ -61,8 +62,9 @@ vi.mock('../../components/calendar/EventForm', () => ({
 describe('CalendarPage', () => {
   const mockUser = { uid: 'test-user-id', email: 'test@example.com' };
 
-  beforeEach(() => {
+beforeEach(() => {
     vi.clearAllMocks();
+    setLanguage('en');
   });
 
   it.skip('renders login message when user is not authenticated', () => {
