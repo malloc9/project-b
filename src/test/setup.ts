@@ -4,18 +4,12 @@ import '@testing-library/jest-dom';
 
 // Initialize i18n for tests
 import '../i18n';
+import { useTranslation, I18nextProvider, initReactI18next } from "./mocks/i18nMock";
 
-// Set default timeout for all tests
-vi.setConfig({ testTimeout: 15000 });
-
-// Minimal i18n mock for tests
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: { language: 'en', changeLanguage: () => {}, isInitialized: true }
-  }),
-  I18nextProvider: ({ children }: { children: any }) => children,
-  initReactI18next: { type: '3rdParty', init: () => {} }
+  useTranslation: useTranslation,
+  I18nextProvider: I18nextProvider,
+  initReactI18next: initReactI18next
 }));
 
 
@@ -150,32 +144,7 @@ vi.mock('firebase/performance', () => ({
 }));
 
 // Mock Firebase configuration module
-vi.mock('../config/firebase', () => ({
-  auth: {
-    currentUser: null,
-    onAuthStateChanged: vi.fn((callback) => {
-      callback({
-        uid: 'test-user-123',
-        email: 'test@example.com',
-        displayName: 'Test User',
-      });
-      return vi.fn();
-    }),
-    signOut: vi.fn(),
-    signInWithEmailAndPassword: vi.fn(),
-  },
-  db: {
-    collection: vi.fn(),
-    doc: vi.fn(),
-  },
-  functions: {
-    httpsCallable: vi.fn(),
-  },
-  default: {
-    name: '[DEFAULT]',
-    options: {},
-  },
-}));
+vi.mock('../config/firebase', () => ({\n  __esModule: true,\n  default: {\n    name: '[DEFAULT]',\n    options: {},\n  },\n  auth: {\n    currentUser: null,\n    onAuthStateChanged: vi.fn((callback) => {\n      callback({\n        uid: 'test-user-123',\n        email: 'test@example.com',\n        displayName: 'Test User',\n      });\n      return vi.fn();\n    }),\n    signOut: vi.fn(),\n    signInWithEmailAndPassword: vi.fn(),\n  },\n  db: {\n    collection: vi.fn(),\n    doc: vi.fn(),\n  },\n  functions: {\n    httpsCallable: vi.fn(),\n  },\n})) ;
 
 // Mock environment variables
 vi.mock('import.meta', () => ({
@@ -261,7 +230,7 @@ vi.mock('../types/errors', () => ({
     DB_PERMISSION_DENIED: 'DB_PERMISSION_DENIED',
     DB_NOT_FOUND: 'DB_NOT_FOUND',
     DB_NETWORK_ERROR: 'DB_NETWORK_ERROR',
-    DB_QUOTA_EXCEEDED: 'DB_QUOTA_EXCEEDED',
+    DB_QUOTA_EXCEEDED: 'DB_QUOTA_EXceeded',
     DB_VALIDATION_ERROR: 'DB_VALIDATION_ERROR',
     STORAGE_UNAUTHORIZED: 'STORAGE_UNAUTHORIZED',
     STORAGE_QUOTA_EXCEEDED: 'STORAGE_QUOTA_EXCEEDED',
@@ -472,7 +441,7 @@ vi.mock('../services/offlineAwarePlantService', () => {
     getPlant: vi.fn().mockResolvedValue(null),
     createPlant: vi.fn().mockResolvedValue('mock-plant-id'),
     updatePlant: vi.fn().mockResolvedValue(undefined),
-    deletePlant: vi.fn().mockResolvedValue(undefined),
+    deleteTask: vi.fn().mockResolvedValue(undefined),
     uploadPlantPhoto: vi.fn().mockResolvedValue({}),
     addCareTask: vi.fn().mockResolvedValue({}),
   };
@@ -527,4 +496,3 @@ vi.mock('../services/calendarService', () => ({
   deleteEvent: vi.fn().mockResolvedValue(undefined),
   syncAllToCalendar: vi.fn().mockResolvedValue(undefined),
 }));
-
