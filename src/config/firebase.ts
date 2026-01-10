@@ -3,3 +3,5 @@ export default {
   getApp: () => ({}),
   app: {},
 };
+
+export const auth: any = {};
