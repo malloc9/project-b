@@ -146,7 +146,7 @@ vi.mock('firebase/performance', () => ({
 }));
 
 // Mock Firebase configuration module
-vi.mock('../config/firebase', () => ({\n  __esModule: true,\n  default: {\n    name: '[DEFAULT]',\n    options: {},\n  },\n  auth: {\n    currentUser: null,\n    onAuthStateChanged: vi.fn((callback) => {\n      callback({\n        uid: 'test-user-123',\n        email: 'test@example.com',\n        displayName: 'Test User',\n      });\n      return vi.fn();\n    }),\n    signOut: vi.fn(),\n    signInWithEmailAndPassword: vi.fn(),\n  },\n  db: {\n    collection: vi.fn(),\n    doc: vi.fn(),\n  },\n  functions: {\n    httpsCallable: vi.fn(),\n  },\n})) ;
+vi.mock("../config/firebase", () => ({\n  __esModule: true,\n  default: {\n    name: '[DEFAULT]',\n    options: {},\n  },\n  auth: {\n    currentUser: null,\n    onAuthStateChanged: vi.fn((callback) => {\n      callback({\n        uid: 'test-user-123',\n        email: 'test@example.com',\n        displayName: 'Test User',\n      });\n      return vi.fn();\n    }),\n    signOut: vi.fn(),\n    signInWithEmailAndPassword: vi.fn(),\n  },\n  db: {\n    collection: vi.fn(),\n    doc: vi.fn(),\n  },\n  functions: {\n    httpsCallable: vi.fn(),\n  },\n})) ;
 
 // Mock environment variables
 vi.mock('import.meta', () => ({
