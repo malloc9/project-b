@@ -64,7 +64,7 @@ describe('UpdateNotification', () => {
     });
 
     // Resolve the update to finish
-    resolveUpdate && resolveUpdate();
+    resolveUpdate?.();
   });
 
   it('applies custom className', () => {

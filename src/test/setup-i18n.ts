@@ -49,8 +49,7 @@ export const I18nextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  children;
-};
+  return <>{children}</>;\n};
 export const initReactI18next = { type: "3rdParty", init: vi.fn() };
 export const setLanguage = (lang: Lang) => {
   currentLang = lang;
