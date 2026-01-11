@@ -13,5 +13,5 @@
 
 ## Phase 3: Localization and Final Polish
 *   [x] Task: Add translation keys for accessibility labels and build time prefixes. (d20c188)
-*   [~] Task: Verify the build time display in different locales (English and Hungarian).
-*   [ ] Task: Conductor - User Manual Verification 'Localization and Final Polish' (Protocol in workflow.md)
+*   [x] Task: Verify the build time display in different locales (English and Hungarian). (2134923)
+*   [~] Task: Conductor - User Manual Verification 'Localization and Final Polish' (Protocol in workflow.md)
