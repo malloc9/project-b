@@ -59,4 +59,16 @@ describe('BuildInfo', () => {
     fireEvent.click(button);
     expect(screen.queryByText(formattedTime)).not.toBeInTheDocument();
   });
+
+  it('should use the correct locale for formatting', () => {
+    const formattedTimeHU = '2026. jan. 11. 14:30';
+    mockGetFormattedBuildTime.mockReturnValue(formattedTimeHU);
+
+    render(<BuildInfo />);
+    
+    const button = screen.getByRole('button', { name: /common:buildInfo\.label/i });
+    fireEvent.click(button);
+
+    expect(mockGetFormattedBuildTime).toHaveBeenCalledWith('en-US');
+  });
 });
