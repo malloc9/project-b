@@ -11,7 +11,7 @@
 *   [x] Task: Integrate the `BuildInfo` component into the `Sidebar` at the bottom. (144a77d)
 *   [x] Task: Conductor - User Manual Verification 'UI Component Development' (Protocol in workflow.md) (db94c81)
 
-## Phase 3: Localization and Final Polish
+## Phase 3: Localization and Final Polish [checkpoint: d559740]
 *   [x] Task: Add translation keys for accessibility labels and build time prefixes. (d20c188)
 *   [x] Task: Verify the build time display in different locales (English and Hungarian). (2134923)
-*   [~] Task: Conductor - User Manual Verification 'Localization and Final Polish' (Protocol in workflow.md)
+*   [x] Task: Conductor - User Manual Verification 'Localization and Final Polish' (Protocol in workflow.md) (d559740)
