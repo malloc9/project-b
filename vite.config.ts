@@ -73,6 +73,9 @@ export default defineConfig({
     react(),
     serviceWorkerCacheBusting()
   ],
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
   build: {
     rollupOptions: {
       output: {
