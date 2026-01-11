@@ -2,7 +2,7 @@
 
 ## Phase 1: Infrastructure and Configuration
 *   [x] Task: Configure Vite to inject the build timestamp as a global constant using `define`. (3a57ee2)
-*   [ ] Task: Create a utility or hook to retrieve and format the build timestamp.
+*   [x] Task: Create a utility or hook to retrieve and format the build timestamp. (c1e151b)
 *   [ ] Task: Conductor - User Manual Verification 'Infrastructure and Configuration' (Protocol in workflow.md)
 
 ## Phase 2: UI Component Development (TDD)
