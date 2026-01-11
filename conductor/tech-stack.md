@@ -10,6 +10,7 @@ This document outlines the core technologies and frameworks used in the Househol
 *   **Styling:** Tailwind CSS
 *   **Routing:** React Router
 *   **Internationalization:** i18next, react-i18next
+*   **Build Info:** Vite `define` for build timestamp injection
 *   **UI Components:** Heroicons
 
 ## 2. Backend and Cloud Services

@@ -16,6 +16,7 @@ Homeowners, renters, and property managers who need a centralized platform to ma
 *   **Project Management:** Organize larger projects with subtasks and progress tracking.
 *   **Plant Care:** A dedicated section for managing house plants, including watering schedules and care logs.
 *   **Calendar Integration:** Visualize tasks and events in a calendar view.
+*   **Build Information:** Display the application's build timestamp in the sidebar for version tracking.
 *   **Internationalization:** Support for multiple languages.
 
 ## 4. Technology Stack

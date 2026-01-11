@@ -1,8 +1,0 @@
-{
-  "track_id": "build_time_info_20260111",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-01-11T14:30:00Z",
-  "updated_at": "2026-01-11T14:30:00Z",
-  "description": "on the left menu, there should be an info icon. If we click it, it should show the time when the app was built. No build version is needed to be stored and handled, the time of the build is enough."
-}
