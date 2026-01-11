@@ -1,9 +1,9 @@
 # Plan: Display Build Time in Sidebar
 
-## Phase 1: Infrastructure and Configuration
+## Phase 1: Infrastructure and Configuration [checkpoint: dffce33]
 *   [x] Task: Configure Vite to inject the build timestamp as a global constant using `define`. (3a57ee2)
 *   [x] Task: Create a utility or hook to retrieve and format the build timestamp. (c1e151b)
-*   [~] Task: Conductor - User Manual Verification 'Infrastructure and Configuration' (Protocol in workflow.md)
+*   [x] Task: Conductor - User Manual Verification 'Infrastructure and Configuration' (Protocol in workflow.md) (dffce33)
 
 ## Phase 2: UI Component Development (TDD)
 *   [ ] Task: Write failing tests for the `BuildInfo` component (icon and popover logic).
