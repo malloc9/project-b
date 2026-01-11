@@ -12,6 +12,6 @@
 *   [x] Task: Conductor - User Manual Verification 'UI Component Development' (Protocol in workflow.md) (db94c81)
 
 ## Phase 3: Localization and Final Polish
-*   [ ] Task: Add translation keys for accessibility labels and build time prefixes.
-*   [ ] Task: Verify the build time display in different locales (English and Hungarian).
+*   [x] Task: Add translation keys for accessibility labels and build time prefixes. (d20c188)
+*   [~] Task: Verify the build time display in different locales (English and Hungarian).
 *   [ ] Task: Conductor - User Manual Verification 'Localization and Final Polish' (Protocol in workflow.md)
