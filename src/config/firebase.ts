@@ -13,6 +13,18 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Validate configuration
+const missingKeys = Object.entries(firebaseConfig)
+  .filter(([_, value]) => !value)
+  .map(([key]) => key);
+
+if (missingKeys.length > 0) {
+  console.error(
+    `CRITICAL: Missing Firebase configuration keys: ${missingKeys.join(', ')}. ` +
+    `Check your environment variables or GitHub Secrets.`
+  );
+}
+
 // Initialize Firebase
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
