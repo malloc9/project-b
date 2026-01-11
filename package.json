@@ -17,7 +17,6 @@
     "firebase:deploy:rules": "firebase deploy --only firestore:rules,storage",
     "firebase:deploy:hosting": "npm run deploy:check && npm run build && firebase deploy --only hosting",
     "deploy:check": "node scripts/deploy-check.js",
-    "deploy:staging": "firebase use staging && npm run firebase:deploy:hosting",
     "deploy:production": "firebase use production && npm run firebase:deploy:hosting",
     "setup:firebase": "node scripts/setup-firebase.js"
   },
