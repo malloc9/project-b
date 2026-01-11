@@ -49,5 +49,9 @@
   "appKeywords": "household, management, plants, projects, tasks, home",
   "invalidDate": "Invalid date",
   "invalidTime": "Invalid time",
-  "uploadPhoto": "Upload Photo"
+  "uploadPhoto": "Upload Photo",
+  "buildInfo": {
+    "label": "App Information",
+    "prefix": "Built on"
+  }
 }

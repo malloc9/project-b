@@ -49,5 +49,9 @@
   "appKeywords": "háztartás, kezelés, növények, projektek, feladatok, otthon",
   "invalidDate": "Érvénytelen dátum",
   "invalidTime": "Érvénytelen idő",
-  "uploadPhoto": "Fotó Feltöltése"
+  "uploadPhoto": "Fotó Feltöltése",
+  "buildInfo": {
+    "label": "App információk",
+    "prefix": "Készült"
+  }
 }
