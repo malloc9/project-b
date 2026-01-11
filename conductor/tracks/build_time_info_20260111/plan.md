@@ -6,8 +6,8 @@
 *   [x] Task: Conductor - User Manual Verification 'Infrastructure and Configuration' (Protocol in workflow.md) (dffce33)
 
 ## Phase 2: UI Component Development (TDD)
-*   [ ] Task: Write failing tests for the `BuildInfo` component (icon and popover logic).
-*   [ ] Task: Implement the `BuildInfo` component using Heroicons and Headless UI (or similar) for the popover.
+*   [x] Task: Write failing tests for the `BuildInfo` component (icon and popover logic). (cc19cdb)
+*   [~] Task: Implement the `BuildInfo` component using Heroicons and Headless UI (or similar) for the popover.
 *   [ ] Task: Integrate the `BuildInfo` component into the `Sidebar` at the bottom.
 *   [ ] Task: Conductor - User Manual Verification 'UI Component Development' (Protocol in workflow.md)
 
