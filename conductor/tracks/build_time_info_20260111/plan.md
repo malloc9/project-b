@@ -7,8 +7,8 @@
 
 ## Phase 2: UI Component Development (TDD)
 *   [x] Task: Write failing tests for the `BuildInfo` component (icon and popover logic). (cc19cdb)
-*   [~] Task: Implement the `BuildInfo` component using Heroicons and Headless UI (or similar) for the popover.
-*   [ ] Task: Integrate the `BuildInfo` component into the `Sidebar` at the bottom.
+*   [x] Task: Implement the `BuildInfo` component using Heroicons and Headless UI (or similar) for the popover. (a969edc)
+*   [~] Task: Integrate the `BuildInfo` component into the `Sidebar` at the bottom.
 *   [ ] Task: Conductor - User Manual Verification 'UI Component Development' (Protocol in workflow.md)
 
 ## Phase 3: Localization and Final Polish
