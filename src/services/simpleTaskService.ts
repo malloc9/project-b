@@ -169,7 +169,8 @@ export const createSimpleTask = async (
 
     const taskToSave = {
       ...taskData,
-      description: taskData.description || null, // Convert undefined or empty string to null
+      description: taskData.description || null,
+      priority: taskData.priority || 'medium',
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now),
       dueDate: taskData.dueDate ? Timestamp.fromDate(taskData.dueDate) : null,
@@ -226,6 +227,7 @@ export const getSimpleTask = async (
     return {
       id: docSnap.id,
       ...data,
+      priority: data.priority || 'medium',
       createdAt: data.createdAt.toDate(),
       updatedAt: data.updatedAt.toDate(),
       dueDate: data.dueDate ? data.dueDate.toDate() : undefined,
@@ -261,6 +263,7 @@ export const getUserSimpleTasks = async (
       tasks.push({
         id: doc.id,
         ...data,
+        priority: data.priority || 'medium',
         createdAt: data.createdAt.toDate(),
         updatedAt: data.updatedAt.toDate(),
         dueDate: data.dueDate ? data.dueDate.toDate() : undefined,
@@ -506,6 +509,34 @@ export const getTaskStatistics = (
     stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
 
   return stats;
+};
+
+/**
+ * Filter tasks by priority
+ */
+export const filterTasksByPriority = (
+  tasks: SimpleTask[],
+  priority: 'low' | 'medium' | 'high' | 'critical'
+): SimpleTask[] => {
+  return tasks.filter((task) => task.priority === priority);
+};
+
+/**
+ * Sort tasks by priority (critical -> high -> medium -> low)
+ */
+export const sortTasksByPriority = (tasks: SimpleTask[]): SimpleTask[] => {
+  const priorityOrder: Record<string, number> = {
+    critical: 3,
+    high: 2,
+    medium: 1,
+    low: 0,
+  };
+
+  return [...tasks].sort((a, b) => {
+    const priorityA = priorityOrder[a.priority || 'medium'];
+    const priorityB = priorityOrder[b.priority || 'medium'];
+    return priorityB - priorityA;
+  });
 };
 
 /**

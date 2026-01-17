@@ -1,6 +1,6 @@
 // Utility types and helper functions
 
-import type { Plant, Project, SimpleTask, PlantCareTask, TaskStatus } from './index';
+import type { Plant, Project, SimpleTask, PlantCareTask, TaskStatus, Priority } from './index';
 
 /**
  * Generic utility types
@@ -162,6 +162,36 @@ export function getTaskStatusLabel(status: TaskStatus): string {
     default:
       return 'Unknown';
   }
+}
+
+export function getPriorityColor(priority: Priority): string {
+  const colors = {
+    low: 'bg-gray-500 text-white',
+    medium: 'bg-blue-500 text-white',
+    high: 'bg-orange-500 text-white',
+    critical: 'bg-red-500 text-white',
+  };
+  return colors[priority];
+}
+
+export function getPriorityLabel(priority: Priority): string {
+  const labels = {
+    low: 'Low',
+    medium: 'Medium',
+    high: 'High',
+    critical: 'Critical',
+  };
+  return labels[priority];
+}
+
+export function getPriorityOrder(priority: Priority): number {
+  const order = {
+    low: 0,
+    medium: 1,
+    high: 2,
+    critical: 3,
+  };
+  return order[priority];
 }
 
 /**

@@ -3,7 +3,10 @@
   "newProject": "New Project",
   "searchProjects": "Search projects...",
   "filterByStatus": "Filter by status",
+  "filterByPriority": "Filter by Priority",
+  "sortByPriority": "Priority",
   "allStatus": "All Status",
+  "allPriorities": "All Priorities",
   "noProjectsFound": "No projects found",
   "getStartedMessage": "Get started by creating your first project.",
   "adjustFiltersMessage": "Try adjusting your search or filter criteria.",
@@ -14,6 +17,11 @@
   "dueDate": "Due Date",
   "progress": "Progress",
   "status": "Status",
+  "priority": "Priority",
+  "low": "Low",
+  "medium": "Medium",
+  "high": "High",
+  "critical": "Critical",
   "subtasks": "Subtasks",
   "addSubtask": "Add Subtask",
   "completion": "Completion",
@@ -59,7 +67,7 @@
   "allOnTrack": "All projects and subtasks are on track! 🎉",
   "statusLabels": {
     "todo": "To Do",
-    "in_progress": "In Progress", 
+    "in_progress": "In Progress",
     "finished": "Finished"
   }
 }

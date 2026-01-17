@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { SimpleTask } from '../../types';
-import { 
-  getUserSimpleTasks, 
-  filterTasksByCompletion, 
-  searchTasks, 
+import type { SimpleTask, Priority } from '../../types';
+import {
+  getUserSimpleTasks,
+  filterTasksByCompletion,
+  searchTasks,
   sortTasksByDueDate,
   toggleTaskCompletion,
-  deleteSimpleTask
+  deleteSimpleTask,
+  filterTasksByPriority,
+  sortTasksByPriority
 } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import { getPriorityColor, getPriorityLabel } from '../../types/utils';
 
 interface TaskListProps {
   onTaskSelect?: (task: SimpleTask) => void;
@@ -25,7 +28,8 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
   const [error, setError] = useState<string | null>(null);
   const [completionFilter, setCompletionFilter] = useState<'all' | 'completed' | 'pending'>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | 'priority'>('asc');
+  const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
 
   useEffect(() => {
     if (user) {
@@ -35,7 +39,7 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
 
   useEffect(() => {
     applyFilters();
-  }, [tasks, completionFilter, searchTerm, sortOrder]);
+  }, [tasks, completionFilter, searchTerm, sortOrder, priorityFilter]);
 
   const loadTasks = async () => {
     if (!user) return;
@@ -61,13 +65,22 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
       filtered = filterTasksByCompletion(filtered, completionFilter === 'completed');
     }
 
+    // Apply priority filter
+    if (priorityFilter !== 'all') {
+      filtered = filterTasksByPriority(filtered, priorityFilter);
+    }
+
     // Apply search filter
     if (searchTerm.trim()) {
       filtered = searchTasks(filtered, searchTerm);
     }
 
     // Apply sorting
-    filtered = sortTasksByDueDate(filtered, sortOrder === 'asc');
+    if (sortOrder === 'priority') {
+      filtered = sortTasksByPriority(filtered);
+    } else {
+      filtered = sortTasksByDueDate(filtered, sortOrder === 'asc');
+    }
 
     setFilteredTasks(filtered);
   };
@@ -190,6 +203,24 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
           </select>
         </div>
         <div className="sm:w-48">
+          <label htmlFor="priority-filter" className="sr-only">
+            {t('filterByPriority', { ns: 'tasks' })}
+          </label>
+          <select
+            id="priority-filter"
+            name="priority-filter"
+            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value as Priority | 'all')}
+          >
+            <option value="all">{t('allPriorities', { ns: 'tasks' })}</option>
+            <option value="low">{t('low', { ns: 'tasks' })}</option>
+            <option value="medium">{t('medium', { ns: 'tasks' })}</option>
+            <option value="high">{t('high', { ns: 'tasks' })}</option>
+            <option value="critical">{t('critical', { ns: 'tasks' })}</option>
+          </select>
+        </div>
+        <div className="sm:w-48">
           <label htmlFor="sort-order" className="sr-only">
             {t('sortOrder', { ns: 'tasks' })}
           </label>
@@ -198,10 +229,11 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
             name="sort-order"
             className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+            onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc' | 'priority')}
           >
             <option value="asc">{t('dueDateEarliest', { ns: 'tasks' })}</option>
             <option value="desc">{t('dueDateLatest', { ns: 'tasks' })}</option>
+            <option value="priority">{t('sortByPriority', { ns: 'tasks' })}</option>
           </select>
         </div>
       </div>
@@ -279,13 +311,20 @@ const TaskList: React.FC<TaskListProps> = ({ onTaskSelect }) => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3
-                          className={`text-lg font-medium ${
-                            task.completed ? 'text-gray-500 line-through' : 'text-gray-900'
-                          }`}
-                        >
-                          {task.title}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3
+                            className={`text-lg font-medium ${
+                              task.completed ? 'text-gray-500 line-through' : 'text-gray-900'
+                            }`}
+                          >
+                            {task.title}
+                          </h3>
+                          {task.priority && (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                              {getPriorityLabel(task.priority)}
+                            </span>
+                          )}
+                        </div>
                         {task.description && (
                           <p
                             className={`mt-1 text-sm ${

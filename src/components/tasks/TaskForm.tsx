@@ -8,6 +8,7 @@ interface TaskFormData {
   title: string;
   description: string;
   dueDate: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 const TaskForm: React.FC = () => {
@@ -20,7 +21,8 @@ const TaskForm: React.FC = () => {
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
     description: '',
-    dueDate: ''
+    dueDate: '',
+    priority: 'medium'
   });
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditing);
@@ -52,7 +54,8 @@ const TaskForm: React.FC = () => {
       setFormData({
         title: task.title,
         description: task.description || '',
-        dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : ''
+        dueDate: task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
+        priority: task.priority || 'medium'
       });
     } catch (err) {
       console.error('Error loading task:', err);
@@ -95,7 +98,8 @@ const TaskForm: React.FC = () => {
         const updateData = {
           title: formData.title.trim(),
           description: formData.description.trim() || undefined,
-          dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined
+          dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+          priority: formData.priority
         };
         await updateSimpleTask(user.uid, taskId, updateData);
       } else {
@@ -104,7 +108,8 @@ const TaskForm: React.FC = () => {
           title: formData.title.trim(),
           description: formData.description.trim() || undefined,
           dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-          completed: false
+          completed: false,
+          priority: formData.priority
         };
         await createSimpleTask(user.uid, createData);
       }
@@ -118,10 +123,10 @@ const TaskForm: React.FC = () => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Clear error when user starts typing
     if (errors[name as keyof TaskFormData]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -215,6 +220,26 @@ const TaskForm: React.FC = () => {
             {errors.dueDate && (
               <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>
             )}
+          </div>
+
+          {/* Priority */}
+          <div>
+            <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
+              {t('tasks:priority')}
+            </label>
+            <select
+              id="priority"
+              name="priority"
+              value={formData.priority}
+              onChange={handleInputChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              disabled={loading}
+            >
+              <option value="low">{t('tasks:low')}</option>
+              <option value="medium">{t('tasks:medium')}</option>
+              <option value="high">{t('tasks:high')}</option>
+              <option value="critical">{t('tasks:critical')}</option>
+            </select>
           </div>
 
           {/* Form Actions */}

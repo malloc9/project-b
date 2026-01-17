@@ -14,6 +14,7 @@ interface SubtaskFormData {
   description: string;
   status: TaskStatus;
   dueDate: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess }) => {
@@ -22,7 +23,8 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
     title: '',
     description: '',
     status: 'todo',
-    dueDate: ''
+    dueDate: '',
+    priority: 'medium'
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Partial<SubtaskFormData>>({});
@@ -61,7 +63,8 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
         status: formData.status,
-        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+        priority: formData.priority
       };
 
       await createSubtask(subtaskData, user.uid);
@@ -172,6 +175,25 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
             {errors.dueDate && (
               <p className="mt-1 text-sm text-red-600">{errors.dueDate}</p>
             )}
+          </div>
+
+          {/* Priority */}
+          <div>
+            <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
+              Priority
+            </label>
+            <select
+              id="priority"
+              value={formData.priority}
+              onChange={(e) => handleInputChange('priority', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              disabled={loading}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
           </div>
 
           {/* Form Actions */}

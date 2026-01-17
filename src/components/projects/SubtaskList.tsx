@@ -3,6 +3,7 @@ import type { Subtask, TaskStatus } from '../../types';
 import { updateSubtask, deleteSubtask } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import { getPriorityColor, getPriorityLabel } from '../../types/utils';
 
 interface SubtaskListProps {
   subtasks: Subtask[];
@@ -155,7 +156,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) 
               subtask.status === 'finished' ? 'bg-gray-50 border-gray-200' : 'bg-white border-gray-300'
             } ${isLoading ? 'opacity-50' : ''}`}
           >
-            <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center space-x-3">
                   <h4 className={`text-sm font-medium ${
@@ -163,6 +164,11 @@ const SubtaskList: React.FC<SubtaskListProps> = ({ subtasks, onSubtaskUpdate }) 
                   }`}>
                     {subtask.title}
                   </h4>
+                  {subtask.priority && (
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(subtask.priority)}`}>
+                      {getPriorityLabel(subtask.priority)}
+                    </span>
+                  )}
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(subtask.status)}`}>
                     {getStatusLabel(subtask.status)}
                   </span>

@@ -17,6 +17,8 @@ export interface User {
 
 export type TaskStatus = 'todo' | 'in_progress' | 'finished';
 
+export type Priority = 'low' | 'medium' | 'high' | 'critical';
+
 export interface RecurrencePattern {
   type: 'daily' | 'weekly' | 'monthly' | 'yearly';
   interval: number; // Every N days/weeks/months/years
@@ -72,6 +74,7 @@ export interface Subtask {
   description?: string;
   status: TaskStatus;
   dueDate?: Date;
+  priority?: Priority;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -83,6 +86,7 @@ export interface Project {
   description: string;
   status: TaskStatus;
   dueDate?: Date;
+  priority?: Priority;
   subtasks: Subtask[];
   createdAt: Date;
   updatedAt: Date;
@@ -99,6 +103,7 @@ export interface SimpleTask {
   description?: string;
   dueDate?: Date;
   completed: boolean;
+  priority?: Priority;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -198,6 +203,7 @@ export interface ProjectFilters {
   dueDateBefore?: Date;
   dueDateAfter?: Date;
   searchTerm?: string;
+  priority?: Priority;
 }
 
 export interface TaskFilters {
@@ -205,6 +211,7 @@ export interface TaskFilters {
   dueDateBefore?: Date;
   dueDateAfter?: Date;
   searchTerm?: string;
+  priority?: Priority;
 }
 
 export interface CalendarFilters {

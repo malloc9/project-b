@@ -10,6 +10,7 @@ interface ProjectFormData {
   description: string;
   status: TaskStatus;
   dueDate: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
 const ProjectForm: React.FC = () => {
@@ -23,7 +24,8 @@ const ProjectForm: React.FC = () => {
     title: '',
     description: '',
     status: 'todo',
-    dueDate: ''
+    dueDate: '',
+    priority: 'medium'
   });
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditing);
@@ -56,7 +58,8 @@ const ProjectForm: React.FC = () => {
         title: project.title,
         description: project.description,
         status: project.status,
-        dueDate: project.dueDate ? project.dueDate.toISOString().split('T')[0] : ''
+        dueDate: project.dueDate ? project.dueDate.toISOString().split('T')[0] : '',
+        priority: project.priority || 'medium'
       });
     } catch (err) {
       console.error('Error loading project:', err);
@@ -110,6 +113,7 @@ const ProjectForm: React.FC = () => {
         description: formData.description.trim(),
         status: formData.status,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+        priority: formData.priority,
         subtasks: []
       };
 
@@ -238,6 +242,25 @@ const ProjectForm: React.FC = () => {
             <p className="mt-1 text-sm text-gray-500">
               {t('projects:optionalDeadline')}
             </p>
+          </div>
+
+          {/* Priority */}
+          <div>
+            <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
+              {t('projects:priority')}
+            </label>
+            <select
+              id="priority"
+              value={formData.priority}
+              onChange={(e) => handleInputChange('priority', e.target.value)}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              disabled={loading}
+            >
+              <option value="low">{t('projects:low')}</option>
+              <option value="medium">{t('projects:medium')}</option>
+              <option value="high">{t('projects:high')}</option>
+              <option value="critical">{t('projects:critical')}</option>
+            </select>
           </div>
 
           {/* Form Actions */}

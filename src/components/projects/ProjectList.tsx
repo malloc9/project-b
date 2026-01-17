@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { Project, TaskStatus } from '../../types';
-import { getProjectsWithSubtasks, filterProjectsByStatus, searchProjects } from '../../services/projectService';
+import type { Project, TaskStatus, Priority } from '../../types';
+import { getProjectsWithSubtasks, filterProjectsByStatus, searchProjects, filterProjectsByPriority } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { calculateProjectProgress } from '../../services/projectService';
+import { getPriorityColor, getPriorityLabel } from '../../types/utils';
 
 interface ProjectListProps {
   onProjectSelect?: (project: Project) => void;
@@ -19,6 +20,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<TaskStatus | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState<Priority | 'all'>('all');
 
   useEffect(() => {
     console.log('ProjectList user:', user);
@@ -29,7 +31,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
 
   useEffect(() => {
     applyFilters();
-  }, [projects, statusFilter, searchTerm]);
+  }, [projects, statusFilter, searchTerm, priorityFilter]);
 
   const loadProjects = async () => {
     if (!user) return;
@@ -53,6 +55,11 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
     // Apply status filter
     if (statusFilter !== 'all') {
       filtered = filterProjectsByStatus(filtered, statusFilter);
+    }
+
+    // Apply priority filter
+    if (priorityFilter !== 'all') {
+      filtered = filterProjectsByPriority(filtered, priorityFilter);
     }
 
     // Apply search filter
@@ -181,6 +188,24 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
             <option value="finished">{t('projects:statusLabels.finished')}</option>
           </select>
         </div>
+        <div className="sm:w-48">
+          <label htmlFor="priority-filter" className="sr-only">
+            {t('projects:filterByPriority')}
+          </label>
+          <select
+            id="priority-filter"
+            name="priority-filter"
+            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value as Priority | 'all')}
+          >
+            <option value="all">{t('projects:allPriorities')}</option>
+            <option value="low">{t('projects:low')}</option>
+            <option value="medium">{t('projects:medium')}</option>
+            <option value="high">{t('projects:high')}</option>
+            <option value="critical">{t('projects:critical')}</option>
+          </select>
+        </div>
       </div>
 
       {/* Project List */}
@@ -241,9 +266,16 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
                         </div>
                       </div>
                       <div className="ml-4">
-                        <h3 className="text-lg font-medium text-gray-900 truncate">
-                          {project.title}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-medium text-gray-900 truncate">
+                            {project.title}
+                          </h3>
+                          {project.priority && (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
+                              {getPriorityLabel(project.priority)}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>

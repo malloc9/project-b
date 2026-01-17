@@ -304,6 +304,7 @@ export const createProject = async (
       title: projectData.title,
       description: projectData.description,
       status: projectData.status,
+      priority: projectData.priority || 'medium',
       subtasks: projectData.subtasks || [],
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now)
@@ -354,6 +355,7 @@ export const getProject = async (projectId: string, userId: string): Promise<Pro
     return {
       id: docSnap.id,
       ...data,
+      priority: data.priority || 'medium',
       createdAt: data.createdAt.toDate(),
       updatedAt: data.updatedAt.toDate(),
       dueDate: data.dueDate ? data.dueDate.toDate() : undefined
@@ -382,6 +384,7 @@ export const getUserProjects = async (userId: string): Promise<Project[]> => {
       projects.push({
         id: doc.id,
         ...data,
+        priority: data.priority || 'medium',
         createdAt: data.createdAt.toDate(),
         updatedAt: data.updatedAt.toDate(),
         dueDate: data.dueDate ? data.dueDate.toDate() : undefined
@@ -490,7 +493,8 @@ export const createSubtask = async (
     const now = new Date();
     const subtaskToSave = {
       ...subtaskData,
-      description: subtaskData.description || null, // Convert undefined or empty string to null
+      description: subtaskData.description || null,
+      priority: subtaskData.priority || 'medium',
       createdAt: Timestamp.fromDate(now),
       updatedAt: Timestamp.fromDate(now),
       dueDate: subtaskData.dueDate ? Timestamp.fromDate(subtaskData.dueDate) : null
@@ -539,6 +543,7 @@ export const getSubtask = async (subtaskId: string, userId: string): Promise<Sub
     return {
       id: docSnap.id,
       ...data,
+      priority: data.priority || 'medium',
       createdAt: data.createdAt.toDate(),
       updatedAt: data.updatedAt.toDate(),
       dueDate: data.dueDate ? data.dueDate.toDate() : undefined
@@ -568,6 +573,7 @@ export const getProjectSubtasks = async (projectId: string, userId: string): Pro
       subtasks.push({
         id: doc.id,
         ...data,
+        priority: data.priority || 'medium',
         createdAt: data.createdAt.toDate(),
         updatedAt: data.updatedAt.toDate(),
         dueDate: data.dueDate ? data.dueDate.toDate() : undefined
@@ -1080,4 +1086,60 @@ export const getDashboardData = async (userId: string): Promise<{
     console.error('Error getting dashboard data:', error);
     throw error;
   }
+};
+
+/**
+ * Filter projects by priority
+ */
+export const filterProjectsByPriority = (
+  projects: Project[],
+  priority: 'low' | 'medium' | 'high' | 'critical'
+): Project[] => {
+  return projects.filter((project) => project.priority === priority);
+};
+
+/**
+ * Sort projects by priority (critical -> high -> medium -> low)
+ */
+export const sortProjectsByPriority = (projects: Project[]): Project[] => {
+  const priorityOrder: Record<string, number> = {
+    critical: 3,
+    high: 2,
+    medium: 1,
+    low: 0,
+  };
+
+  return [...projects].sort((a, b) => {
+    const priorityA = priorityOrder[a.priority || 'medium'];
+    const priorityB = priorityOrder[b.priority || 'medium'];
+    return priorityB - priorityA;
+  });
+};
+
+/**
+ * Filter subtasks by priority
+ */
+export const filterSubtasksByPriority = (
+  subtasks: Subtask[],
+  priority: 'low' | 'medium' | 'high' | 'critical'
+): Subtask[] => {
+  return subtasks.filter((subtask) => subtask.priority === priority);
+};
+
+/**
+ * Sort subtasks by priority (critical -> high -> medium -> low)
+ */
+export const sortSubtasksByPriority = (subtasks: Subtask[]): Subtask[] => {
+  const priorityOrder: Record<string, number> = {
+    critical: 3,
+    high: 2,
+    medium: 1,
+    low: 0,
+  };
+
+  return [...subtasks].sort((a, b) => {
+    const priorityA = priorityOrder[a.priority || 'medium'];
+    const priorityB = priorityOrder[b.priority || 'medium'];
+    return priorityB - priorityA;
+  });
 };
