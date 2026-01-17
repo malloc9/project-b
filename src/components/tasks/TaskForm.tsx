@@ -95,14 +95,13 @@ const TaskForm: React.FC = () => {
         userId: user.uid,
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
-        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
-        completed: false
+        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined
       };
 
       if (isEditing && taskId) {
         await updateSimpleTask(user.uid, taskId, taskData);
       } else {
-        await createSimpleTask(user.uid, taskData);
+        await createSimpleTask(user.uid, { ...taskData, completed: false });
       }
 
       navigate('/tasks');
