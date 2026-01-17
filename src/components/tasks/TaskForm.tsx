@@ -91,17 +91,22 @@ const TaskForm: React.FC = () => {
       setLoading(true);
       setErrors({});
 
-      const taskData = {
-        userId: user.uid,
-        title: formData.title.trim(),
-        description: formData.description.trim() || undefined,
-        dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined
-      };
-
       if (isEditing && taskId) {
-        await updateSimpleTask(user.uid, taskId, taskData);
+        const updateData = {
+          title: formData.title.trim(),
+          description: formData.description.trim() || undefined,
+          dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined
+        };
+        await updateSimpleTask(user.uid, taskId, updateData);
       } else {
-        await createSimpleTask(user.uid, { ...taskData, completed: false });
+        const createData = {
+          userId: user.uid,
+          title: formData.title.trim(),
+          description: formData.description.trim() || undefined,
+          dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+          completed: false
+        };
+        await createSimpleTask(user.uid, createData);
       }
 
       navigate('/tasks');
