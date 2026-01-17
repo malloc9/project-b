@@ -6,24 +6,7 @@ vi.mock('../../config/firebase', () => ({
   db: {}
 }));
 
-// Mock Firestore functions
-vi.mock('firebase/firestore', () => ({
-  collection: vi.fn(),
-  doc: vi.fn(),
-  addDoc: vi.fn(),
-  getDoc: vi.fn(),
-  getDocs: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn(),
-  query: vi.fn(),
-  where: vi.fn(),
-  orderBy: vi.fn(),
-  limit: vi.fn(),
-  Timestamp: {
-    fromDate: vi.fn((date: Date) => ({ toDate: () => date })),
-    now: vi.fn(() => ({ toDate: () => new Date() }))
-  }
-}));
+
 
 // Import the service after mocking
 import {
@@ -43,14 +26,18 @@ import {
   sortEventsByStartDate
 } from '../calendarService';
 
-// Import mocked functions
+// Import mocked functions and objects from global setup
 import {
   addDoc,
   getDoc,
   getDocs,
   updateDoc,
   deleteDoc,
-  Timestamp
+  Timestamp,
+  query,
+  where,
+  orderBy,
+  limit
 } from 'firebase/firestore';
 
 describe.skip('Calendar Service', () => {
@@ -86,9 +73,35 @@ describe.skip('Calendar Service', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (Timestamp.fromDate as any).mockImplementation((date: Date) => ({
-      toDate: () => date
-    }));
+    vi.mocked(addDoc).mockResolvedValue({ id: mockEventId } as any);
+    vi.mocked(getDoc).mockResolvedValue({
+      exists: () => false,
+      data: () => undefined,
+      id: 'mock-id'
+    } as any);
+    vi.mocked(getDocs).mockResolvedValue({
+      empty: true,
+      size: 0,
+      docs: [],
+      forEach: () => {}
+    } as any);
+    vi.mocked(updateDoc).mockResolvedValue(undefined);
+    vi.mocked(deleteDoc).mockResolvedValue(undefined);
+    vi.mocked(Timestamp.fromDate).mockImplementation((date: Date) => ({ toDate: () => date }) as any);
+
+    // Mock query related functions if they are used directly in the service
+    vi.mocked(query).mockImplementation((_col, ...constraints) => ({
+      _collection: _col,
+      _constraints: constraints,
+      where: vi.fn(),
+      orderBy: vi.fn(),
+      limit: vi.fn(),
+      startAfter: vi.fn(),
+      endBefore: vi.fn(),
+    }) as any);
+    vi.mocked(where).mockImplementation((field, op, value) => ({ type: 'where', field, op, value }) as any);
+    vi.mocked(orderBy).mockImplementation((field, direction) => ({ type: 'orderBy', field, direction }) as any);
+    vi.mocked(limit).mockImplementation((l) => ({ type: 'limit', limit: l }) as any);
   });
 
   afterEach(() => {

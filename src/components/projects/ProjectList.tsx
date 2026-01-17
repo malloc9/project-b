@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { Project, TaskStatus } from '../../types';
-import { getUserProjects, filterProjectsByStatus, searchProjects } from '../../services/projectService';
+import { getProjectsWithSubtasks, filterProjectsByStatus, searchProjects } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
 import { calculateProjectProgress } from '../../services/projectService';
@@ -37,7 +37,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ onProjectSelect }) => {
     try {
       setLoading(true);
       setError(null);
-      const userProjects = await getUserProjects(user.uid);
+      const userProjects = await getProjectsWithSubtasks(user.uid);
       setProjects(userProjects);
     } catch (err) {
       console.error('Error loading projects:', err);
