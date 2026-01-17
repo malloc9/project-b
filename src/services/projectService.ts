@@ -409,15 +409,20 @@ export const updateProject = async (
       ...updates,
       updatedAt: Timestamp.fromDate(new Date())
     };
-    
+
     // Explicitly handle dueDate to ensure it's null if undefined
     if (updates.dueDate === undefined) {
       updateData.dueDate = null;
     } else if (updates.dueDate !== undefined) {
       updateData.dueDate = Timestamp.fromDate(updates.dueDate);
     }
-    
-    await updateDoc(docRef, updateData);
+
+    // Filter out undefined values (Firestore doesn't accept them)
+    const cleanData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value !== undefined)
+    ) as Record<string, any>;
+
+    await updateDoc(docRef, cleanData);
 
     // Update calendar event for the project
     const updatedProject = await getProject(projectId, userId);
@@ -590,15 +595,20 @@ export const updateSubtask = async (
       ...updates,
       updatedAt: Timestamp.fromDate(new Date())
     };
-    
+
     // Convert Date objects to Timestamps
     if (updates.dueDate) {
       updateData.dueDate = Timestamp.fromDate(updates.dueDate);
     } else if (updates.dueDate === undefined) {
       updateData.dueDate = null;
     }
-    
-    await updateDoc(docRef, updateData);
+
+    // Filter out undefined values (Firestore doesn't accept them)
+    const cleanData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value !== undefined)
+    ) as Record<string, any>;
+
+    await updateDoc(docRef, cleanData);
 
     // Update calendar event for the subtask
     const updatedSubtask = await getSubtask(subtaskId, userId);

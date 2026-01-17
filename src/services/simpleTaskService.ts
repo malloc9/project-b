@@ -302,7 +302,12 @@ export const updateSimpleTask = async (
       updateData.dueDate = null;
     }
 
-    await updateDoc(docRef, updateData);
+    // Filter out undefined values (Firestore doesn't accept them)
+    const cleanData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value !== undefined)
+    ) as Record<string, any>;
+
+    await updateDoc(docRef, cleanData);
 
     // Update calendar event for the task
     const updatedTask = await getSimpleTask(userId, taskId);

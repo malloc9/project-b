@@ -181,7 +181,12 @@ export const updateEvent = async (
       updateData.endDate = Timestamp.fromDate(updates.endDate);
     }
 
-    await updateDoc(docRef, updateData);
+    // Filter out undefined values (Firestore doesn't accept them)
+    const cleanData = Object.fromEntries(
+      Object.entries(updateData).filter(([_, value]) => value !== undefined)
+    ) as Record<string, any>;
+
+    await updateDoc(docRef, cleanData);
 
     // Return the updated event
     const updatedEvent = await getEvent(userId, eventId);
