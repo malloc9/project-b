@@ -17,5 +17,15 @@
   "upcomingItems": "Upcoming Items",
   "upcomingItemsSubtitle": "Tasks and deadlines this week",
   "noUpcomingItemsScheduled": "No upcoming items scheduled",
-  "plantCareRemindersWillShow": "Your plant care reminders and project deadlines will show here"
+  "plantCareRemindersWillShow": "Your plant care reminders and project deadlines will show here",
+  "gettingStarted": "Getting Started",
+  "gettingStartedSubtitle": "Quick tips to get you started",
+  "tips": {
+    "addFirstPlant": "Add Your First Plant",
+    "addFirstPlantDescription": "Start tracking your plants by adding your first plant to the codex",
+    "createProject": "Create a Project",
+    "createProjectDescription": "Organize household tasks and subtasks into manageable projects",
+    "syncCalendar": "Sync Your Calendar",
+    "syncCalendarDescription": "View all your upcoming care tasks, projects, and events in one place"
+  }
 }

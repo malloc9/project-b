@@ -17,5 +17,15 @@
   "upcomingItems": "Közelgő elemek",
   "upcomingItemsSubtitle": "Feladatok és határidők ezen a héten",
   "noUpcomingItemsScheduled": "Nincsenek ütemezett közelgő elemek",
-  "plantCareRemindersWillShow": "A növénygondozási emlékeztetők és projekt határidők itt jelennek meg"
+  "plantCareRemindersWillShow": "A növénygondozási emlékeztetők és projekt határidők itt jelennek meg",
+  "gettingStarted": "Kezdő lépések",
+  "gettingStartedSubtitle": "Gyors tippek az induláshoz",
+  "tips": {
+    "addFirstPlant": "Adja hozzá az első növényt",
+    "addFirstPlantDescription": "Kezdje el követni a növényeit az első növény hozzáadásával a kódexbe",
+    "createProject": "Hozzon létre egy projektet",
+    "createProjectDescription": "Szervezze háztartási feladatait és alfeladatait kezelhető projektekbe",
+    "syncCalendar": "Szinkronizálja a naptárát",
+    "syncCalendarDescription": "Tekintse meg az összes közelgő gondozási feladatot, projektet és eseményt egy helyen"
+  }
 }
