@@ -4,6 +4,7 @@ import type { TaskStatus } from '../../types';
 import { createProject, getProject, updateProject } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import { RichTextEditor } from '../common/RichTextEditor';
 
 interface ProjectFormData {
   title: string;
@@ -110,7 +111,7 @@ const ProjectForm: React.FC = () => {
       const projectData = {
         userId: user.uid,
         title: formData.title.trim(),
-        description: formData.description.trim(),
+        description: formData.description,
         status: formData.status,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
         priority: formData.priority,
@@ -187,20 +188,13 @@ const ProjectForm: React.FC = () => {
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
               {t('projects:description')} *
             </label>
-            <textarea
-              id="description"
-              rows={4}
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                errors.description ? 'border-red-300' : ''
-              }`}
+              onChange={(value) => handleInputChange('description', value)}
               placeholder={t('projects:describeProject')}
               disabled={loading}
+              error={errors.description}
             />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-            )}
           </div>
 
           {/* Status */}

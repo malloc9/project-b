@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { PlantCareTask, RecurrencePattern } from '../../types';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { RichTextEditor } from '../common/RichTextEditor';
 import { format } from 'date-fns';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -113,7 +114,7 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
 
     const taskData: Omit<PlantCareTask, 'id' | 'plantId'> = {
       title: formData.title.trim(),
-      description: formData.description.trim() || undefined,
+      description: formData.description || undefined,
       dueDate: new Date(formData.dueDate),
       completed: formData.completed,
       recurrence: hasRecurrence ? recurrenceData : undefined,
@@ -187,14 +188,12 @@ export function CareTaskForm({ task, onSave, onCancel, isLoading }: CareTaskForm
               <label htmlFor="task-description" className="block text-sm font-medium text-gray-700 mb-1">
                 {t('forms:labels.description')}
               </label>
-              <textarea
-                id="task-description"
-                rows={3}
+              <RichTextEditor
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(value) => handleInputChange('description', value)}
                 placeholder={t('forms:placeholders.careTaskDescription')}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
                 disabled={isLoading}
+                minHeight="150px"
               />
             </div>
 

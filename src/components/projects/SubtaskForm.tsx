@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { TaskStatus } from '../../types';
 import { createSubtask } from '../../services/projectService';
 import { useAuth } from '../../contexts/AuthContext';
+import { RichTextEditor } from '../common/RichTextEditor';
 
 interface SubtaskFormProps {
   projectId: string;
@@ -61,7 +62,7 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
         projectId,
         userId: user.uid,
         title: formData.title.trim(),
-        description: formData.description.trim() || undefined,
+        description: formData.description || undefined,
         status: formData.status,
         dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
         priority: formData.priority
@@ -128,14 +129,12 @@ const SubtaskForm: React.FC<SubtaskFormProps> = ({ projectId, onClose, onSuccess
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
               Description
             </label>
-            <textarea
-              id="description"
-              rows={3}
+            <RichTextEditor
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              onChange={(value) => handleInputChange('description', value)}
               placeholder="Enter subtask description (optional)"
               disabled={loading}
+              minHeight="150px"
             />
           </div>
 

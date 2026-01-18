@@ -4,6 +4,7 @@ import type { SimpleTask } from '../../types';
 import { getSimpleTask, toggleTaskCompletion, deleteSimpleTask } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import { MarkdownRenderer } from '../common/MarkdownRenderer';
 
 const TaskDetail: React.FC = () => {
   const { taskId } = useParams<{ taskId: string }>();
@@ -218,7 +219,7 @@ const TaskDetail: React.FC = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{t('description', { ns: 'tasks' })}</h3>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-gray-700 whitespace-pre-wrap">{task.description}</p>
+                  <MarkdownRenderer content={task.description} />
                 </div>
               </div>
             )}

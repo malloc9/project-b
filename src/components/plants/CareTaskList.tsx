@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { CareTaskForm } from './CareTaskForm';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
+import { MarkdownRenderer } from '../common/MarkdownRenderer';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -18,7 +19,7 @@ interface CareTaskListProps {
 
 export function CareTaskList({ plantId, careTasks, onTaskUpdate, onTaskAdd, onTaskDelete }: CareTaskListProps) {
   const { user } = useAuth();
-  const { t } = useTranslation(['loading', 'common']);
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<PlantCareTask | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -190,9 +191,9 @@ export function CareTaskList({ plantId, careTasks, onTaskUpdate, onTaskAdd, onTa
                           {task.title}
                         </h4>
                         {task.description && (
-                          <p className={`text-sm mt-1 ${task.completed ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {task.description}
-                          </p>
+                          <div className={`text-sm mt-1 ${task.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                            <MarkdownRenderer content={task.description} className="prose-sm" />
+                          </div>
                         )}
                       </div>
 

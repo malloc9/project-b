@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { createSimpleTask, getSimpleTask, updateSimpleTask } from '../../services/simpleTaskService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../hooks/useTranslation';
+import { RichTextEditor } from '../common/RichTextEditor';
 
 interface TaskFormData {
   title: string;
@@ -97,7 +98,7 @@ const TaskForm: React.FC = () => {
       if (isEditing && taskId) {
         const updateData = {
           title: formData.title.trim(),
-          description: formData.description.trim() || undefined,
+          description: formData.description || undefined,
           dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
           priority: formData.priority
         };
@@ -106,7 +107,7 @@ const TaskForm: React.FC = () => {
         const createData = {
           userId: user.uid,
           title: formData.title.trim(),
-          description: formData.description.trim() || undefined,
+          description: formData.description || undefined,
           dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
           completed: false,
           priority: formData.priority
@@ -180,23 +181,13 @@ const TaskForm: React.FC = () => {
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
               {t('forms:labels.description')}
             </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
+            <RichTextEditor
               value={formData.description}
-              onChange={handleInputChange}
-              className={`mt-1 block w-full border rounded-md px-3 py-2 shadow-sm focus:outline-none focus:ring-1 ${
-                errors.description
-                  ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
-              }`}
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
               placeholder={t('forms:placeholders.enterDescription') + ' (' + t('forms:placeholders.optional') + ')'}
               disabled={loading}
+              error={errors.description}
             />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">{errors.description}</p>
-            )}
           </div>
 
           {/* Due Date */}

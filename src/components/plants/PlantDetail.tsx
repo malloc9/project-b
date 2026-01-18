@@ -7,6 +7,7 @@ import { PhotoTimeline } from './PhotoTimeline';
 import { CareTaskList } from './CareTaskList';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
+import { MarkdownRenderer } from '../common/MarkdownRenderer';
 import { formatDistanceToNow, format } from 'date-fns';
 
 interface PlantDetailProps {
@@ -177,7 +178,9 @@ export function PlantDetail({ plantId, onEdit, onDelete, onBack }: PlantDetailPr
                 <p className="text-lg text-gray-600 italic mb-2">{plant.species}</p>
               )}
               
-              <p className="text-gray-700 mb-4">{plant.description}</p>
+              <div className="text-gray-700 mb-4">
+                <MarkdownRenderer content={plant.description} />
+              </div>
               
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 <span>📸 {plant.photos.length} {t('detail.stats.photosUploaded')}</span>
