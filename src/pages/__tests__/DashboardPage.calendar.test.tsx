@@ -104,7 +104,7 @@ describe('DashboardPage Calendar Integration', () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(getUpcomingEvents).toHaveBeenCalledWith(mockUser.uid, 7);
+      expect(getUpcomingEvents).toHaveBeenCalledWith(mockUser.uid, 60);
     });
 
     // Check that the stats card shows the correct count
@@ -122,7 +122,7 @@ describe('DashboardPage Calendar Integration', () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(getUpcomingEvents).toHaveBeenCalledWith(mockUser.uid, 7);
+      expect(getUpcomingEvents).toHaveBeenCalledWith(mockUser.uid, 60);
     });
 
     // Should show 0 events when there's an error
@@ -166,7 +166,7 @@ describe('DashboardPage Calendar Integration', () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(getUpcomingEvents).toHaveBeenCalledWith(mockUser.uid, 7);
+      expect(getUpcomingEvents).toHaveBeenCalledWith(mockUser.uid, 60);
       const statsCards = screen.getAllByTestId('stats-card');
       const calendarStatsCard = statsCards.find(card => 
         card.textContent?.includes('📅') && card.textContent?.includes('1')

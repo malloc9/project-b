@@ -40,7 +40,7 @@ export function DashboardPage() {
       setEventsError(null);
       
       try {
-        const events = await getUpcomingEvents(user.uid, 7); // Next 7 days
+        const events = await getUpcomingEvents(user.uid, 60); // Next 60 days (2 months)
         setUpcomingEventsCount(events.length);
         console.log('Successfully loaded events:', events.length);
       } catch (err) {

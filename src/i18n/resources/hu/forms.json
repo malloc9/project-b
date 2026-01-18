@@ -46,7 +46,8 @@
     "create": "Létrehozás",
     "update": "Frissítés",
     "upload": "Feltöltés",
-    "submit": "Küldés"
+    "submit": "Küldés",
+    "preview": "Előnézet"
   },
   "validation": {
     "required": "Ez a mező kötelező",

@@ -46,7 +46,8 @@
     "create": "Create",
     "update": "Update",
     "upload": "Upload",
-    "submit": "Submit"
+    "submit": "Submit",
+    "preview": "Preview"
   },
   "validation": {
     "required": "This field is required",
